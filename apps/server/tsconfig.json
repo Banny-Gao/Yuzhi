@@ -1,0 +1,42 @@
+{
+  // 从工作区共享TypeScript配置中继承基本设置
+  "extends": "@workspace/typescript-config/base.json",
+  "compilerOptions": {
+    // 模块解析策略为Node.js
+    "moduleResolution": "node",
+    // 使用CommonJS模块系统(Node.js标准)
+    "module": "commonjs",
+    // 生成相应的.d.ts文件
+    "declaration": true,
+    // 删除编译后代码中的注释
+    "removeComments": true,
+    // 为装饰器启用元数据支持(NestJS需要)
+    "emitDecoratorMetadata": true,
+    // 启用实验性装饰器支持(NestJS需要)
+    "experimentalDecorators": true,
+    // 允许导入没有默认导出的模块时使用import x from 'y'语法
+    "allowSyntheticDefaultImports": true,
+    // 编译目标为ES2021，适用于现代Node.js版本
+    "target": "ES2021",
+    // 生成源映射文件，便于调试
+    "sourceMap": true,
+    // 编译输出目录
+    "outDir": "./dist",
+    // 解析非相对模块名的基准目录
+    "baseUrl": "./",
+    // 增量编译，加快后续构建
+    "incremental": true,
+    // 跳过类型声明文件的类型检查，加快编译
+    "skipLibCheck": true,
+
+    // 类型检查相关设置(当前为宽松模式)
+    // 注意：生产环境建议启用严格模式
+    "strict": false,
+    "strictNullChecks": false, // 不检查null和undefined
+    "strictPropertyInitialization": false, // 不检查类属性是否初始化
+    "noImplicitAny": false, // 允许隐式any类型
+    "strictBindCallApply": false, // 不检查函数调用的参数类型
+    "forceConsistentCasingInFileNames": false, // 不强制文件名大小写一致
+    "noFallthroughCasesInSwitch": false // 允许switch语句的贯穿情况
+  }
+}
