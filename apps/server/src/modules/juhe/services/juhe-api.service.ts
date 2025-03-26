@@ -1,7 +1,7 @@
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import axios from 'axios'
-
+import type { SolarTerm } from '@workspace/types'
 @Injectable()
 export class JuheApiService {
   private readonly logger = new Logger(JuheApiService.name)

@@ -13,43 +13,37 @@ export class SolarTerm {
 
   @ApiProperty({ description: '年份' })
   @Column()
-  year: number
+  pub_year: number
 
   @ApiProperty({ description: '节气名称' })
-  @Column({ length: 50 })
+  @Column()
   name: string
 
-  @ApiProperty({ description: '节气日期（公历）' })
-  @Column({
-    length: 20,
-    nullable: false,
-    comment: '节气的公历日期，格式：YYYY-MM-DD',
-  })
-  date: string
+  @ApiProperty({ description: '节气公历日期' })
+  @Column()
+  pub_date: string
 
-  @ApiProperty({ description: '农历日期' })
-  @Column({
-    name: 'lunar_date',
-    length: 20,
-    nullable: false,
-    default: '未知',
-    comment: '节气的农历日期',
-  })
-  lunarDate: string
+  @ApiProperty({ description: '节气农历日期' })
+  @Column()
+  pri_date: string
 
-  @ApiProperty({ description: '节气介绍' })
-  @Column({
-    type: 'text',
-    nullable: true,
-    comment: '节气的详细介绍',
-  })
-  intro: string
+  @ApiProperty({ description: '节气时间' })
+  @Column()
+  pub_time: string
 
-  @ApiProperty({ description: '创建时间' })
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date
+  @ApiProperty({ description: '节气简介' })
+  @Column('text')
+  des: string
 
-  @ApiProperty({ description: '更新时间' })
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date
+  @ApiProperty({ description: '节气由来' })
+  @Column('text')
+  youLai: string
+
+  @ApiProperty({ description: '节气习俗' })
+  @Column('text')
+  xiSu: string
+
+  @ApiProperty({ description: '节气养生建议' })
+  @Column('text')
+  heath: string
 }

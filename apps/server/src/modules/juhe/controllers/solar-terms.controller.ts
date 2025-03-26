@@ -17,7 +17,7 @@ export class SolarTermsController {
     type: [SolarTerm],
   })
   @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getSolarTerms(@Query() query: SolarTermQueryDto) {
     return this.solarTermsService.getSolarTerms(query.year)

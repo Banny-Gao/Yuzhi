@@ -57,8 +57,8 @@ export class SolarTermsService {
    */
   private async findSolarTermsByYear(year: number): Promise<SolarTerm[]> {
     return this.solarTermRepository.find({
-      where: { year },
-      order: { date: 'ASC' },
+      where: { pub_year: year },
+      order: { pub_date: 'ASC' },
     })
   }
 
@@ -68,60 +68,29 @@ export class SolarTermsService {
    * @param apiData API返回的数据
    * @returns 保存后的节气数据列表
    */
-  private async saveSolarTermsFromApi(year: number, apiData: any): Promise<SolarTerm[]> {
-    const solarTerms: SolarTerm[] = []
-
+  private async saveSolarTermsFromApi(year: number, apiData: SolarTerm[]): Promise<SolarTerm[]> {
     // 确保apiData是有效的对象
     if (!apiData || typeof apiData !== 'object') {
       this.logger.error('API返回的数据格式无效')
       throw new BadRequestException('无法解析API返回的节气数据')
     }
 
+    const solarTerms: SolarTerm[] = apiData?.map(item => {
+      const solarTerm = new SolarTerm()
+      solarTerm.pub_year = year
+      solarTerm.pub_date = item.pub_date
+      solarTerm.pri_date = item.pri_date
+      solarTerm.pub_time = item.pub_time
+      solarTerm.des = item.des
+      solarTerm.name = item.name
+      solarTerm.youLai = item.youLai
+      solarTerm.xiSu = item.xiSu
+      solarTerm.heath = item.heath
+
+      return solarTerm
+    })
+
     // 处理API返回的数据
-    for (const key in apiData) {
-      if (Object.prototype.hasOwnProperty.call(apiData, key)) {
-        const termData = apiData[key]
-
-        // 记录当前处理的数据，便于调试
-        this.logger.debug(`处理节气: ${key}, 数据: ${JSON.stringify(termData)}`)
-
-        // 数据验证：确保必要字段存在
-        if (!termData || !termData.gregoriandate) {
-          this.logger.warn(`节气 ${key} 数据无效或缺少必要字段, 跳过`)
-          continue
-        }
-
-        // 创建新的节气实体
-        const solarTerm = new SolarTerm()
-        solarTerm.year = year
-        solarTerm.name = key
-
-        // 确保date字段有值
-        if (termData.gregoriandate) {
-          solarTerm.date = termData.gregoriandate // 公历日期
-        } else {
-          // 提供默认值，避免数据库错误
-          const defaultDate = `${year}-01-01`
-          this.logger.warn(`节气 ${key} 缺少日期数据，使用默认值: ${defaultDate}`)
-          solarTerm.date = defaultDate
-        }
-
-        // 确保lunarDate字段有值
-        if (termData.lunardate) {
-          solarTerm.lunarDate = termData.lunardate // 农历日期
-        } else {
-          // 提供默认值
-          solarTerm.lunarDate = '未知'
-          this.logger.warn(`节气 ${key} 缺少农历日期数据，使用默认值`)
-        }
-
-        // 设置介绍信息
-        solarTerm.intro = termData.intro || '' // 如果API提供了介绍则使用，否则为空字符串
-
-        // 保存到数组
-        solarTerms.push(solarTerm)
-      }
-    }
 
     // 批量保存到数据库
     if (solarTerms.length > 0) {
