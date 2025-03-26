@@ -12,9 +12,9 @@
     "lint": "eslint \"src/**/*.ts*\""
   },
   "devDependencies": {
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9.22.0",
+    "globals": "^16.0.0",
     "tsup": "^8.4.0",
     "typescript": "^5.3.3"
   }
