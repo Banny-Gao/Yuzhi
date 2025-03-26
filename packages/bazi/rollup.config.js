@@ -2,9 +2,10 @@ import typescript from '@rollup/plugin-typescript'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import terser from '@rollup/plugin-terser'
+import path from 'path'
 
 const input = 'src/index.ts'
-const external = ['dayjs', '@amap/amap-jsapi-loader']
+const external = ['dayjs', '@amap/amap-jsapi-loader', 'decimal.js', 'localforage', 'tslib']
 
 // 基础插件配置
 const basePlugins = [nodeResolve(), commonjs()]
@@ -24,9 +25,10 @@ export default [
       ...basePlugins,
       typescript({
         tsconfig: './tsconfig.json',
+        outDir: 'dist/esm',
         declaration: true,
         declarationDir: 'dist/esm/types',
-        outDir: 'dist/esm',
+        declarationMap: true,
         exclude: ['**/*.test.ts'],
       }),
     ],
@@ -46,8 +48,9 @@ export default [
       ...basePlugins,
       typescript({
         tsconfig: './tsconfig.json',
-        declaration: false,
         outDir: 'dist/cjs',
+        declaration: false,
+        declarationMap: false,
         exclude: ['**/*.test.ts'],
       }),
     ],
@@ -66,6 +69,8 @@ export default [
       typescript({
         tsconfig: './tsconfig.json',
         declaration: false,
+        declarationMap: false,
+        outDir: 'dist/min',
         exclude: ['**/*.test.ts'],
       }),
       terser(),

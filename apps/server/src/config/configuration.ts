@@ -38,7 +38,6 @@ export default () => ({
 
   // 聚合数据API配置(用于获取外部数据服务)
   juhe: {
-    apiKey: process.env.JUHE_API_KEY, // 聚合数据平台API密钥
     apiUrl: process.env.JUHE_API_URL, // 聚合数据平台API基础URL
   },
 })

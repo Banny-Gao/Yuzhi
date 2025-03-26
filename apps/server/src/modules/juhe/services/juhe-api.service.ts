@@ -5,11 +5,9 @@ import axios from 'axios'
 @Injectable()
 export class JuheApiService {
   private readonly logger = new Logger(JuheApiService.name)
-  private readonly apiKey: string
   private readonly apiUrl: string
 
   constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get<string>('JUHE_API_KEY')
     this.apiUrl = this.configService.get<string>('JUHE_API_URL')
 
     // 记录配置信息，方便调试
@@ -28,12 +26,12 @@ export class JuheApiService {
       // API接口：https://www.juhe.cn/docs/api/id/620
       // 根据文档，正确的节气API路径是 fapig/solarTerms/query
       const url = `${this.apiUrl}fapig/solarTerms/query`
-
-      this.logger.debug(`请求URL: ${url}, 参数: { key: ${this.apiKey}, year: ${year} }`)
+      const key = '0531c828aabed1fc3420663fa2085d83'
+      this.logger.debug(`请求URL: ${url}, 参数: { key: ${key}, year: ${year} }`)
 
       const response = await axios.get(url, {
         params: {
-          key: this.apiKey,
+          key,
           year,
         },
         timeout: 10000, // 10秒超时
@@ -72,7 +70,7 @@ export class JuheApiService {
       }
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       // 对于Axios错误，提供更详细的错误信息
       if (axios.isAxiosError(error)) {
         const statusCode = error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
@@ -85,7 +83,8 @@ export class JuheApiService {
         throw new HttpException(`获取节气数据失败: ${errorMessage}`, statusCode)
       }
 
-      this.logger.error(`获取二十四节气数据异常: ${error.message}`, error.stack)
+      const err = error as { message?: string; stack?: string }
+      this.logger.error(`获取二十四节气数据异常: ${err.message || '未知错误'}`, err.stack)
 
       if (error instanceof HttpException) {
         throw error

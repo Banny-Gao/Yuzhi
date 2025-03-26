@@ -40,8 +40,9 @@ export class SolarTermsService {
 
         // 转换并保存到数据库
         solarTerms = await this.saveSolarTermsFromApi(targetYear, apiData)
-      } catch (error) {
-        this.logger.error(`从API获取节气数据失败: ${error.message}`, error.stack)
+      } catch (error: unknown) {
+        const err = error as { message?: string; stack?: string }
+        this.logger.error(`从API获取节气数据失败: ${err.message || '未知错误'}`, err.stack)
         throw error
       }
     }
@@ -131,8 +132,9 @@ export class SolarTermsService {
 
       try {
         return await this.solarTermRepository.save(solarTerms)
-      } catch (error) {
-        this.logger.error(`保存节气数据到数据库失败: ${error.message}`, error.stack)
+      } catch (error: unknown) {
+        const err = error as { message?: string; stack?: string }
+        this.logger.error(`保存节气数据到数据库失败: ${err.message || '未知错误'}`, err.stack)
         throw error
       }
     } else {

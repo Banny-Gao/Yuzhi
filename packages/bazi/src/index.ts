@@ -1,4 +1,4 @@
-export * from './bazi'
+export * from './core'
 export * from './wuxing'
 export * from './date'
 export * from './global'

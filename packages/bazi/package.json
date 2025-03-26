@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "decimal.js": "^10.4.3",
-    "localforage": "^1.10.0"
+    "localforage": "^1.10.0",
+    "tslib": "^2.6.2"
   }
 }
