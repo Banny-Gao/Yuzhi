@@ -1,0 +1,36 @@
+{
+  "name": "@workspace/request",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "clean": "rm -rf dist",
+    "lint": "eslint \"src/**/*.ts*\"",
+    "generate": "node scripts/generate-api.js"
+  },
+  "dependencies": {
+    "axios": "^1.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.26",
+    "@workspace/typescript-config": "workspace:*",
+    "dotenv": "^16.4.5",
+    "openapi-typescript-codegen": "^0.27.0",
+    "eslint": "^9.22.0",
+    "globals": "^16.0.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.3.3"
+  }
+}
