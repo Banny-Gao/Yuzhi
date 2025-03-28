@@ -5,7 +5,7 @@ import { SolarTermQueryDto } from '../dto/solar-term-query.dto'
 import { SolarTerm } from '../entities/solar-term.entity'
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'
 
-@ApiTags('节气')
+@ApiTags('SolarTerms')
 @Controller('calendar/solar-terms')
 export class SolarTermsController {
   constructor(private readonly solarTermsService: SolarTermsService) {}

@@ -8,7 +8,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard'
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger'
 
-@ApiTags('认证')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

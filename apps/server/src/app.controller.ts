@@ -8,7 +8,7 @@ import { AppService } from './app.service'
  * 处理应用层面的基本HTTP请求
  * 主要用于健康检查、基本信息和服务状态等接口
  */
-@ApiTags('app') // Swagger文档标签
+@ApiTags('App') // Swagger文档标签
 @Controller() // 路由前缀为空，表示根路径(/)
 export class AppController {
   /**

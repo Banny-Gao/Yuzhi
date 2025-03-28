@@ -2,36 +2,31 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ApiRequestOptions } from './ApiRequestOptions'
+import type { ApiRequestOptions } from './ApiRequestOptions';
+
+type Resolver<T> = (options: ApiRequestOptions) => Promise<T>;
+type Headers = Record<string, string>;
 
 export type OpenAPIConfig = {
-  BASE: string
-  VERSION: string
-  WITH_CREDENTIALS: boolean
-  CREDENTIALS: 'include' | 'omit' | 'same-origin'
-  TOKEN?: string | (() => string)
-  USERNAME?: string | (() => string)
-  PASSWORD?: string | (() => string)
-  HEADERS?: Record<string, string | (() => string)>
-  ENCODE_PATH?: (path: string) => string
-  SIGNAL?: AbortSignal | (() => AbortSignal)
-  REQUEST?: (options: ApiRequestOptions) => Promise<ApiRequestOptions>
-  RESPONSE?: (response: Response, options: ApiRequestOptions) => Promise<Response>
-  ERROR?: (error: Error, options: ApiRequestOptions) => Promise<never>
-}
+    BASE: string;
+    VERSION: string;
+    WITH_CREDENTIALS: boolean;
+    CREDENTIALS: 'include' | 'omit' | 'same-origin';
+    TOKEN?: string | Resolver<string> | undefined;
+    USERNAME?: string | Resolver<string> | undefined;
+    PASSWORD?: string | Resolver<string> | undefined;
+    HEADERS?: Headers | Resolver<Headers> | undefined;
+    ENCODE_PATH?: ((path: string) => string) | undefined;
+};
 
 export const OpenAPI: OpenAPIConfig = {
-  BASE: '',
-  VERSION: '1.0',
-  WITH_CREDENTIALS: false,
-  CREDENTIALS: 'same-origin',
-  TOKEN: undefined,
-  USERNAME: undefined,
-  PASSWORD: undefined,
-  HEADERS: undefined,
-  ENCODE_PATH: undefined,
-  SIGNAL: undefined,
-  REQUEST: undefined,
-  RESPONSE: undefined,
-  ERROR: undefined,
-}
+    BASE: '',
+    VERSION: '1.0',
+    WITH_CREDENTIALS: false,
+    CREDENTIALS: 'include',
+    TOKEN: undefined,
+    USERNAME: undefined,
+    PASSWORD: undefined,
+    HEADERS: undefined,
+    ENCODE_PATH: undefined,
+};

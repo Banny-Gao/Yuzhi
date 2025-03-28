@@ -3,11 +3,13 @@
  * @description 此文件导出所有API服务和类型
  */
 
-// 导出所有生成的服务和模型
-export * from './generated'
-
-// 导出配置API客户端的方法
-export { ApiError, CancelablePromise, OpenAPI } from './generated'
-
-// 为Axios配置添加拦截器的工具函数
+// 导出API客户端配置工具
 export { setupApiClient } from './setup'
+export type { ApiClientOptions } from './setup'
+
+// 这些导出将在运行 generate 命令后生效
+// 如果您看到错误，请先运行 npm run generate
+// export { ApiError } from './generated/core/ApiError';
+// export { CancelablePromise, CancelError } from './generated/core/CancelablePromise';
+// export { OpenAPI } from './generated/core/OpenAPI';
+// export type { OpenAPIConfig } from './generated/core/OpenAPI';
