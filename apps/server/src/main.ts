@@ -4,6 +4,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { AppModule } from './app.module'
 import { corsOptions } from './config/cors.config'
+import { HttpExceptionFilter, AllExceptionsFilter } from './config/http-exception.filter'
+import { ValidationException } from './config/exceptions'
 
 /**
  * 应用程序引导函数 - 负责创建并配置NestJS应用实例
@@ -23,12 +25,24 @@ async function bootstrap() {
   // 允许前端应用从不同的域名/端口访问API
   app.enableCors(corsOptions)
 
+  // 注册全局异常过滤器
+  // 确保所有响应异常都有统一的格式
+  app.useGlobalFilters(new AllExceptionsFilter(), new HttpExceptionFilter())
+
   // 启用全局验证管道
   // 自动验证请求数据，确保符合DTO(数据传输对象)定义的规则
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // 自动移除非DTO中定义的属性
       transform: true, // 自动转换数据类型(如字符串转数字)
+      exceptionFactory: errors => {
+        // 自定义验证错误的处理方式
+        const messages = errors.map(error => {
+          return `${error.property}: ${Object.values(error.constraints).join(', ')}`
+        })
+        // 使用我们的ValidationException
+        return new ValidationException(messages)
+      },
     })
   )
 

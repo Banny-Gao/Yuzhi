@@ -2,9 +2,13 @@
  * API客户端配置工具
  * @description 配置全局API客户端设置，如基础URL、拦截器等
  */
-import axios from 'axios'
+import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { OpenAPI } from './generated/core/OpenAPI'
-import type { ApiRequestOptions } from './generated/core/ApiRequestOptions'
+
+// 扩展AxiosRequestConfig以添加重试计数
+interface RequestConfigWithRetry extends InternalAxiosRequestConfig {
+  retryCount?: number
+}
 
 /**
  * API客户端配置选项
@@ -26,19 +30,44 @@ export interface ApiClientOptions {
   getToken?: () => string | null | undefined
 
   /**
+   * 请求超时时间（毫秒）
+   */
+  timeout?: number
+
+  /**
    * 请求拦截器 - 在请求发送前修改请求配置
    */
-  requestInterceptor?: (config: any) => any | Promise<any>
+  requestInterceptor?: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
 
   /**
    * 响应拦截器 - 在收到响应后处理响应
    */
-  responseInterceptor?: (response: any) => any | Promise<any>
+  responseInterceptor?: (response: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>
 
   /**
    * 错误拦截器 - 处理请求错误
    */
-  errorInterceptor?: (error: any) => any | Promise<any>
+  errorInterceptor?: (error: AxiosError) => any | Promise<any>
+
+  /**
+   * 请求重试配置
+   */
+  retry?: {
+    /**
+     * 最大重试次数
+     */
+    maxRetries: number
+
+    /**
+     * 重试延迟时间（毫秒）
+     */
+    retryDelay: number
+
+    /**
+     * 应该重试的HTTP状态码
+     */
+    statusCodes: number[]
+  }
 }
 
 /**
@@ -58,6 +87,11 @@ export function setupApiClient(options: ApiClientOptions = {}): void {
   if (options.withAuth) {
     OpenAPI.WITH_CREDENTIALS = true
     axios.defaults.withCredentials = true
+  }
+
+  // 设置请求超时
+  if (options.timeout) {
+    axios.defaults.timeout = options.timeout
   }
 
   // 配置请求拦截器
@@ -87,12 +121,58 @@ export function setupApiClient(options: ApiClientOptions = {}): void {
       }
       return response
     },
-    error => {
+    async error => {
+      // 实现请求重试逻辑
+      const { config, response } = error as AxiosError
+
+      if (config && options.retry && response) {
+        // 将config转换为包含retryCount的类型
+        const retryConfig = config as RequestConfigWithRetry
+
+        // 获取当前重试次数
+        retryConfig.retryCount = retryConfig.retryCount || 0
+
+        // 检查是否应该重试 - 使用可选链确保安全访问
+        const retryOptions = options.retry
+        const shouldRetry = retryConfig.retryCount < retryOptions.maxRetries && retryOptions.statusCodes.includes(response.status)
+
+        if (shouldRetry) {
+          // 增加重试计数
+          retryConfig.retryCount += 1
+
+          // 延迟后重试
+          await new Promise(resolve => setTimeout(resolve, retryOptions.retryDelay))
+
+          // 重新发送请求
+          return axios(retryConfig)
+        }
+      }
+
       // 应用自定义错误拦截器
       if (options.errorInterceptor) {
         return options.errorInterceptor(error)
       }
+
       return Promise.reject(error)
     }
   )
+}
+
+/**
+ * 清除API客户端配置
+ * 在测试或需要重置配置时使用
+ */
+export function clearApiClientSetup(): void {
+  // 重置axios配置
+  axios.defaults.baseURL = undefined
+  axios.defaults.withCredentials = false
+  axios.defaults.timeout = 0
+
+  // 清除所有拦截器
+  axios.interceptors.request.clear()
+  axios.interceptors.response.clear()
+
+  // 重置OpenAPI配置
+  OpenAPI.BASE = ''
+  OpenAPI.WITH_CREDENTIALS = false
 }

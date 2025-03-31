@@ -262,6 +262,127 @@ try {
 }
 ```
 
+## 高级功能
+
+### 请求重试
+
+为请求添加自动重试功能，适用于处理临时性网络问题或服务不可用情况：
+
+```typescript
+import { withRetry, ResponseStatus } from '@workspace/request'
+
+// 使用默认重试配置
+const result = await withRetry(() => AuthService.getProfile())
+
+// 使用自定义重试配置
+const resultWithCustomRetry = await withRetry(() => AuthService.getProfile(), {
+  maxRetries: 5, // 最大重试5次
+  retryDelay: retryCount => Math.pow(2, retryCount) * 1000, // 指数退避
+  statusCodes: [ResponseStatus.ERROR, ResponseStatus.SERVICE_UNAVAILABLE, ResponseStatus.BAD_GATEWAY],
+})
+```
+
+### 请求超时控制
+
+为长时间运行的请求添加超时保护：
+
+```typescript
+import { withTimeout } from '@workspace/request'
+
+// 设置5秒超时
+const result = await withTimeout(() => AuthService.getProfile(), {
+  timeout: 5000,
+  message: '获取用户资料超时',
+})
+```
+
+### 数据缓存
+
+缓存不常变化的数据，减少重复请求：
+
+```typescript
+import { withCache, clearCache } from '@workspace/request'
+
+// 缓存数据1小时
+const cachedData = await withCache(() => ConfigService.getSystemConfig(), {
+  key: 'system-config',
+  ttl: 60 * 60 * 1000, // 1小时缓存
+})
+
+// 清除特定缓存
+clearCache('system-config')
+
+// 清除所有缓存
+clearCache()
+```
+
+### 分页数据加载
+
+简化分页数据加载和状态管理：
+
+```typescript
+import { createPaginator } from '@workspace/request'
+
+// 创建分页器
+const paginator = createPaginator({
+  fetchPage: async (page, pageSize) => {
+    // 调用分页API
+    const response = await ProductService.getProducts({
+      page,
+      pageSize,
+    })
+
+    return {
+      items: response.items,
+      total: response.totalCount,
+      hasMore: response.hasMore,
+    }
+  },
+  pageSize: 20, // 每页20条
+})
+
+// 加载第一页
+const firstPageItems = await paginator.loadFirstPage()
+
+// 加载下一页（如果有更多数据）
+if (paginator.hasMore) {
+  const moreItems = await paginator.loadNextPage()
+}
+
+// 获取当前加载的所有数据
+console.log(paginator.items)
+```
+
+### 标准错误处理
+
+统一处理API错误：
+
+```typescript
+import { handleApiError, ApiError } from '@workspace/request'
+
+try {
+  await AuthService.login(credentials)
+} catch (error) {
+  // 获取友好错误消息
+  const errorMessage = handleApiError(error, '登录失败')
+  console.error(errorMessage)
+
+  // 或者手动处理错误
+  if (error instanceof ApiError) {
+    switch (error.status) {
+      case 400:
+        // 处理验证错误
+        break
+      case 401:
+        // 处理未授权错误
+        break
+      default:
+      // 处理其他错误
+    }
+  }
+}
+```
+
 ## 生成的API结构
 
 ```
