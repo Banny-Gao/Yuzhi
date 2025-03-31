@@ -19,3 +19,4 @@ export { $SolarTerm } from './schemas/$SolarTerm';
 
 export { AuthService } from './services/AuthService';
 export { SolarTermsService } from './services/SolarTermsService';
+export { SystemService } from './services/SystemService';
