@@ -1,0 +1,144 @@
+@level-padding: 16px;
+@gap: 6px;
+@gap-md: 8px;
+@gap-lg: 12px;
+@border-radius: 8px;
+@font-color: var(--text-primary);
+@tip-color: var(--text-tertiary);
+@border-color: var(--border-color);
+@small-font-size: 12px;
+@error-color: var(--error-color);
+@warning-color: var(--warning-color);
+@success-color: var(--success-color);
+@hover-bg-color: rgba(0, 0, 0, 0.04);
+
+.icon-size(@size: 22px) {
+  font-size: @size !important;
+  width: @size !important;
+  height: @size !important;
+  object-fit: cover !important;
+}
+.color(@color: @font-color) {
+  color: @color !important;
+}
+
+.width(@width: 100%) {
+  width: @width !important;
+}
+.height(@height: 100%) {
+  height: @height !important;
+}
+.minWidth(@minWidth: 0) {
+  min-width: @minWidth !important;
+}
+.minHeight(@minHeight: 0) {
+  min-height: @minHeight !important;
+}
+.maxWidth(@maxWidth: 100%) {
+  max-width: @maxWidth !important;
+}
+.maxHeight(@maxHeight: 100%) {
+  max-height: @maxHeight !important;
+}
+
+.flex(@direction: row, @justify: initial, @align: initial, @gap: initial) {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: @direction;
+  justify-content: @justify;
+  align-items: @align;
+  gap: @gap;
+}
+.flex-row(@gap: @gap) {
+  .flex(row, initial, initial, @gap);
+}
+.flex-column(@gap: @gap) {
+  .flex(column, initial, initial, @gap);
+}
+.flex-row-center(@gap: @gap) {
+  .flex(row, initial, center, @gap);
+}
+.flex-row-reverse(@gap: @gap) {
+  .flex(row-reverse, initial, center, @gap);
+}
+.flex-column-center(@gap: @gap) {
+  .flex(column, center, initial, @gap);
+}
+.flex-base(@flex: 1) {
+  flex: @flex;
+}
+.flex1 {
+  flex: 1;
+}
+
+.position(@position: absolute, @top: initial, @left: initial, @right: initial, @bottom: initial) {
+  position: @position !important;
+  top: @top;
+  left: @left;
+  right: @right;
+  bottom: @bottom;
+}
+
+.overflow(@overflowX: hidden, @overflowY: hidden) {
+  overflow: @overflowX @overflowY;
+}
+
+.transition(@property: all, @duration: 0.2s, @ease: ease-in-out) {
+  transition: @property @duration @ease;
+}
+
+.display(@display: flex) {
+  display: @display !important;
+  box-sizing: border-box;
+}
+
+.padding(@size: @gap) {
+  padding: @size !important;
+}
+.padding-lr(@size: @gap) {
+  padding-left: @size !important;
+  padding-right: @size !important;
+}
+.padding-tb(@size: @gap) {
+  padding-top: @size !important;
+  padding-bottom: @size !important;
+}
+.padding0 {
+  padding: 0 !important;
+}
+
+.margin(@size: @gap) {
+  margin: @size !important;
+}
+.margin-t(@size: @gap) {
+  margin-top: @size !important;
+}
+.margin-b(@size: @gap) {
+  margin-bottom: @size !important;
+}
+.margin-lr(@size: @gap) {
+  margin-left: @size !important;
+  margin-right: @size !important;
+}
+.margin-tb(@size: @gap) {
+  margin-top: @size !important;
+  margin-bottom: @size !important;
+}
+.margin0 {
+  margin: 0 !important;
+}
+
+.border-radius(@radius: @border-radius) {
+  border-radius: @radius !important;
+}
+
+.border(@position: @top @right @bottom @left, @size: 1px, @color: @border-color) {
+  each(@position, {
+    border-@{key}: @size solid @color !important;
+  });
+}
+
+.tip {
+  font-size: @small-font-size;
+  color: @tip-color;
+}

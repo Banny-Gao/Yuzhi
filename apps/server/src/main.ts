@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { AppModule } from './app.module'
+import { corsOptions } from './config/cors.config'
 
 /**
  * 应用程序引导函数 - 负责创建并配置NestJS应用实例
@@ -20,7 +21,7 @@ async function bootstrap() {
 
   // 启用CORS(跨域资源共享)
   // 允许前端应用从不同的域名/端口访问API
-  app.enableCors()
+  app.enableCors(corsOptions)
 
   // 启用全局验证管道
   // 自动验证请求数据，确保符合DTO(数据传输对象)定义的规则

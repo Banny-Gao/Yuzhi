@@ -1,14 +1,20 @@
 import { View, Text } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
-import './index.css'
+import './index.less'
 
-export default function Login () {
+export const pageMeta = {
+  title: '无权限中转页面',
+  requiresAuth: true,
+};
+
+
+export default function Forbidden () {
   useLoad(() => {
     console.log('Page loaded.')
   })
 
   return (
-    <View className='login'>
+    <View className='forbidden'>
       <Text>Hello world!</Text>
     </View>
   )

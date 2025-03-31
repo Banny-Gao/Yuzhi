@@ -6,6 +6,7 @@ import { AppService } from './app.service'
 import { AuthModule } from './modules/auth/auth.module'
 import { UsersModule } from './modules/users/users.module'
 import { JuheModule } from './modules/juhe/juhe.module'
+import { SystemModule } from './modules/system/system.module'
 import configuration from './config/configuration'
 
 /**
@@ -77,6 +78,9 @@ import configuration from './config/configuration'
 
     // 聚合数据模块 - 集成第三方聚合数据API服务
     JuheModule,
+
+    // 系统模块 - 处理系统相关的功能
+    SystemModule,
   ],
   controllers: [AppController], // 根控制器 - 处理基本的应用路由
   providers: [AppService], // 根服务 - 提供基本的应用功能

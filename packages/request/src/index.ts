@@ -9,7 +9,6 @@ export type { ApiClientOptions } from './setup'
 
 // 这些导出将在运行 generate 命令后生效
 // 如果您看到错误，请先运行 npm run generate
-// export { ApiError } from './generated/core/ApiError';
-// export { CancelablePromise, CancelError } from './generated/core/CancelablePromise';
-// export { OpenAPI } from './generated/core/OpenAPI';
-// export type { OpenAPIConfig } from './generated/core/OpenAPI';
+export * from './generated'
+
+export { ResponseStatus } from './status'

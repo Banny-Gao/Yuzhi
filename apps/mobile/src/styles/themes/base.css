@@ -1,0 +1,27 @@
+/* 基础主题变量 - 默认黑白古风 */
+:root {
+  --primary-color: #333333;
+  --primary-light: #666666;
+  --primary-dark: #000000;
+
+  --text-primary: #101010;
+  --text-secondary: #333333;
+  --text-tertiary: #666666;
+  --text-disabled: #999999;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e5e5e5;
+  --bg-mask: rgba(0, 0, 0, 0.65);
+
+  --border-color: #bbbbbb;
+  --border-color-light: #dddddd;
+
+  --success-color: #4c4c4c;
+  --warning-color: #7c7c7c;
+  --error-color: #2c2c2c;
+  --info-color: #5c5c5c;
+
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

@@ -27,16 +27,19 @@ function pageExists(pagePath) {
   return fs.existsSync(fullPath)
 }
 
+const permissionLevels = ['general', 'more', 'super']
 /**
  * 生成页面配置模板代码
  * @param {string} title 页面标题
  * @param {boolean} requiresAuth 是否需要登录
+ * @param {string} requiresPermission 是否需要权限，以及权限类型
  * @returns {string} 页面配置代码
  */
-function generatePageMetaTemplate(title, requiresAuth = false) {
+function generatePageMetaTemplate(title, requiresAuth = false, requiresPermission = 'general') {
   return `export const pageMeta = {
   title: '${title}',
   requiresAuth: ${requiresAuth},
+  requiresPermission:' ${requiresPermission}',
 };
 `
 }
@@ -46,8 +49,9 @@ function generatePageMetaTemplate(title, requiresAuth = false) {
  * @param {string} pagePath 页面文件路径
  * @param {string} title 页面标题
  * @param {boolean} requiresAuth 是否需要登录
+ * @param {boolean} requiresPermission 是否需要权限
  */
-function addPageMeta(pagePath, title, requiresAuth) {
+function addPageMeta({ pagePath, title, requiresAuth, requiresPermission } = {}) {
   const pageSrcPath = path.join(ROOT_DIR, 'src', pagePath, 'index.tsx')
 
   if (fs.existsSync(pageSrcPath)) {
@@ -57,7 +61,7 @@ function addPageMeta(pagePath, title, requiresAuth) {
     // 检查是否已有 pageMeta
     if (!content.includes('export const pageMeta')) {
       // 在文件顶部添加元数据
-      const metaTemplate = generatePageMetaTemplate(title, requiresAuth)
+      const metaTemplate = generatePageMetaTemplate(title, requiresAuth, requiresPermission)
       const importStatements = content.match(/^import.*?$/gm) || []
 
       if (importStatements.length > 0) {
@@ -194,6 +198,17 @@ async function promptForOptions(cmdOptions) {
     })
   }
 
+  // 如果没有提供权限选项，询问
+  if (cmdOptions.permission === undefined) {
+    questions.push({
+      type: 'list',
+      name: 'permission',
+      message: '请选择页面权限:',
+      choices: permissionLevels,
+      default: 'general',
+    })
+  }
+
   // 如果有需要询问的问题，进行交互
   if (questions.length > 0) {
     const answers = await inquirer.prompt(questions)
@@ -304,7 +319,8 @@ async function createPage(options) {
     // 添加页面元数据
     const title = options.description || (options.name && options.name.replace(/--name=/, '')) || '新页面'
     const requiresAuth = options.auth === true
-    addPageMeta(pagePath, title, requiresAuth)
+    const requiresPermission = options.permission || 'general'
+    addPageMeta({ pagePath, title, requiresAuth, requiresPermission })
 
     // 自动生成路由配置
     console.log('🔄 更新路由配置...')
@@ -329,12 +345,13 @@ async function createPage(options) {
 program
   .name('createPage')
   .description('创建Taro页面并自动配置路由')
-  .option('--name <name>', '页面名称')
-  .option('--dir <dir>', '页面目录路径')
-  .option('--subpkg <subpkg>', '分包路径')
-  .option('--description <description>', '页面描述')
-  .option('--type <type>', '模板类型，默认为page')
-  .option('--auth', '是否需要认证')
+  .option('--name <name>')
+  .option('--dir <dir>')
+  .option('--subpkg <subpkg>')
+  .option('--description <description>')
+  .option('--type <type>')
+  .option('--auth <auth>')
+  .option('--permission <permission>')
   .action(async options => {
     try {
       // 收集完整的选项（命令行参数 + 交互式输入）

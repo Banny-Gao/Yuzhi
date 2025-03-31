@@ -1,0 +1,27 @@
+/* 冬季主题 */
+[data-theme='winter'] {
+  --primary-color: #1890ff;
+  --primary-light: #40a9ff;
+  --primary-dark: #096dd9;
+
+  --text-primary: #262626;
+  --text-secondary: #595959;
+  --text-tertiary: #8c8c8c;
+  --text-disabled: #bfbfbf;
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f5ff;
+  --bg-tertiary: #d6e4ff;
+  --bg-mask: rgba(0, 0, 0, 0.45);
+
+  --border-color: #adc6ff;
+  --border-color-light: #d6e4ff;
+
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #ff4d4f;
+  --info-color: #1890ff;
+
+  --box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(24, 144, 255, 0.1);
+}

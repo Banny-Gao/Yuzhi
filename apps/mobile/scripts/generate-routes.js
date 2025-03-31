@@ -15,6 +15,43 @@ const PAGES_DIR = path.resolve(ROOT_DIR, 'src/pages')
 const OUTPUT_FILE = path.resolve(ROOT_DIR, 'src/generated.routes.ts')
 
 /**
+ * 解析页面元数据
+ * @param {string} filePath 页面文件路径
+ * @returns {Object} 页面元数据对象
+ */
+function parseMeta(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8')
+
+    // 提取pageMeta对象
+    const regex = /export\s+const\s+pageMeta\s*=\s*({[\s\S]*?})/
+    const match = content.match(regex)
+
+    if (match && match[1]) {
+      try {
+        // 使用Function构造器安全地解析对象
+        const parseObject = new Function(`return ${match[1]}`)
+        return parseObject()
+      } catch (e) {
+        console.warn(`警告: 解析pageMeta失败 ${filePath}`, e.message)
+      }
+    }
+
+    // 如果没有找到pageMeta或解析失败，返回默认值
+    return {
+      title: path.basename(path.dirname(filePath)),
+      requiresAuth: false,
+    }
+  } catch (e) {
+    console.warn(`警告: 读取文件失败 ${filePath}`, e.message)
+    return {
+      title: '',
+      requiresAuth: false,
+    }
+  }
+}
+
+/**
  * 递归获取目录下的所有页面
  * @param {string} dir 目录路径
  * @param {string} baseDir 基础目录路径
@@ -49,27 +86,10 @@ function getPages(dir, baseDir = '') {
         const routeKey = pagePath.replace(/\//g, '_') || 'index'
 
         // 构建路由路径
-        const routePath = `pages/${pagePath}/index`
+        const routePath = `/pages/${pagePath}/index`
 
-        // 获取页面可能存在的元数据
-        let meta = {}
-        try {
-          const pageContent = fs.readFileSync(indexFile, 'utf-8')
-          const metaMatch = pageContent.match(/export\s+const\s+pageMeta\s*=\s*({[^;]*})/)
-          if (metaMatch && metaMatch[1]) {
-            // 提取元数据对象字符串
-            const metaString = metaMatch[1].trim()
-            // 注意: 这里使用 eval 仅作为示例，实际生产环境应使用更安全的方法
-            try {
-              // 尝试解析元数据
-              meta = eval(`(${metaString})`)
-            } catch (e) {
-              console.warn(`警告: 无法解析页面元数据 ${indexFile}`)
-            }
-          }
-        } catch (e) {
-          console.warn(`警告: 读取文件失败 ${indexFile}`)
-        }
+        // 获取页面元数据
+        const meta = parseMeta(indexFile)
 
         // 添加到路由配置
         routes[routeKey] = {

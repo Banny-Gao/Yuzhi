@@ -1,17 +1,22 @@
-import { getStorageSync, navigateTo } from '@tarojs/taro'
-import { setupApiClient } from '@workspace/request'
+import { getStorageSync, setStorageSync, removeStorageSync, navigateTo } from '@tarojs/taro'
+import { setupApiClient, ResponseStatus } from '@workspace/request'
 
 import routes from '@/generated.routes'
 
 export const setupRequest = () => {
-  const apiUrl = process.env.API_URL
+  // 获取API URL
+  const apiUrl = process.env.TARO_APP_API_URL
   if (!apiUrl) {
-    throw new Error('API_URL is not set')
+    console.warn('TARO_APP_API_URL未设置，API请求可能无法正常工作')
   }
 
+  console.log('环境:', process.env.NODE_ENV)
+  console.log('API URL:', apiUrl)
+
+  // 配置API客户端
   setupApiClient({
     // 基础配置
-    baseUrl: 'https://api.example.com',
+    baseUrl: apiUrl,
     withAuth: true,
     getToken: () => getStorageSync('token'),
 
@@ -32,7 +37,11 @@ export const setupRequest = () => {
 
     // 响应拦截器 - 在收到响应后处理
     responseInterceptor: response => {
-      // 自定义响应处理
+      // 检查是否有新的令牌在响应中
+      const newToken = response.headers['x-auth-token']
+      if (newToken) setStorageSync('token', newToken)
+
+      // 处理弃用通知
       if (response.headers['x-deprecation-notice']) {
         console.warn('API 即将弃用:', response.headers['x-deprecation-notice'])
       }
@@ -46,19 +55,24 @@ export const setupRequest = () => {
         // 处理特定错误码
         const status = error.response.status
 
-        if (status === 401) {
-          // 未授权 - 重定向到登录页
-          getStorageSync('token')
-          navigateTo({
-            url: routes.login.path,
-          })
-        } else if (status === 403) {
-          // 禁止访问 - 显示无权限页面
-          window.location.href = '/forbidden'
-        } else if (status === 429) {
-          // 请求过多 - 实现重试逻辑
-          console.warn('请求频率过高，将在 1 秒后重试')
-          await new Promise(resolve => setTimeout(resolve, 1000))
+        switch (status) {
+          case ResponseStatus.UNAUTHORIZED:
+            // 未授权 - 清除可能无效的令牌并重定向到登录页
+            removeStorageSync('token')
+            navigateTo({
+              url: routes.login.path,
+            })
+            break
+          case ResponseStatus.FORBIDDEN:
+            // 禁止访问 - 显示无权限页面
+            navigateTo({
+              url: routes.forbidden.path,
+            })
+            break
+          case ResponseStatus.TOO_MANY_REQUESTS:
+            // 请求过多 - 实现重试逻辑
+            console.warn('请求频率过高，将在 1 秒后重试')
+            await new Promise(resolve => setTimeout(resolve, 1000))
           // 这里可以实现重试逻辑
         }
       } else if (error.request) {

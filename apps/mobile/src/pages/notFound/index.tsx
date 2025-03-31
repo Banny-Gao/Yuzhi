@@ -3,19 +3,19 @@ import { useLoad } from '@tarojs/taro'
 import './index.less'
 
 export const pageMeta = {
-  title: '首页',
-  requiresAuth: true,
-};
+  title: 'notFound',
+  requiresAuth: false,
+  requiresPermission: ' general',
+}
 
-
-export default function Index () {
+export default function NotFound() {
   useLoad(() => {
     console.log('Page loaded.')
   })
 
   return (
-    <View className='index'>
-      <Text>Hello world!</Text>
+    <View className="notFound">
+      <Text>页面不存在</Text>
     </View>
   )
 }

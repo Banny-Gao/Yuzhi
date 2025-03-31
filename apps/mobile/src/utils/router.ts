@@ -1,6 +1,7 @@
 import { navigateTo, navigateBack, redirectTo, getStorageSync } from '@tarojs/taro'
+import { AppError } from '@/utils/error'
 
-import { default as routes, authRequiredPages } from '@/generated.routes'
+import { default as routes, authRequiredPages, pages } from '@/generated.routes'
 
 interface EventChannel {
   emit(eventName: string, ...args: any): void
@@ -20,13 +21,34 @@ type NavigateToOption = {
   success?: (res: TaroGeneral.CallbackResult & { eventChannel: EventChannel }) => void
 }
 
-const detectAuth = (option: NavigateToOption) => {
-  const token = getStorageSync('token')
-  if (!token && authRequiredPages.includes(option.url)) {
-    navigateTo({ url: routes.login.path })
+const checkAuthorized = (route: string) =>
+  new Promise((resolve, reject) => {
+    const token = getStorageSync('token')
 
-    throw new Error('请先登录')
-  }
+    if (!token && authRequiredPages.includes(route)) {
+      navigateTo({ url: routes.login.path })
+
+      return reject(new AppError('未登录'))
+    }
+
+    resolve(true)
+  })
+
+const checkExisted = (route: string) =>
+  new Promise((resolve, reject) => {
+    if (!pages.includes(route)) {
+      navigateTo({ url: routes.notFound.path })
+      reject(new AppError('页面不存在'))
+    }
+
+    resolve(true)
+  })
+
+export const withRouteGuard = async (route: string, callback?: () => Promise<void>) => {
+  await checkAuthorized(route)
+  await checkExisted(route)
+
+  return callback?.()
 }
 
 export const router = new Proxy(
@@ -37,9 +59,8 @@ export const router = new Proxy(
   },
   {
     get(target, prop) {
-      return (option: NavigateToOption) => {
-        detectAuth(option)
-        return target[prop](option)
+      return async (option: NavigateToOption) => {
+        return await withRouteGuard(option.url, () => target[prop](option))
       }
     },
   }

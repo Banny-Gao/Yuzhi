@@ -3,6 +3,8 @@
  * @description 配置全局API客户端设置，如基础URL、拦截器等
  */
 import axios from 'axios'
+import { OpenAPI } from './generated/core/OpenAPI'
+import type { ApiRequestOptions } from './generated/core/ApiRequestOptions'
 
 /**
  * API客户端配置选项
@@ -45,7 +47,17 @@ export interface ApiClientOptions {
 export function setupApiClient(options: ApiClientOptions = {}): void {
   // 设置基础URL
   if (options.baseUrl) {
+    // 更新axios配置
     axios.defaults.baseURL = options.baseUrl
+
+    // 同步更新OpenAPI配置
+    OpenAPI.BASE = options.baseUrl
+  }
+
+  // 设置认证相关配置
+  if (options.withAuth) {
+    OpenAPI.WITH_CREDENTIALS = true
+    axios.defaults.withCredentials = true
   }
 
   // 配置请求拦截器

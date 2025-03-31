@@ -1,0 +1,93 @@
+@import "./variables.less";
+
+.fullWidth {
+  .flex-base;
+  width: 100%;
+}
+.fullHeight {
+  .flex-base;
+  height: 100%;
+}
+
+.hidden {
+  .overflow(hidden, hidden);
+}
+.hiddenX {
+  .overflow(hidden, auto);
+}
+.hiddenY {
+  .overflow(auto, hidden);
+}
+
+.visible {
+  visibility: visible;
+}
+.visibleVidden {
+  visibility: hidden;
+}
+
+.textHidden {
+  .hidden;
+  text-wrap: nowrap;
+}
+
+.relative {
+  .position(relative);
+}
+.absolute {
+  .position(absolute);
+}
+.fixed {
+  .position(fixed);
+}
+.sticky {
+  .position(sticky);
+}
+
+.allTransition {
+  .transition(all, 0.2s, ease-in-out);
+}
+.backgroundTransition {
+  .transition(background-color, 0.2s, ease-in-out);
+}
+.fontTransition {
+  .transition(color, 0.2s, ease-in-out);
+}
+
+.icon {
+  .icon-size;
+
+  &.primaryIcon,
+  &.secondaryIcon {
+    .icon-size(16px);
+    cursor: pointer;
+  }
+
+  &.folderIcon {
+    .icon-size(24px);
+  }
+  &.uploadIcon {
+    .icon-size(24px);
+  }
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.activeColor {
+  font-weight: 500;
+  .color(@success-color);
+}
+
+.errorColor {
+  .color(@error-color);
+}
+.warningColor {
+  .color(@warning-color);
+}
+
+.longInputNumber {
+  .width(200px);
+}

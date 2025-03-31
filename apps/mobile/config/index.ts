@@ -1,5 +1,7 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
+import dotenv from 'dotenv'
+
 import devConfig from './dev'
 import prodConfig from './prod'
 
@@ -7,11 +9,27 @@ import prodConfig from './prod'
 export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
   console.log('command', command)
   console.log('mode', mode)
-  const isDev = process.env.NODE_ENV === 'development'
+  const isDev = mode === 'development'
+
+  dotenv.config({ path: [isDev ? '.env.local' : '.env'] })
+
+  const pxtransform = {
+    enable: true,
+    config: {
+      onePxTransform: true,
+      unitPrecision: 3,
+      propList: ['*'],
+      selectorBlackList: ['ignore'],
+      replace: true,
+      mediaQuery: true,
+      baseFontSize: 20,
+    },
+  }
+
   const baseConfig: UserConfigExport<'webpack5'> = {
     projectName: 'mobile',
     date: '2025-3-28',
-    designWidth: 750,
+    designWidth: 375,
     deviceRatio: {
       640: 2.34 / 2,
       750: 1,
@@ -21,7 +39,9 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     sourceRoot: 'src',
     outputRoot: 'dist',
     plugins: ['@tarojs/plugin-http'],
-    defineConstants: {},
+    defineConstants: {
+      'process.env': JSON.stringify(process.env),
+    },
     copy: {
       patterns: [],
       options: {},
@@ -33,10 +53,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     },
     mini: {
       postcss: {
-        pxtransform: {
-          enable: true,
-          config: {},
-        },
+        pxtransform,
         cssModules: {
           enable: true, // 默认为 false，如需使用 css modules 功能，则设为 true
           config: {
@@ -53,13 +70,13 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       publicPath: '/',
       staticDirectory: 'static',
       output: {
-        filename: 'js/[name].[hash:8].js',
-        chunkFilename: 'js/[name].[chunkhash:8].js',
+        filename: 'js/[name].[contenthash:8].js',
+        chunkFilename: 'js/[name].[contenthash:8].js',
       },
       miniCssExtractPluginOption: {
         ignoreOrder: true,
-        filename: 'css/[name].[hash].css',
-        chunkFilename: 'css/[name].[chunkhash].css',
+        filename: 'css/[name].[contenthash].css',
+        chunkFilename: 'css/[name].[contenthash].css',
       },
       postcss: {
         autoprefixer: {
@@ -73,6 +90,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
             generateScopedName: '[name]__[local]___[hash:base64:5]',
           },
         },
+        pxtransform,
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
