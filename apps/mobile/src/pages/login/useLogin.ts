@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { AuthService } from '@workspace/request'
-import { setStorageSync, showToast } from '@tarojs/taro'
+import { withErrorHandling, withNetworkCheck } from '@/utils/requestHelpers'
 
-import type { LoginUserDto, SmsLoginDto } from '@workspace/request'
+import type { LoginUserDto, SmsLoginDto, CreateUserDto } from '@workspace/request'
 
 export const useLogin = () => {
   // 用户名手机号登录
@@ -12,38 +12,8 @@ export const useLogin = () => {
     rememberMe: true,
   })
 
-  // 加载状态
-  const [loading, setLoading] = useState(false)
-
-  const handleLogin = async () => {
-    try {
-      setLoading(true)
-      const response = await AuthService.authControllerLogin(loginUser)
-
-      console.log('登录成功:', response)
-
-      // 保存token到存储
-      if (response.accessToken) {
-        setStorageSync('token', response.accessToken)
-      }
-
-      showToast({
-        title: '登录成功',
-        icon: 'success',
-      })
-
-      return response
-    } catch (error) {
-      console.error('登录失败:', error)
-      showToast({
-        title: '登录失败，请检查用户名和密码',
-        icon: 'none',
-      })
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }
+  const handleLogin = async () =>
+    withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerLogin(loginUser)), '登录失败，请检查您的用户名和密码')
 
   // sms 登录
   const [smsLoginUser, setSmsLoginUser] = useState<SmsLoginDto>({
@@ -51,33 +21,21 @@ export const useLogin = () => {
     code: '',
   })
 
-  const handleSmsLogin = async () => {
-    try {
-      setLoading(true)
-      const response = await AuthService.authControllerLoginWithSms(smsLoginUser)
-      console.log('短信登录成功:', response)
+  const handleSmsLogin = async () =>
+    withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerLoginWithSms(smsLoginUser)), '登录失败，请检查您的验证码')
 
-      // 保存token到存储
-      if (response.accessToken) {
-        setStorageSync('token', response.accessToken)
-      }
+  // 用户注册
+  const [registerUser, setRegisterUser] = useState<CreateUserDto>({
+    username: '',
+    email: '',
+    phoneNumber: '',
+    password: '',
+  })
 
-      showToast({
-        title: '登录成功',
-        icon: 'success',
-      })
+  const handleRegister = async () => withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerRegister(registerUser)), '注册失败，请稍后重试')
 
-      return response
-    } catch (error) {
-      console.error('短信登录失败:', error)
-      showToast({
-        title: '登录失败，请检查手机号和验证码',
-        icon: 'none',
-      })
-      throw error
-    } finally {
-      setLoading(false)
-    }
+  const getProfile = async () => {
+    return withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerGetProfile()), '获取用户信息失败')
   }
 
   return {
@@ -87,6 +45,9 @@ export const useLogin = () => {
     smsLoginUser,
     setSmsLoginUser,
     handleSmsLogin,
-    loading,
+    registerUser,
+    setRegisterUser,
+    handleRegister,
+    getProfile,
   }
 }

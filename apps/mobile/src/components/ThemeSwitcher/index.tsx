@@ -1,17 +1,12 @@
 /**
  * 主题切换器组件
  */
-import React from 'react'
-import { View, Text } from '@tarojs/components'
+import { FC, useCallback, useEffect, useState } from 'react'
+import { View, Button, Text } from '@tarojs/components'
+
 import { useTheme } from '../../contexts/ThemeContext'
-import { getAvailableThemes, ThemeType, themeNames } from '../../styles/themes/themeTypes'
-
+import { getAvailableThemes, ThemeType } from '../../styles/themes/themeTypes'
 import './index.less'
-
-interface ThemeSwitcherProps {
-  showName?: boolean
-  iconOnly?: boolean
-}
 
 /**
  * 获取主题图标
@@ -35,56 +30,62 @@ const getThemeIcon = (themeType: ThemeType): string => {
   }
 }
 
-const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ showName = true, iconOnly = false }) => {
+const ThemeSwitcher: FC = () => {
   const { themeType, setThemeType } = useTheme()
+  const [isOpen, setIsOpen] = useState(false)
+
+  // Available themes
   const availableThemes = getAvailableThemes()
 
-  // 处理主题切换
-  const handleThemeChange = (newTheme: ThemeType) => {
-    setThemeType(newTheme)
-  }
+  // Handle theme change
+  const handleThemeChange = useCallback(
+    (theme: ThemeType) => {
+      setThemeType(theme)
+      setIsOpen(false)
+    },
+    [setThemeType]
+  )
+
+  // Toggle menu open state
+  const toggleMenu = useCallback(e => {
+    e.stopPropagation()
+    setIsOpen(prev => !prev)
+  }, [])
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleClickOutside = () => {
+      setIsOpen(false)
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [isOpen])
 
   return (
-    <View className="theme-switcher">
-      {iconOnly ? (
-        <View
-          className="theme-switcher__icon"
-          onClick={() => {
-            const currentIndex = availableThemes.indexOf(themeType)
-            const nextIndex = (currentIndex + 1) % availableThemes.length
-            setThemeType(availableThemes[nextIndex])
-          }}
-        >
-          {getThemeIcon(themeType)}
-        </View>
-      ) : (
-        <View className="theme-switcher__list">
-          {availableThemes.map(theme => (
-            <View
-              key={theme}
-              className={`theme-switcher__item ${theme === themeType ? 'theme-switcher__item--active' : ''}`}
-              style={{
-                backgroundColor: theme === themeType ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
-                borderColor: theme === themeType ? 'var(--primary-color)' : 'var(--border-color-light)',
-              }}
-              onClick={() => handleThemeChange(theme)}
-            >
-              <Text className="theme-switcher__icon">{getThemeIcon(theme)}</Text>
-              {showName && (
-                <Text
-                  className="theme-switcher__name"
-                  style={{
-                    fontWeight: theme === themeType ? 'bold' : 'normal',
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  {themeNames[theme]}
-                </Text>
-              )}
-            </View>
-          ))}
-        </View>
-      )}
+    <View className={`theme-switcher ${isOpen ? 'theme-switcher--open' : ''}`} onClick={e => e.stopPropagation()}>
+      <Button className={`theme-switcher__fab ${themeType ? 'theme-switcher__fab--active' : ''}`} onClick={toggleMenu}>
+        <Text className="theme-switcher__current-icon">{getThemeIcon(themeType)}</Text>
+      </Button>
+
+      <View className={`theme-switcher__menu ${isOpen ? 'theme-switcher__menu--open' : ''}`}>
+        {availableThemes.map((theme, index) => (
+          <View
+            key={theme}
+            className={`theme-switcher__item ${theme === themeType ? 'theme-switcher__item--active' : ''}`}
+            onClick={() => handleThemeChange(theme)}
+            style={{
+              transitionDelay: `${index * 50}ms`,
+            }}
+          >
+            <Text className="theme-switcher__icon">{getThemeIcon(theme)}</Text>
+          </View>
+        ))}
+      </View>
     </View>
   )
 }

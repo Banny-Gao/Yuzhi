@@ -4,6 +4,7 @@ import { useLaunch, useRouter, useError } from '@tarojs/taro'
 import { setupRequest } from '@/utils/request'
 import { withRouteGuard } from '@/utils/router'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import ThemeSwitcher from '@/components/ThemeSwitcher'
 
 import './app.less'
 
@@ -20,7 +21,12 @@ const App = ({ children }: PropsWithChildren<any>) => {
     console.log(error)
   })
 
-  return <ThemeProvider useSeasonalThemeByDefault>{children}</ThemeProvider>
+  return (
+    <ThemeProvider useSeasonalThemeByDefault>
+      {children}
+      <ThemeSwitcher />
+    </ThemeProvider>
+  )
 }
 
 export default App

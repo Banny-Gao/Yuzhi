@@ -1,27 +1,27 @@
 /* 暗色主题 */
 [data-theme='dark'] {
-  --primary-color: #177ddc;
-  --primary-light: #1f6fdf;
-  --primary-dark: #0050b3;
+  --primary-color: #9d7ad2;
+  --primary-light: #b48fe0;
+  --primary-dark: #8065b9;
 
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.85);
-  --text-tertiary: rgba(255, 255, 255, 0.65);
+  --text-secondary: rgba(255, 255, 255, 0.9);
+  --text-tertiary: rgba(255, 255, 255, 0.7);
   --text-disabled: rgba(255, 255, 255, 0.45);
 
-  --bg-primary: #1f1f1f;
-  --bg-secondary: #141414;
-  --bg-tertiary: #2a2a2a;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-tertiary: #2c2c2c;
   --bg-mask: rgba(0, 0, 0, 0.85);
 
-  --border-color: #424242;
-  --border-color-light: #303030;
+  --border-color: #3a3a3a;
+  --border-color-light: #2d2d2d;
 
-  --success-color: #49aa19;
-  --warning-color: #d89614;
-  --error-color: #a61d24;
-  --info-color: #177ddc;
+  --success-color: #5fad7d;
+  --warning-color: #e0a778;
+  --error-color: #d17277;
+  --info-color: #9d7ad2;
 
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-  --box-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  --box-shadow-light: 0 2px 5px rgba(0, 0, 0, 0.35);
 }

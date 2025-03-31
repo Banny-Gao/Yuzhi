@@ -59,6 +59,8 @@
     "@workspace/request": "workspace:*",
     "commander": "^12.0.0",
     "inquirer": "^8.2.6",
+    "mobx": "^6.13.7",
+    "mobx-react-lite": "^4.1.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },

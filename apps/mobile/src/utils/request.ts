@@ -1,5 +1,5 @@
 import { getStorageSync, setStorageSync, removeStorageSync, navigateTo } from '@tarojs/taro'
-import { setupApiClient, ResponseStatus } from '@workspace/request'
+import { setupApiClient, ResponseStatus, StatusGroups, isRetryable } from '@workspace/request'
 
 import routes from '@/generated.routes'
 
@@ -82,6 +82,13 @@ export const setupRequest = () => {
 
       // 继续抛出错误，供调用处处理
       return Promise.reject(error)
+    },
+
+    // 添加重试配置，使用预定义的可重试状态码
+    retry: {
+      maxRetries: 3,
+      retryDelay: 1000,
+      statusCodes: StatusGroups.RETRYABLE_CODES,
     },
   })
 }

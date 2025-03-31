@@ -1,0 +1,96 @@
+@import '../../../../styles/variables.less';
+@import '../../../../styles/animations.less';
+
+.auth-toggle {
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin-bottom: 24px;
+
+  &__tab {
+    .flex(row, center, center);
+    flex: 1;
+    z-index: 2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    padding: 12px 0;
+    margin: 0 8px;
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: transparent;
+      transition: background-color 0.3s ease;
+    }
+
+    &--active {
+      .auth-toggle__text {
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      &:after {
+        background-color: var(--primary-color);
+      }
+    }
+  }
+
+  &__text {
+    font-size: 16px;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+  }
+
+  // Theme adaptations
+  &--spring {
+    .auth-toggle__tab--active:after {
+      background-color: var(--primary-color);
+    }
+  }
+
+  &--summer {
+    .auth-toggle__tab--active:after {
+      background-color: var(--primary-color);
+    }
+  }
+
+  &--autumn {
+    .auth-toggle__tab--active:after {
+      background-color: var(--primary-color);
+    }
+  }
+
+  &--winter {
+    .auth-toggle__tab--active:after {
+      background-color: var(--primary-color);
+    }
+  }
+
+  &--newYear {
+    .auth-toggle__tab--active:after {
+      background-color: var(--primary-color);
+    }
+  }
+
+  &--dark {
+    .auth-toggle__text {
+      color: var(--text-tertiary);
+    }
+
+    .auth-toggle__tab--active {
+      .auth-toggle__text {
+        color: var(--primary-color);
+      }
+
+      &:after {
+        background-color: var(--primary-color);
+      }
+    }
+  }
+}
