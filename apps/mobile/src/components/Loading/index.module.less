@@ -1,0 +1,55 @@
+@import '@/styles/index.module.less';
+
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-mask);
+  z-index: 1000;
+}
+
+.fadeIn {
+  animation: fadeInScale 0.3s ease-in-out;
+}
+
+.fadeOut {
+  animation: fadeOutScale 0.3s ease-in-out;
+}
+
+.canvas {
+  filter: drop-shadow(0 0 8px var(--primary-color));
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOutScale {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+// Dark theme specific adjustments
+.dark {
+  .canvas {
+    filter: drop-shadow(0 0 10px var(--primary-color));
+  }
+}

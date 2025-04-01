@@ -5,6 +5,7 @@
 
 import { setupApiClient, ApiClientOptions } from '@workspace/request'
 import { getStorage, removeStorage, STORAGE_KEYS } from './storage'
+import { loadingManager } from '@/components/Loading'
 
 /**
  * 格式化API响应
@@ -30,19 +31,27 @@ export function initApiClient(baseUrl: string): void {
 
     // 请求拦截器
     requestInterceptor: config => {
+      // 显示加载提示
+      loadingManager.show()
+
       // 在这里可以添加额外的请求头
       return config
     },
 
     // 响应拦截器
     responseInterceptor: response => {
-      // 格式化响应数据
+      // 隐藏加载提示
+      loadingManager.hide()
 
+      // 格式化响应数据
       return response
     },
 
     // 错误拦截器
     errorInterceptor: error => {
+      // 隐藏加载提示
+      loadingManager.hide()
+
       // 处理常见错误
       if (!error.response) {
         console.error('网络连接失败:', error.message)
