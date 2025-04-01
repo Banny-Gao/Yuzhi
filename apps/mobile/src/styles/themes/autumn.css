@@ -1,27 +1,28 @@
-/* 秋季主题 */
+/* 秋季主题 - 枫叶红 */
 [data-theme='autumn'] {
-  --primary-color: #fa8c16;
-  --primary-light: #ffa940;
-  --primary-dark: #d46b08;
+  --primary-color: #e67e22;
+  --primary-color-rgb: 230, 126, 34;
+  --primary-dark: #d35400;
+  --primary-light: #fff5eb;
 
-  --text-primary: #262626;
-  --text-secondary: #595959;
-  --text-tertiary: #8c8c8c;
-  --text-disabled: #bfbfbf;
+  --text-primary: #2c3e50;
+  --text-secondary: #34495e;
+  --text-tertiary: #7f8c8d;
+  --text-disabled: #bdc3c7;
 
   --bg-primary: #ffffff;
-  --bg-secondary: #fff7e6;
-  --bg-tertiary: #ffe7ba;
-  --bg-mask: rgba(0, 0, 0, 0.45);
+  --bg-secondary: #fff8f3;
+  --bg-tertiary: #ffe4d0;
+  --bg-tertiary-dark: #ffd4b8;
+  --bg-tertiary-dark-light: #fff5eb;
 
-  --border-color: #ffd591;
-  --border-color-light: #ffe7ba;
+  --border-color: #ffd4b8;
+  --border-color-light: #ffe4d0;
 
-  --success-color: #52c41a;
-  --warning-color: #fa8c16;
-  --error-color: #ff4d4f;
-  --info-color: #1890ff;
+  --success-color: #2ecc71;
+  --warning-color: #f1c40f;
+  --error-color: #e74c3c;
 
-  --box-shadow: 0 2px 8px rgba(250, 140, 22, 0.15);
-  --box-shadow-light: 0 2px 4px rgba(250, 140, 22, 0.1);
+  --box-shadow: 0 2px 8px rgba(230, 126, 34, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(230, 126, 34, 0.1);
 }

@@ -1,7 +1,73 @@
-import { getStorageSync, setStorageSync, removeStorageSync, navigateTo } from '@tarojs/taro'
-import { setupApiClient, ResponseStatus, StatusGroups, isRetryable } from '@workspace/request'
+/**
+ * API请求工具
+ * @description 配置移动应用的API请求客户端
+ */
 
-import routes from '@/generated.routes'
+import { setupApiClient, ApiClientOptions } from '@workspace/request'
+import { getStorage, removeStorage, STORAGE_KEYS } from './storage'
+
+/**
+ * 格式化API响应
+ * 处理新旧两种格式的API响应
+ */
+
+/**
+ * 获取授权令牌
+ */
+const getToken = (): string | null => {
+  return getStorage<string>(STORAGE_KEYS.TOKEN)
+}
+
+/**
+ * 初始化API客户端
+ */
+export function initApiClient(baseUrl: string): void {
+  const apiOptions: ApiClientOptions = {
+    baseUrl,
+    timeout: 10000, // 10秒超时
+    withAuth: true,
+    getToken, // 使用获取令牌函数
+
+    // 请求拦截器
+    requestInterceptor: config => {
+      // 在这里可以添加额外的请求头
+      return config
+    },
+
+    // 响应拦截器
+    responseInterceptor: response => {
+      // 格式化响应数据
+
+      return response
+    },
+
+    // 错误拦截器
+    errorInterceptor: error => {
+      // 处理常见错误
+      if (!error.response) {
+        console.error('网络连接失败:', error.message)
+        // 可以在这里显示全局网络错误提示
+      } else if (error.response.status === 401) {
+        // 处理未授权错误，可能需要重新登录
+        console.error('需要重新登录')
+        removeStorage(STORAGE_KEYS.TOKEN) // 使用存储工具移除令牌
+        // 可以在这里重定向到登录页面
+      }
+
+      return Promise.reject(error)
+    },
+
+    // 重试配置
+    retry: {
+      maxRetries: 2,
+      retryDelay: 1000,
+      statusCodes: [408, 500, 502, 503, 504],
+    },
+  }
+
+  // 设置API客户端
+  setupApiClient(apiOptions)
+}
 
 export const setupRequest = () => {
   // 获取API URL
@@ -14,81 +80,5 @@ export const setupRequest = () => {
   console.log('API URL:', apiUrl)
 
   // 配置API客户端
-  setupApiClient({
-    // 基础配置
-    baseUrl: apiUrl,
-    withAuth: true,
-    getToken: () => getStorageSync('token'),
-
-    // 请求拦截器 - 在请求发送前修改请求
-    requestInterceptor: config => {
-      // 添加自定义头部
-      config.headers = config.headers || {}
-      config.headers['X-App-Version'] = '1.0.0'
-      config.headers['X-Platform'] = 'web'
-
-      // 在开发环境添加调试信息
-      if (process.env.NODE_ENV === 'development') {
-        config.params = { ...config.params, _debug: true }
-      }
-
-      return config
-    },
-
-    // 响应拦截器 - 在收到响应后处理
-    responseInterceptor: response => {
-      // 检查是否有新的令牌在响应中
-      const newToken = response.headers['x-auth-token']
-      if (newToken) setStorageSync('token', newToken)
-
-      // 处理弃用通知
-      if (response.headers['x-deprecation-notice']) {
-        console.warn('API 即将弃用:', response.headers['x-deprecation-notice'])
-      }
-
-      return response
-    },
-
-    // 错误拦截器 - 统一处理错误
-    errorInterceptor: async error => {
-      if (error.response) {
-        // 处理特定错误码
-        const status = error.response.status
-
-        switch (status) {
-          case ResponseStatus.UNAUTHORIZED:
-            // 未授权 - 清除可能无效的令牌并重定向到登录页
-            removeStorageSync('token')
-            navigateTo({
-              url: routes.login.path,
-            })
-            break
-          case ResponseStatus.FORBIDDEN:
-            // 禁止访问 - 显示无权限页面
-            navigateTo({
-              url: routes.forbidden.path,
-            })
-            break
-          case ResponseStatus.TOO_MANY_REQUESTS:
-            // 请求过多 - 实现重试逻辑
-            console.warn('请求频率过高，将在 1 秒后重试')
-            await new Promise(resolve => setTimeout(resolve, 1000))
-          // 这里可以实现重试逻辑
-        }
-      } else if (error.request) {
-        // 网络错误 - 显示网络错误提示
-        console.error('网络错误，请检查您的连接')
-      }
-
-      // 继续抛出错误，供调用处处理
-      return Promise.reject(error)
-    },
-
-    // 添加重试配置，使用预定义的可重试状态码
-    retry: {
-      maxRetries: 3,
-      retryDelay: 1000,
-      statusCodes: StatusGroups.RETRYABLE_CODES,
-    },
-  })
+  initApiClient(apiUrl || '')
 }

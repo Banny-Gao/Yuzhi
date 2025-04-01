@@ -1,91 +1,71 @@
 import { makeAutoObservable } from 'mobx'
-import Taro from '@tarojs/taro'
-import { withErrorHandling, withNetworkCheck } from '@/utils/requestHelpers'
+import { withErrorHandling } from '@/utils/requestHelpers'
 import { AuthService } from '@workspace/request'
-import type { LoginUserDto, SmsLoginDto, CreateUserDto } from '@workspace/request'
+import { getStorage, setStorage, removeStorage, STORAGE_KEYS } from '@/utils/storage'
+import { goTo } from '@/utils/router'
 
-// Define UserProfileDto since it's not exported from @workspace/request
-export interface UserProfileDto {
-  id: string
-  username: string
-  email?: string
-  phoneNumber?: string
-  avatar?: string
-  createdAt?: string
-  updatedAt?: string
-  [key: string]: any
-}
-
-// Storage keys
-const TOKEN_STORAGE_KEY = 'token'
-const USER_INFO_STORAGE_KEY = 'userInfo'
-
+import type { LoginUserDto, SmsLoginDto, CreateUserDto, LoginResponseDto, RegisterResponseDto, UserDto, ApiResponse } from '@workspace/request'
 export class UserStore {
-  // User state
-  isLoggedIn: boolean = false
-  token: string | null = null
-  userInfo: UserProfileDto | null = null
-  loading: boolean = false
+  private token: string | null = null
+  private userInfo: UserDto | null = null
+  private loading = false
 
   constructor() {
     makeAutoObservable(this)
     this.initFromStorage()
   }
 
-  // Initialize from local storage
-  initFromStorage() {
+  private initFromStorage() {
     try {
-      const token = Taro.getStorageSync(TOKEN_STORAGE_KEY)
-      const userInfo = Taro.getStorageSync(USER_INFO_STORAGE_KEY)
+      const token = getStorage<string>(STORAGE_KEYS.TOKEN)
+      const userInfo = getStorage<UserDto>(STORAGE_KEYS.USER_INFO)
 
       if (token) {
-        this.token = token
-        this.isLoggedIn = true
+        this.setToken(token)
       }
 
       if (userInfo) {
-        this.userInfo = JSON.parse(userInfo)
+        this.setUserInfo(userInfo)
       }
     } catch (error) {
-      console.error('Failed to restore user state from storage:', error)
+      console.error('Failed to initialize from storage:', error)
     }
   }
 
-  // Save state to storage
-  saveToStorage() {
+  private saveToStorage() {
     try {
       if (this.token) {
-        Taro.setStorageSync(TOKEN_STORAGE_KEY, this.token)
+        setStorage(STORAGE_KEYS.TOKEN, this.token)
       } else {
-        Taro.removeStorageSync(TOKEN_STORAGE_KEY)
+        removeStorage(STORAGE_KEYS.TOKEN)
       }
 
       if (this.userInfo) {
-        Taro.setStorageSync(USER_INFO_STORAGE_KEY, JSON.stringify(this.userInfo))
+        setStorage(STORAGE_KEYS.USER_INFO, this.userInfo)
       } else {
-        Taro.removeStorageSync(USER_INFO_STORAGE_KEY)
+        removeStorage(STORAGE_KEYS.USER_INFO)
       }
     } catch (error) {
-      console.error('Failed to save user state to storage:', error)
+      console.error('Failed to save to storage:', error)
     }
   }
 
-  // Set loading state
-  setLoading(loading: boolean) {
-    this.loading = loading
-  }
+  // Handle successful authentication
+  private async handleSuccessfulAuth(response: LoginResponseDto | RegisterResponseDto) {
+    const { accessToken, refreshToken, user } = response
 
-  // Set user token
-  setToken(token: string | null) {
-    this.token = token
-    this.isLoggedIn = !!token
-    this.saveToStorage()
-  }
+    // Store tokens
+    setStorage(STORAGE_KEYS.TOKEN, accessToken)
+    setStorage(STORAGE_KEYS.REFRESH_TOKEN, refreshToken)
 
-  // Set user info
-  setUserInfo(userInfo: UserProfileDto | null) {
-    this.userInfo = userInfo
-    this.saveToStorage()
+    // Update user state
+    this.setUserInfo(user)
+    this.setToken(accessToken)
+
+    // Navigate to home
+    goTo.home()
+
+    return true
   }
 
   // Login with username/phone and password
@@ -93,14 +73,12 @@ export class UserStore {
     this.setLoading(true)
 
     try {
-      const response = await withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerLogin(loginData)), '登录失败，请检查您的用户名和密码')
+      const response = await withErrorHandling<LoginResponseDto>(
+        async () => await AuthService.authControllerLogin({ requestBody: loginData }),
+        '登录失败，请检查您的用户名和密码'
+      )
 
-      if (response && response.token) {
-        this.setToken(response.token)
-        await this.fetchUserProfile()
-        return true
-      }
-      return false
+      return await this.handleSuccessfulAuth(response)
     } catch (error) {
       console.error('Login failed:', error)
       return false
@@ -114,14 +92,12 @@ export class UserStore {
     this.setLoading(true)
 
     try {
-      const response = await withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerLoginWithSms(smsData)), '登录失败，请检查您的验证码')
+      const response = await withErrorHandling<LoginResponseDto>(
+        async () => await AuthService.authControllerSmsLogin({ requestBody: smsData }),
+        '登录失败，请检查您的验证码'
+      )
 
-      if (response && response.token) {
-        this.setToken(response.token)
-        await this.fetchUserProfile()
-        return true
-      }
-      return false
+      return await this.handleSuccessfulAuth(response)
     } catch (error) {
       console.error('SMS login failed:', error)
       return false
@@ -135,14 +111,12 @@ export class UserStore {
     this.setLoading(true)
 
     try {
-      const response = await withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerRegister(userData)), '注册失败，请稍后重试')
+      const response = await withErrorHandling<RegisterResponseDto>(
+        async () => await AuthService.authControllerRegister({ requestBody: userData }),
+        '注册失败，请稍后重试'
+      )
 
-      if (response && response.token) {
-        this.setToken(response.token)
-        await this.fetchUserProfile()
-        return true
-      }
-      return false
+      return await this.handleSuccessfulAuth(response)
     } catch (error) {
       console.error('Registration failed:', error)
       return false
@@ -151,37 +125,32 @@ export class UserStore {
     }
   }
 
-  // Fetch user profile
-  async fetchUserProfile() {
-    if (!this.token) return null
-
-    this.setLoading(true)
-
-    try {
-      const userProfile = await withErrorHandling(() => withNetworkCheck(() => AuthService.authControllerGetProfile()), '获取用户信息失败')
-
-      if (userProfile) {
-        this.setUserInfo(userProfile)
-        return userProfile
-      }
-      return null
-    } catch (error) {
-      console.error('Failed to fetch user profile:', error)
-      return null
-    } finally {
-      this.setLoading(false)
-    }
+  // Getters and setters
+  get isAuthenticated(): boolean {
+    return !!this.token
   }
 
-  // Logout
-  logout() {
-    this.setToken(null)
-    this.setUserInfo(null)
-    this.isLoggedIn = false
+  get isLoading(): boolean {
+    return this.loading
+  }
+
+  get user(): UserDto | null {
+    return this.userInfo
+  }
+
+  private setToken(token: string) {
+    this.token = token
+    this.saveToStorage()
+  }
+
+  private setUserInfo(user: UserDto) {
+    this.userInfo = user
+    this.saveToStorage()
+  }
+
+  private setLoading(loading: boolean) {
+    this.loading = loading
   }
 }
 
-// Create a singleton instance
 export const userStore = new UserStore()
-
-export default userStore

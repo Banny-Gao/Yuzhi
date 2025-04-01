@@ -7,7 +7,7 @@ import { getStatusMessage } from '@workspace/request'
  *
  * 为所有抛出的异常提供一致的响应格式:
  * {
- *   statusCode: number,
+ *   status: number,
  *   message: string,
  *   path: string,
  *   timestamp: string,
@@ -50,7 +50,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // 构建标准错误响应
     const errorResponse = {
-      statusCode: status,
+      status,
       message: message,
       path: request.url,
       timestamp: new Date().toISOString(),
@@ -100,7 +100,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // 构建标准错误响应
     const errorResponse = {
-      statusCode: status,
+      status: status,
       message: message,
       path: request.url,
       timestamp: new Date().toISOString(),

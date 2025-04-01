@@ -79,7 +79,6 @@
     "@types/webpack-env": "^1.13.6",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
-    "@workspace/types": "workspace:^",
     "babel-preset-taro": "4.0.9",
     "eslint": "^9.22.0",
     "eslint-plugin-react": "^7.37.4",

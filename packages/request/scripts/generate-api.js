@@ -5,7 +5,7 @@
 import { generate } from 'openapi-typescript-codegen'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
-import { existsSync, mkdirSync, createWriteStream, readFileSync, writeFileSync, readdirSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'fs'
 import dotenv from 'dotenv'
 import https from 'https'
 import http from 'http'
@@ -52,80 +52,6 @@ async function fetchSwaggerDoc() {
       .on('error', error => {
         reject(new Error(`Failed to fetch Swagger documentation: ${error.message}`))
       })
-  })
-}
-
-/**
- * 从Swagger文档中提取DTO定义
- * @param {Object} swaggerDoc - Swagger文档对象
- * @returns {Object} - DTO定义对象
- */
-function extractDtoDefinitions(swaggerDoc) {
-  const dtoDefinitions = {}
-
-  // 遍历所有组件定义
-  if (swaggerDoc.components && swaggerDoc.components.schemas) {
-    Object.entries(swaggerDoc.components.schemas).forEach(([name, schema]) => {
-      // 包含所有类型定义
-      dtoDefinitions[name] = schema
-    })
-  }
-
-  return dtoDefinitions
-}
-
-/**
- * 生成DTO类型定义文件
- * @param {Object} dtoDefinitions - DTO定义对象
- */
-function generateDtoFiles(dtoDefinitions) {
-  // 确保models目录存在
-  if (!existsSync(MODELS_DIR)) {
-    mkdirSync(MODELS_DIR, { recursive: true })
-  }
-
-  // 生成每个DTO的类型定义文件
-  Object.entries(dtoDefinitions).forEach(([name, schema]) => {
-    const filePath = join(MODELS_DIR, `${name.toLowerCase()}.ts`)
-    let content = `/* eslint-disable */\n/* This file is auto-generated, do not modify directly */\n\n`
-
-    // 添加类型定义
-    content += `export type ${name} = {\n`
-
-    // 处理属性
-    if (schema.properties) {
-      Object.entries(schema.properties).forEach(([propName, propSchema]) => {
-        // 添加属性注释
-        if (propSchema.description) {
-          content += `  /**\n   * ${propSchema.description}\n   */\n`
-        }
-
-        // 确定属性类型
-        let propType = 'any'
-        if (propSchema.type === 'string') {
-          propType = 'string'
-        } else if (propSchema.type === 'number') {
-          propType = 'number'
-        } else if (propSchema.type === 'boolean') {
-          propType = 'boolean'
-        } else if (propSchema.type === 'array') {
-          const itemType = propSchema.items?.type || 'any'
-          propType = `${itemType}[]`
-        } else if (propSchema.$ref) {
-          // 处理引用类型
-          const refName = propSchema.$ref.split('/').pop()
-          propType = refName
-        }
-
-        // 添加属性定义
-        content += `  ${propName}${propSchema.required ? '' : '?'}: ${propType};\n`
-      })
-    }
-
-    content += `};\n`
-
-    writeFileSync(filePath, content)
-    console.log(`Generated ${name} at: ${filePath}`)
   })
 }
 
@@ -237,8 +163,7 @@ async function generateApiClient() {
     await generate({
       input: `${API_URL}/api-json`,
       output: OUTPUT_DIR,
-      httpClientType: 'axios',
-      useSingleHttpClient: true,
+      httpClient: 'axios',
       useOptions: true,
       useUnionTypes: true,
       exportSchemas: true,

@@ -54,10 +54,10 @@ export class JuheApiService {
       return result
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const statusCode = error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
+        const status = error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR
         const errorMessage = error.response?.data?.reason || error.message
-        this.logger.error(`API request failed: ${errorMessage}, status: ${statusCode}`)
-        throw new HttpException(`获取节气数据失败: ${errorMessage}`, statusCode)
+        this.logger.error(`API request failed: ${errorMessage}, status: ${status}`)
+        throw new HttpException(`获取节气数据失败: ${errorMessage}`, status)
       }
 
       const err = error as { message?: string; stack?: string }

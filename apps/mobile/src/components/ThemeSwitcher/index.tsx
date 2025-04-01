@@ -4,9 +4,9 @@
 import { FC, useCallback, useEffect, useState } from 'react'
 import { View, Button, Text } from '@tarojs/components'
 
-import { useTheme } from '../../contexts/ThemeContext'
-import { getAvailableThemes, ThemeType } from '../../styles/themes/themeTypes'
-import './index.less'
+import { useTheme } from '@/contexts/ThemeContext'
+import { getAvailableThemes, ThemeType } from '@/styles/themes/themeTypes'
+import styles from './index.module.less'
 
 /**
  * 获取主题图标
@@ -66,25 +66,38 @@ const ThemeSwitcher: FC = () => {
     }
   }, [isOpen])
 
+  // Generate class names using CSS Modules
+  const switcherClass = [styles.switcher, isOpen && styles.open].filter(Boolean).join(' ')
+
+  const fabClass = [styles.fab, themeType && styles.fabActive].filter(Boolean).join(' ')
+
+  const menuClass = [styles.menu, isOpen && styles.menuOpen].filter(Boolean).join(' ')
+
   return (
-    <View className={`theme-switcher ${isOpen ? 'theme-switcher--open' : ''}`} onClick={e => e.stopPropagation()}>
-      <Button className={`theme-switcher__fab ${themeType ? 'theme-switcher__fab--active' : ''}`} onClick={toggleMenu}>
-        <Text className="theme-switcher__current-icon">{getThemeIcon(themeType)}</Text>
+    <View className={switcherClass} onClick={e => e.stopPropagation()}>
+      <Button className={fabClass} onClick={toggleMenu}>
+        <Text className={styles.currentIcon}>{getThemeIcon(themeType)}</Text>
       </Button>
 
-      <View className={`theme-switcher__menu ${isOpen ? 'theme-switcher__menu--open' : ''}`}>
-        {availableThemes.map((theme, index) => (
-          <View
-            key={theme}
-            className={`theme-switcher__item ${theme === themeType ? 'theme-switcher__item--active' : ''}`}
-            onClick={() => handleThemeChange(theme)}
-            style={{
-              transitionDelay: `${index * 50}ms`,
-            }}
-          >
-            <Text className="theme-switcher__icon">{getThemeIcon(theme)}</Text>
-          </View>
-        ))}
+      <View className={menuClass}>
+        {availableThemes.map((theme, index) => {
+          const itemClass = [styles.item, theme === themeType && styles.itemActive].filter(Boolean).join(' ')
+
+          const iconClass = [styles.icon, theme === themeType && styles.activeIcon].filter(Boolean).join(' ')
+
+          return (
+            <View
+              key={theme}
+              className={itemClass}
+              onClick={() => handleThemeChange(theme)}
+              style={{
+                transitionDelay: `${index * 50}ms`,
+              }}
+            >
+              <Text className={iconClass}>{getThemeIcon(theme)}</Text>
+            </View>
+          )
+        })}
       </View>
     </View>
   )

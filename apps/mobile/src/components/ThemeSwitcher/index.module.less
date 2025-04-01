@@ -1,0 +1,124 @@
+@import '@/styles/index.module.less';
+
+.switcher {
+  position: fixed;
+  z-index: 999;
+  --size: 38px;
+  top: @padding-lg + @gap-sm;
+  right: @padding-lg + @gap-sm;
+  transform: none;
+}
+
+.fab {
+  padding: @gap-sm;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  .bg-tertiary;
+  .shadow-light;
+  .themeTransition;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: none;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  /* Fix for button appearance */
+  &::after {
+    content: none !important;
+    border: none !important;
+  }
+}
+
+.fabActive {
+  .bg-tertiary;
+  .shadow-light;
+}
+
+.currentIcon {
+  font-size: @font-size-lg + 2px;
+  .text-primary;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.menu {
+  position: absolute;
+  .vertical-box(@gap-sm, @gap);
+  z-index: 1000;
+  border-radius: @border-radius-lg;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  top: calc(var(--size) + 10px);
+  right: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.menuOpen {
+  opacity: 1;
+  transform: translateY(0) translateX(5px);
+  pointer-events: auto;
+}
+
+.item {
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  .bg-tertiary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transform: scale(0.9);
+  opacity: 0;
+
+  .menuOpen & {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  &:active {
+    transform: scale(0.9) !important;
+  }
+}
+
+.itemActive {
+  .bg-tertiary;
+  .shadow-light;
+}
+
+.icon {
+  font-size: @font-size-lg + 2px;
+  line-height: 1;
+}
+
+.activeIcon {
+  .text-primary;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.open {
+  .fab {
+    transform: rotate(180deg);
+  }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 375px) {
+  .switcher {
+    --size: 32px;
+    top: @padding-lg;
+    right: @padding-lg;
+  }
+
+  .menu {
+    gap: @gap-md;
+    padding: @padding-md;
+  }
+}

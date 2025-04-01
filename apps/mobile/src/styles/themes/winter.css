@@ -1,27 +1,28 @@
-/* 冬季主题 */
+/* 冬季主题 - 冰雪白 */
 [data-theme='winter'] {
-  --primary-color: #1890ff;
-  --primary-light: #40a9ff;
-  --primary-dark: #096dd9;
+  --primary-color: #3498db;
+  --primary-color-rgb: 52, 152, 219;
+  --primary-dark: #2980b9;
+  --primary-light: #f0f9ff;
 
-  --text-primary: #262626;
-  --text-secondary: #595959;
-  --text-tertiary: #8c8c8c;
-  --text-disabled: #bfbfbf;
+  --text-primary: #2c3e50;
+  --text-secondary: #34495e;
+  --text-tertiary: #7f8c8d;
+  --text-disabled: #bdc3c7;
 
   --bg-primary: #ffffff;
-  --bg-secondary: #f0f5ff;
-  --bg-tertiary: #d6e4ff;
-  --bg-mask: rgba(0, 0, 0, 0.45);
+  --bg-secondary: #f5f9fc;
+  --bg-tertiary: #e8f2f8;
+  --bg-tertiary-dark: #d1e5f2;
+  --bg-tertiary-dark-light: #f0f9ff;
 
-  --border-color: #adc6ff;
-  --border-color-light: #d6e4ff;
+  --border-color: #d1e5f2;
+  --border-color-light: #e8f2f8;
 
-  --success-color: #52c41a;
-  --warning-color: #faad14;
-  --error-color: #ff4d4f;
-  --info-color: #1890ff;
+  --success-color: #2ecc71;
+  --warning-color: #f1c40f;
+  --error-color: #e74c3c;
 
-  --box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
-  --box-shadow-light: 0 2px 4px rgba(24, 144, 255, 0.1);
+  --box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(52, 152, 219, 0.1);
 }

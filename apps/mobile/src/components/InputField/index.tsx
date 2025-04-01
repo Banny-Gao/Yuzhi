@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, Input } from '@tarojs/components'
 import { useTheme } from '@/contexts/ThemeContext'
-import './index.less'
+import styles from './index.module.less'
 
 export interface InputFieldProps {
   label: string
@@ -39,26 +39,21 @@ const InputField: React.FC<InputFieldProps> = ({
   // Determine if the field has an error
   const hasError = error !== ''
 
-  // Generate the class names based on state
-  const fieldClass = `
-    input-field
-    input-field--${themeType}
-    ${focused ? 'input-field--focused' : ''}
-    ${hasError ? 'input-field--error' : ''}
-    ${disabled ? 'input-field--disabled' : ''}
-    ${className}
-  `
+  // Generate the class names based on state using CSS Modules
+  const fieldClass = [styles.field, styles[themeType], focused && styles.focused, hasError && styles.error, disabled && styles.disabled, className]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <View className={fieldClass.trim()}>
-      <View className="input-field__label-row">
-        <Text className="input-field__label">{label}</Text>
-        {required && <Text className="input-field__required">*</Text>}
+    <View className={fieldClass}>
+      <View className={styles.labelRow}>
+        <Text className={styles.label}>{label}</Text>
+        {required && <Text className={styles.required}>*</Text>}
       </View>
 
-      <View className="input-field__input-container">
+      <View className={styles.inputContainer}>
         <Input
-          className="input-field__input"
+          className={styles.input}
           value={value}
           type={type === 'password' ? 'safe-password' : type}
           password={type === 'password'}
@@ -71,7 +66,7 @@ const InputField: React.FC<InputFieldProps> = ({
         />
       </View>
 
-      {hasError && <Text className="input-field__error-text">{error}</Text>}
+      {hasError && <Text className={styles.errorText}>{error}</Text>}
     </View>
   )
 }

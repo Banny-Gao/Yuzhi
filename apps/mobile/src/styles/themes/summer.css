@@ -1,27 +1,28 @@
-/* 夏季主题 */
+/* 夏季主题 - 清新蓝 */
 [data-theme='summer'] {
-  --primary-color: #1890ff;
-  --primary-light: #40a9ff;
-  --primary-dark: #096dd9;
+  --primary-color: #4a90e2;
+  --primary-color-rgb: 74, 144, 226;
+  --primary-dark: #357abd;
+  --primary-light: #f0f7ff;
 
-  --text-primary: #262626;
-  --text-secondary: #595959;
-  --text-tertiary: #8c8c8c;
-  --text-disabled: #bfbfbf;
+  --text-primary: #2c3e50;
+  --text-secondary: #34495e;
+  --text-tertiary: #7f8c8d;
+  --text-disabled: #bdc3c7;
 
   --bg-primary: #ffffff;
-  --bg-secondary: #e6f7ff;
-  --bg-tertiary: #bae7ff;
-  --bg-mask: rgba(0, 0, 0, 0.45);
+  --bg-secondary: #f5f9ff;
+  --bg-tertiary: #e8f2ff;
+  --bg-tertiary-dark: #d1e5ff;
+  --bg-tertiary-dark-light: #f0f7ff;
 
-  --border-color: #91d5ff;
-  --border-color-light: #bae7ff;
+  --border-color: #d1e5ff;
+  --border-color-light: #e8f2ff;
 
-  --success-color: #52c41a;
-  --warning-color: #faad14;
-  --error-color: #ff4d4f;
-  --info-color: #1890ff;
+  --success-color: #2ecc71;
+  --warning-color: #f1c40f;
+  --error-color: #e74c3c;
 
-  --box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
-  --box-shadow-light: 0 2px 4px rgba(24, 144, 255, 0.1);
+  --box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(74, 144, 226, 0.1);
 }

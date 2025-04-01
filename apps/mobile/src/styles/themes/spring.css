@@ -1,27 +1,34 @@
-/* 春季主题 */
+/* 春季主题 - 清新绿 */
 [data-theme='spring'] {
+  /* 主题色 */
   --primary-color: #52c41a;
-  --primary-light: #73d13d;
+  --primary-color-rgb: 82, 196, 26;
   --primary-dark: #389e0d;
+  --primary-light: #f6ffed;
 
+  /* 文本颜色 */
   --text-primary: #262626;
   --text-secondary: #595959;
   --text-tertiary: #8c8c8c;
   --text-disabled: #bfbfbf;
 
+  /* 背景颜色 */
   --bg-primary: #ffffff;
   --bg-secondary: #f6ffed;
   --bg-tertiary: #d9f7be;
-  --bg-mask: rgba(0, 0, 0, 0.45);
+  --bg-tertiary-dark: #b7eb8f;
+  --bg-tertiary-dark-light: #f6ffed;
 
+  /* 边框颜色 */
   --border-color: #b7eb8f;
   --border-color-light: #d9f7be;
 
+  /* 功能色 */
   --success-color: #52c41a;
   --warning-color: #faad14;
   --error-color: #ff4d4f;
-  --info-color: #1890ff;
 
+  /* 阴影 */
   --box-shadow: 0 2px 8px rgba(82, 196, 26, 0.15);
   --box-shadow-light: 0 2px 4px rgba(82, 196, 26, 0.1);
 }

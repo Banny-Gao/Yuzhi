@@ -1,27 +1,35 @@
 /* 基础主题变量 - 默认黑白古风 */
 :root {
+  /* 主题色 */
   --primary-color: #333333;
-  --primary-light: #666666;
+  --primary-color-rgb: 51, 51, 51;
   --primary-dark: #000000;
+  --primary-light: #666666;
 
-  --text-primary: #101010;
-  --text-secondary: #333333;
-  --text-tertiary: #666666;
-  --text-disabled: #999999;
-
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --bg-tertiary: #e5e5e5;
-  --bg-mask: rgba(0, 0, 0, 0.65);
-
-  --border-color: #bbbbbb;
-  --border-color-light: #dddddd;
-
+  /* 功能色 */
   --success-color: #4c4c4c;
   --warning-color: #7c7c7c;
   --error-color: #2c2c2c;
   --info-color: #5c5c5c;
 
+  /* 文本颜色 */
+  --text-primary: #101010;
+  --text-secondary: #333333;
+  --text-tertiary: #666666;
+  --text-disabled: #999999;
+
+  /* 背景颜色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e5e5e5;
+  --bg-tertiary-dark: #d9d9d9;
+  --bg-tertiary-dark-light: #f0f0f0;
+
+  /* 边框颜色 */
+  --border-color: #bbbbbb;
+  --border-color-light: #dddddd;
+
+  /* 阴影 */
   --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   --box-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

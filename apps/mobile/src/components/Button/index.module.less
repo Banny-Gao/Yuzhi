@@ -1,0 +1,147 @@
+@import '@/styles/index.module.less';
+
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  border-radius: @border-radius;
+  .themeTransition;
+  border: none !important;
+  outline: none !important;
+  cursor: pointer;
+  line-height: normal;
+  text-align: center;
+  box-sizing: border-box;
+  margin: 0;
+
+  /* Override Taro button default styles */
+  &:after {
+    display: none !important;
+    border: none !important;
+  }
+
+  &:active {
+    background-color: inherit;
+  }
+}
+
+.block {
+  width: 100%;
+  display: flex;
+}
+
+// Button sizes
+.small {
+  height: 32px;
+  padding: 0 @padding-md;
+  font-size: @font-size;
+}
+
+.medium {
+  height: 40px;
+  padding: 0 @padding-lg;
+  font-size: @font-size-md;
+}
+
+.large {
+  height: 48px;
+  padding: 0 @padding-lg * 1.5;
+  font-size: @font-size-lg;
+}
+
+// Button types
+.primary {
+  .btn-primary;
+
+  &:active {
+    background-color: var(--primary-dark);
+  }
+
+  &:disabled {
+    background-color: var(--primary-light);
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.secondary {
+  .btn-secondary;
+
+  &:active {
+    background-color: var(--bg-tertiary-dark);
+  }
+
+  &:disabled {
+    background-color: var(--bg-tertiary-light);
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.outlined {
+  background-color: transparent;
+  .border;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color);
+
+  &:active {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+  }
+
+  &:disabled {
+    border-color: var(--text-disabled) !important;
+    .text-disabled;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.text {
+  background-color: transparent;
+  color: var(--primary-color);
+  padding-left: 0;
+  padding-right: 0;
+
+  &:active {
+    opacity: 0.7;
+  }
+
+  &:disabled {
+    .text-disabled;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Animations
+.animated {
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &.primary,
+  &.secondary {
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
+      border-radius: inherit;
+      .themeTransition;
+    }
+
+    &:active:after {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// Loading state
+.loading {
+  .loading-spinner;
+}
