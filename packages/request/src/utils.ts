@@ -58,7 +58,10 @@ export function withRetry<T>(requestFn: () => Promise<T>, retryConfig: RetryConf
 
         // 判断是否需要重试
         const shouldRetry =
-          attempts <= maxRetries && error instanceof ApiError && (statusCodes ? statusCodes.includes(error.status) : isRetryable(error.status))
+          attempts <= maxRetries &&
+          ((error instanceof ApiError && (statusCodes ? statusCodes.includes(error.status) : isRetryable(error.status))) ||
+            // 处理网络或连接错误
+            (error instanceof Error && (error.message?.includes('Network Error') || error.message?.includes('network') || error.message?.includes('timeout'))))
 
         if (shouldRetry) {
           // 计算延迟时间
@@ -76,7 +79,11 @@ export function withRetry<T>(requestFn: () => Promise<T>, retryConfig: RetryConf
     }
 
     // 启动第一次请求
-    attemptRequest()
+    try {
+      await attemptRequest()
+    } catch (error) {
+      reject(error)
+    }
   })
 }
 
@@ -136,8 +143,18 @@ export function withTimeout<T>(requestFn: (() => Promise<T>) | CancelablePromise
  */
 export function handleApiError(error: unknown, defaultMessage = '请求失败'): string {
   if (error instanceof ApiError) {
-    return `${error.message || error.statusText || defaultMessage} (${error.status})`
+    // 从API响应体中提取错误消息
+    const errorMessage =
+      error.body && typeof error.body === 'object' && 'message' in error.body ? error.body.message : error.message || error.statusText || defaultMessage
+
+    return `${errorMessage} (${error.status})`
   } else if (error instanceof Error) {
+    if (error.message?.includes('Network Error') || error.message?.includes('network')) {
+      return '网络连接错误，请检查您的网络设置'
+    }
+    if (error.message?.includes('timeout')) {
+      return '请求超时，请稍后重试'
+    }
     return error.message || defaultMessage
   }
 

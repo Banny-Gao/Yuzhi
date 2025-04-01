@@ -55,7 +55,10 @@ async function bootstrap() {
     .addBearerAuth() // 添加Bearer认证支持(JWT)
     .build()
 
-  const document = SwaggerModule.createDocument(app, config)
+  // 自动扫描所有控制器和它们使用的 DTO
+  const document = SwaggerModule.createDocument(app, config, {
+    deepScanRoutes: true, // 自动扫描所有路由和 DTO
+  })
   SwaggerModule.setup('api', app, document) // 设置文档路径为/api
 
   // 启动HTTP服务器

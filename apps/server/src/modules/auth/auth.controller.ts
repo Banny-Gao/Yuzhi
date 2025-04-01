@@ -1,82 +1,185 @@
-import { Controller, Post, Body, UseGuards, Req, HttpCode, HttpStatus, Get } from '@nestjs/common'
+import { Controller, Post, Body, UseGuards, Get, Request, HttpStatus } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { CreateUserDto } from '../users/dto/create-user.dto'
 import { LoginUserDto } from '../users/dto/login-user.dto'
 import { SmsLoginDto } from '../users/dto/sms-login.dto'
-import { LocalAuthGuard } from './guards/local-auth.guard'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard'
-import { ApiTags, ApiOperation, ApiResponse as SwaggerResponse, ApiBearerAuth } from '@nestjs/swagger'
-import { ResponseStatus } from '@workspace/request'
-import { ResponseUtil, ApiResponse } from '../../config'
+import { RefreshAuthGuard } from './guards/refresh-auth.guard'
+import { Public } from './decorators/public.decorator'
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiExtraModels } from '@nestjs/swagger'
+import { ApiResponse } from '../../common/dto/api-response.dto'
+import { LoginResponseDto, RegisterResponseDto, SmsLoginResponseDto, RefreshTokenResponseDto, LogoutResponseDto } from './dto/auth-response.dto'
+import { UserDto } from '../users/dto/user.dto'
 
-@ApiTags('Auth')
+@ApiTags('auth')
+@ApiExtraModels(ApiResponse, LoginResponseDto, RegisterResponseDto, SmsLoginResponseDto, RefreshTokenResponseDto, LogoutResponseDto, UserDto)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ summary: '用户注册' })
-  @SwaggerResponse({ status: ResponseStatus.SUCCESS, description: '注册成功' })
-  @SwaggerResponse({ status: ResponseStatus.BAD_REQUEST, description: '注册失败' })
-  @SwaggerResponse({ status: ResponseStatus.CONFLICT, description: '用户名/手机号/邮箱已存在' })
+  @Public()
   @Post('register')
-  async register(@Body() createUserDto: CreateUserDto): Promise<ApiResponse> {
+  @ApiOperation({ summary: '用户注册' })
+  @ApiCreatedResponse({
+    description: '注册成功',
+    schema: {
+      allOf: [
+        { $ref: '#/components/schemas/ApiResponse' },
+        {
+          properties: {
+            data: {
+              $ref: '#/components/schemas/RegisterResponseDto',
+            },
+          },
+        },
+      ],
+    },
+  })
+  async register(@Body() createUserDto: CreateUserDto): Promise<ApiResponse<RegisterResponseDto>> {
     const result = await this.authService.register(createUserDto)
-    return ResponseUtil.success(result, '注册成功')
+    return {
+      code: HttpStatus.CREATED,
+      data: result,
+      message: '注册成功',
+    }
   }
 
-  @ApiOperation({ summary: '用户登录' })
-  @SwaggerResponse({ status: ResponseStatus.SUCCESS, description: '登录成功' })
-  @SwaggerResponse({ status: ResponseStatus.UNAUTHORIZED, description: '未授权' })
-  @HttpCode(ResponseStatus.SUCCESS)
+  @Public()
   @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto): Promise<ApiResponse> {
+  @ApiOperation({ summary: '用户登录' })
+  @ApiOkResponse({
+    description: '登录成功',
+    schema: {
+      allOf: [
+        { $ref: '#/components/schemas/ApiResponse' },
+        {
+          properties: {
+            data: {
+              $ref: '#/components/schemas/LoginResponseDto',
+            },
+          },
+        },
+      ],
+    },
+  })
+  async login(@Body() loginUserDto: LoginUserDto): Promise<ApiResponse<LoginResponseDto>> {
     const result = await this.authService.login(loginUserDto)
-    return ResponseUtil.success(result, '登录成功')
+    return {
+      code: HttpStatus.OK,
+      data: result,
+      message: '登录成功',
+    }
   }
 
+  @Public()
+  @Post('sms-login')
   @ApiOperation({ summary: '短信验证码登录' })
-  @SwaggerResponse({ status: ResponseStatus.SUCCESS, description: '登录成功' })
-  @SwaggerResponse({ status: ResponseStatus.BAD_REQUEST, description: '登录失败' })
-  @HttpCode(ResponseStatus.SUCCESS)
-  @Post('login/sms')
-  async loginWithSms(@Body() smsLoginDto: SmsLoginDto): Promise<ApiResponse> {
+  @ApiOkResponse({
+    description: '登录成功',
+    schema: {
+      allOf: [
+        { $ref: '#/components/schemas/ApiResponse' },
+        {
+          properties: {
+            data: {
+              $ref: '#/components/schemas/SmsLoginResponseDto',
+            },
+          },
+        },
+      ],
+    },
+  })
+  async smsLogin(@Body() smsLoginDto: SmsLoginDto): Promise<ApiResponse<SmsLoginResponseDto>> {
     const result = await this.authService.loginWithSms(smsLoginDto)
-    return ResponseUtil.success(result, '登录成功')
+    return {
+      code: HttpStatus.OK,
+      data: result,
+      message: '登录成功',
+    }
   }
 
-  @ApiOperation({ summary: '刷新令牌' })
-  @SwaggerResponse({ status: ResponseStatus.SUCCESS, description: '刷新成功' })
-  @SwaggerResponse({ status: ResponseStatus.UNAUTHORIZED, description: '刷新失败' })
-  @ApiBearerAuth()
-  @UseGuards(JwtRefreshGuard)
-  @HttpCode(ResponseStatus.SUCCESS)
+  @UseGuards(RefreshAuthGuard)
   @Post('refresh')
-  async refreshTokens(@Req() req): Promise<ApiResponse> {
-    const userId = req.user.id
+  @ApiOperation({ summary: '刷新访问令牌' })
+  @ApiOkResponse({
+    description: '令牌刷新成功',
+    schema: {
+      allOf: [
+        { $ref: '#/components/schemas/ApiResponse' },
+        {
+          properties: {
+            data: {
+              $ref: '#/components/schemas/RefreshTokenResponseDto',
+            },
+          },
+        },
+      ],
+    },
+  })
+  async refreshTokens(@Request() req): Promise<ApiResponse<RefreshTokenResponseDto>> {
+    const userId = req.user.sub
     const refreshToken = req.user.refreshToken
-    const result = await this.authService.refreshTokens(userId, refreshToken)
-    return ResponseUtil.success(result, '令牌刷新成功')
+    const tokens = await this.authService.refreshTokens(userId, refreshToken)
+    return {
+      code: HttpStatus.OK,
+      data: tokens,
+      message: '令牌刷新成功',
+    }
   }
 
-  @ApiOperation({ summary: '退出登录' })
-  @SwaggerResponse({ status: ResponseStatus.SUCCESS, description: '退出成功' })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @HttpCode(ResponseStatus.SUCCESS)
   @Post('logout')
-  async logout(@Req() req): Promise<ApiResponse> {
-    await this.authService.logout(req.user.id)
-    return ResponseUtil.success(null, '退出登录成功')
+  @ApiOperation({ summary: '用户退出登录' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: '退出登录成功',
+    schema: {
+      allOf: [
+        { $ref: '#/components/schemas/ApiResponse' },
+        {
+          properties: {
+            data: {
+              $ref: '#/components/schemas/LogoutResponseDto',
+            },
+          },
+        },
+      ],
+    },
+  })
+  async logout(@Request() req): Promise<ApiResponse<LogoutResponseDto>> {
+    const userId = req.user.sub
+    const result = await this.authService.logout(userId)
+    return {
+      code: HttpStatus.OK,
+      data: result,
+      message: '退出登录成功',
+    }
   }
 
-  @ApiOperation({ summary: '获取当前用户信息' })
-  @SwaggerResponse({ status: ResponseStatus.SUCCESS, description: '获取成功' })
-  @SwaggerResponse({ status: ResponseStatus.UNAUTHORIZED, description: '未授权' })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req): ApiResponse {
-    return ResponseUtil.success(req.user, '获取用户资料成功')
+  @ApiOperation({ summary: '获取当前用户信息' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: '获取用户信息成功',
+    schema: {
+      allOf: [
+        { $ref: '#/components/schemas/ApiResponse' },
+        {
+          properties: {
+            data: {
+              $ref: '#/components/schemas/UserDto',
+            },
+          },
+        },
+      ],
+    },
+  })
+  async getProfile(@Request() req): Promise<ApiResponse<UserDto>> {
+    return {
+      code: HttpStatus.OK,
+      data: req.user,
+      message: '获取用户信息成功',
+    }
   }
 }

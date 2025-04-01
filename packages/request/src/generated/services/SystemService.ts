@@ -19,15 +19,16 @@ export class SystemService {
     }
     /**
      * 添加Origin到CORS白名单
-     * @param requestBody
      * @returns any
      * @throws ApiError
      */
-    public static corsControllerAddOrigin(
+    public static corsControllerAddOrigin({
+        requestBody,
+    }: {
         requestBody: {
             origin?: string;
         },
-    ): CancelablePromise<any> {
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/system/cors/origins',
@@ -37,13 +38,14 @@ export class SystemService {
     }
     /**
      * 从CORS白名单移除Origin
-     * @param origin
      * @returns any
      * @throws ApiError
      */
-    public static corsControllerRemoveOrigin(
+    public static corsControllerRemoveOrigin({
+        origin,
+    }: {
         origin: string,
-    ): CancelablePromise<any> {
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/system/cors/origins/{origin}',
@@ -54,13 +56,14 @@ export class SystemService {
     }
     /**
      * 检查Origin是否在CORS白名单中
-     * @param origin
      * @returns any
      * @throws ApiError
      */
-    public static corsControllerIsOriginAllowed(
+    public static corsControllerIsOriginAllowed({
+        origin,
+    }: {
         origin: string,
-    ): CancelablePromise<any> {
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/system/cors/origins/check/{origin}',

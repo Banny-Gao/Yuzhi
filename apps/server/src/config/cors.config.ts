@@ -1,4 +1,7 @@
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface'
+import { Logger } from '@nestjs/common'
+
+const logger = new Logger('CorsConfig')
 
 /**
  * 允许的跨域请求来源
@@ -32,7 +35,7 @@ export const corsOptions: CorsOptions = {
 export const addAllowedOrigin = (origin: string): string[] => {
   if (!allowedOrigins.includes(origin)) {
     allowedOrigins.push(origin)
-    console.log(`已添加Origin到CORS白名单: ${origin}`)
+    logger.debug(`Added origin to CORS whitelist: ${origin}`)
   }
   return allowedOrigins
 }
@@ -46,7 +49,7 @@ export const removeAllowedOrigin = (origin: string): string[] => {
   const index = allowedOrigins.indexOf(origin)
   if (index !== -1) {
     allowedOrigins.splice(index, 1)
-    console.log(`已从CORS白名单移除Origin: ${origin}`)
+    logger.debug(`Removed origin from CORS whitelist: ${origin}`)
   }
   return allowedOrigins
 }

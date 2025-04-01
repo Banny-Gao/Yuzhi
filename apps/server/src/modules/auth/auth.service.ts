@@ -6,7 +6,8 @@ import { UsersService } from '../users/users.service'
 import { CreateUserDto } from '../users/dto/create-user.dto'
 import { LoginUserDto } from '../users/dto/login-user.dto'
 import { SmsLoginDto } from '../users/dto/sms-login.dto'
-import { User } from '../users/entities/user.entity'
+import { LoginResponseDto, RegisterResponseDto, SmsLoginResponseDto, RefreshTokenResponseDto, LogoutResponseDto } from './dto/auth-response.dto'
+import { UserDto } from '../users/dto/user.dto'
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     private configService: ConfigService
   ) {}
 
-  async validateUser(usernameOrPhone: string, password: string): Promise<any> {
+  async validateUser(usernameOrPhone: string, password: string): Promise<Omit<UserDto, 'password' | 'refreshToken'> | null> {
     const user = await this.usersService.findByUsernameOrPhone(usernameOrPhone)
     if (user && (await bcrypt.compare(password, user.password))) {
       const { password, refreshToken, ...result } = user
@@ -25,16 +26,17 @@ export class AuthService {
     return null
   }
 
-  async register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
     try {
       const user = await this.usersService.create(createUserDto)
-      const { password, refreshToken, ...result } = user
+      const { password, refreshToken, ...userData } = user
       const tokens = await this.getTokens(user.id, user.username)
       await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
 
+      // Format the response to match RegisterResponseDto
       return {
-        ...result,
         ...tokens,
+        user: userData as UserDto,
       }
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -44,7 +46,7 @@ export class AuthService {
     }
   }
 
-  async login(loginUserDto: LoginUserDto) {
+  async login(loginUserDto: LoginUserDto): Promise<LoginResponseDto> {
     const user = await this.validateUser(loginUserDto.usernameOrPhone, loginUserDto.password)
 
     if (!user) {
@@ -58,24 +60,19 @@ export class AuthService {
       await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
     }
 
+    // Format the response to match LoginResponseDto
     return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        isPhoneVerified: user.isPhoneVerified,
-        isEmailVerified: user.isEmailVerified,
-      },
       ...tokens,
+      user: user as UserDto,
     }
   }
 
-  async loginWithSms(smsLoginDto: SmsLoginDto) {
+  async loginWithSms(smsLoginDto: SmsLoginDto): Promise<SmsLoginResponseDto> {
     // 在实际应用中，这里应该实现验证码验证逻辑
     // 这里简化处理，假设验证码已验证通过
 
     let user = await this.usersService.findByPhone(smsLoginDto.phoneNumber)
+    let isNewUser = false
 
     // 如果用户不存在，则为首次登录，需要注册
     if (!user) {
@@ -93,6 +90,7 @@ export class AuthService {
         }
 
         user = await this.usersService.create(createUserDto)
+        isNewUser = true
 
         // 标记手机号已验证
         user = await this.usersService.verifyPhone(user.id)
@@ -105,21 +103,17 @@ export class AuthService {
     const tokens = await this.getTokens(user.id, user.username)
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken)
 
+    const { password, refreshToken, ...userData } = user
+
+    // Format the response to match SmsLoginResponseDto
     return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        isPhoneVerified: user.isPhoneVerified,
-        isEmailVerified: user.isEmailVerified,
-      },
-      isNewUser: !user.isPhoneVerified,
       ...tokens,
+      user: userData as UserDto,
+      isNewUser,
     }
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
+  async refreshTokens(userId: string, refreshToken: string): Promise<RefreshTokenResponseDto> {
     const user = await this.usersService.findById(userId)
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException('刷新令牌已失效')
@@ -138,13 +132,13 @@ export class AuthService {
     return tokens
   }
 
-  async logout(userId: string) {
+  async logout(userId: string): Promise<LogoutResponseDto> {
     // 清除刷新令牌
     await this.usersService.updateRefreshToken(userId, null)
     return { message: '退出登录成功' }
   }
 
-  private async getTokens(userId: string, username: string) {
+  private async getTokens(userId: string, username: string): Promise<RefreshTokenResponseDto> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {

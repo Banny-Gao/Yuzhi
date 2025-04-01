@@ -9,13 +9,17 @@ import { request as __request } from '../core/request';
 export class SolarTermsService {
     /**
      * 获取二十四节气
-     * @param year 年份，默认为当前年份
      * @returns SolarTerm 返回二十四节气数据
      * @throws ApiError
      */
-    public static solarTermsControllerGetSolarTerms(
+    public static solarTermsControllerGetSolarTerms({
+        year,
+    }: {
+        /**
+         * 年份，默认为当前年份
+         */
         year?: number,
-    ): CancelablePromise<Array<SolarTerm>> {
+    }): CancelablePromise<Array<SolarTerm>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/calendar/solar-terms',

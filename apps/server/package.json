@@ -30,7 +30,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.8",
     "@nestjs/typeorm": "^10.0.1",
-    "@workspace/request": "workspace:^",
+    "@workspace/request": "workspace:*",
     "axios": "^1.8.2",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",

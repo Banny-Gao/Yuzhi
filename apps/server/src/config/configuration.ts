@@ -26,8 +26,8 @@ export default () => ({
   jwt: {
     secret: process.env.JWT_SECRET, // 访问令牌加密密钥
     refreshSecret: process.env.JWT_REFRESH_SECRET, // 刷新令牌加密密钥
-    accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m', // 访问令牌有效期，默认15分钟
-    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d', // 刷新令牌有效期，默认7天
+    accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN, // 访问令牌有效期，默认15分钟
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN, // 刷新令牌有效期，默认7天
   },
 
   // 短信服务配置(用于短信验证等功能)
