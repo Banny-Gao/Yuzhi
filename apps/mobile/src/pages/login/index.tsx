@@ -2,10 +2,10 @@ import React from 'react'
 import { View, Text, Switch, ScrollView, Input } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
 
-import AuthToggle from '@/pages/login/components/AuthToggle'
-import { PageWrapper } from '@/components'
 import InputField from '@/components/InputField'
 import ThemedButton from '@/components/Button'
+import AuthToggle from './components/AuthToggle'
+
 import { useLogin } from './useLogin'
 
 import styles from './index.module.less'
@@ -24,8 +24,7 @@ const Login: React.FC = () => {
     formErrors,
     username,
     password,
-    confirmPassword,
-    email,
+
     phoneNumber,
     smsCode,
     rememberMe,
@@ -37,8 +36,7 @@ const Login: React.FC = () => {
     handleUsernameInput,
     handlePhoneInput,
     handlePasswordInput,
-    handleConfirmPasswordInput,
-    handleEmailInput,
+
     handleSmsCodeInput,
     handleRememberMeChange,
     handleSubmit,
@@ -127,57 +125,20 @@ const Login: React.FC = () => {
     )
   }
 
-  // Render registration form
-  const renderRegistrationForm = () => {
-    return (
-      <View className={styles.formContent}>
-        <InputField label="用户名" value={username} onInput={handleUsernameInput} placeholder="请设置用户名" required error={formErrors.username} />
-
-        <InputField
-          label="手机号"
-          value={phoneNumber}
-          onInput={handlePhoneInput}
-          placeholder="请输入手机号"
-          type="number"
-          required
-          error={formErrors.phoneNumber}
-          maxLength={11}
-        />
-
-        <InputField label="邮箱" value={email} onInput={handleEmailInput} placeholder="请输入邮箱" required error={formErrors.email} />
-
-        <InputField label="密码" value={password} onInput={handlePasswordInput} placeholder="请设置密码" type="password" required error={formErrors.password} />
-
-        <InputField
-          label="确认密码"
-          value={confirmPassword}
-          onInput={handleConfirmPasswordInput}
-          placeholder="请再次输入密码"
-          type="password"
-          required
-          error={formErrors.confirmPassword}
-        />
-
-        <ThemedButton type="primary" size="large" onClick={handleSubmit} loading={isLoading} disabled={isLoading} block>
-          注册
-        </ThemedButton>
-      </View>
-    )
-  }
-
   // Render different forms based on auth mode
   const renderAuthForm = () => {
-    if (authMode === 'login') {
-      return renderAccountLoginForm()
-    } else if (authMode === 'smsLogin') {
-      return renderSmsLoginForm()
-    } else {
-      return renderRegistrationForm()
+    switch (authMode) {
+      case 'login':
+        return renderAccountLoginForm()
+      case 'smsLogin':
+        return renderSmsLoginForm()
+      default:
+        return null
     }
   }
 
   return (
-    <PageWrapper useScrollView={false}>
+    <>
       <div className={styles.header}>
         <div className={styles.logoContainer}>
           <Text className={styles.logoText}>禹智</Text>
@@ -197,7 +158,7 @@ const Login: React.FC = () => {
           </div>
         </ScrollView>
       </div>
-    </PageWrapper>
+    </>
   )
 }
 

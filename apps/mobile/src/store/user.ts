@@ -4,7 +4,7 @@ import { AuthService } from '@workspace/request'
 import { getStorage, setStorage, removeStorage, STORAGE_KEYS } from '@/utils/storage'
 import { goTo } from '@/utils/router'
 
-import type { LoginUserDto, SmsLoginDto, CreateUserDto, LoginResponseDto, RegisterResponseDto, UserDto, ApiResponse } from '@workspace/request'
+import type { LoginUserDto, SmsLoginDto, LoginResponseDto, RegisterResponseDto, UserDto } from '@workspace/request'
 export class UserStore {
   private token: string | null = null
   private userInfo: UserDto | null = null
@@ -100,25 +100,6 @@ export class UserStore {
       return await this.handleSuccessfulAuth(response)
     } catch (error) {
       console.error('SMS login failed:', error)
-      return false
-    } finally {
-      this.setLoading(false)
-    }
-  }
-
-  // Register new user
-  async register(userData: CreateUserDto) {
-    this.setLoading(true)
-
-    try {
-      const response = await withErrorHandling<RegisterResponseDto>(
-        async () => await AuthService.authControllerRegister({ requestBody: userData }),
-        '注册失败，请稍后重试'
-      )
-
-      return await this.handleSuccessfulAuth(response)
-    } catch (error) {
-      console.error('Registration failed:', error)
       return false
     } finally {
       this.setLoading(false)

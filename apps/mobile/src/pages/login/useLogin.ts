@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { router } from '@/utils/router'
 import routes from '@/generated.routes'
 import { userStore } from '@/store/user'
-import type { LoginUserDto, SmsLoginDto, CreateUserDto } from '@workspace/request'
+import type { LoginUserDto, SmsLoginDto } from '@workspace/request'
 
 // Validation utilities
 export const isValidEmail = (email: string) => {
@@ -27,7 +27,7 @@ export const isValidPassword = (password: string) => {
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,30}$/.test(password)
 }
 
-export type AuthMode = 'login' | 'register' | 'smsLogin'
+export type AuthMode = 'login' | 'smsLogin'
 
 export const useLogin = () => {
   const scrollViewRef = useRef<any>(null)
@@ -40,10 +40,9 @@ export const useLogin = () => {
   const [countdown, setCountdown] = useState(0)
 
   // Form state
-  const [username, setUsername] = useState('johndoe')
-  const [password, setPassword] = useState('Password123!')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('admin')
+  const [password, setPassword] = useState('Admin@123')
+
   const [phoneNumber, setPhoneNumber] = useState('')
   const [smsCode, setSmsCode] = useState('')
   const [rememberMe, setRememberMe] = useState(true)
@@ -92,8 +91,7 @@ export const useLogin = () => {
   const resetForm = () => {
     setUsername('')
     setPassword('')
-    setConfirmPassword('')
-    setEmail('')
+
     setPhoneNumber('')
     setSmsCode('')
     setFormErrors({})
@@ -105,17 +103,6 @@ export const useLogin = () => {
 
     if (value) {
       clearError('username')
-    }
-
-    // 注册模式下的用户名验证
-    if (authMode === 'register' && value) {
-      if (value.length < 3 || value.length > 20) {
-        setError('username', '用户名长度必须在3-20个字符之间')
-      } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
-        setError('username', '用户名只能包含字母、数字和下划线')
-      } else {
-        clearError('username')
-      }
     }
 
     // Phone number validation if applicable
@@ -146,56 +133,6 @@ export const useLogin = () => {
 
     if (value) {
       clearError('password')
-    }
-
-    // For registration, validate password
-    if (authMode === 'register' && value.length > 0) {
-      if (value.length < 8 || value.length > 30) {
-        setError('password', '密码长度必须在8-30个字符之间')
-      } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value)) {
-        setError('password', '密码必须包含至少一个大写字母、一个小写字母、一个数字和一个特殊字符')
-      } else {
-        clearError('password')
-      }
-    }
-
-    // Also validate confirm password if it exists
-    validatePasswordMatch(value, confirmPassword)
-  }
-
-  const validatePasswordMatch = (pass: string, confirmPass: string) => {
-    if (!confirmPass) return
-
-    if (pass !== confirmPass) {
-      setError('confirmPassword', '两次密码输入不一致')
-    } else {
-      clearError('confirmPassword')
-    }
-  }
-
-  const handleConfirmPasswordInput = (value: string) => {
-    setConfirmPassword(value)
-
-    if (!value) {
-      setError('confirmPassword', '请确认密码')
-      return
-    }
-
-    validatePasswordMatch(password, value)
-  }
-
-  const handleEmailInput = (value: string) => {
-    setEmail(value)
-
-    if (!value) {
-      setError('email', '请输入邮箱')
-      return
-    }
-
-    if (!isValidEmail(value)) {
-      setError('email', '请输入有效的邮箱地址')
-    } else {
-      clearError('email')
     }
   }
 
@@ -230,30 +167,6 @@ export const useLogin = () => {
     } else if (authMode === 'smsLogin') {
       validatePhone()
       if (!smsCode) errors.smsCode = '请输入验证码'
-    } else if (authMode === 'register') {
-      if (!username) {
-        errors.username = '请输入用户名'
-      } else if (username.length < 3 || username.length > 20) {
-        errors.username = '用户名长度必须在3-20个字符之间'
-      } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-        errors.username = '用户名只能包含字母、数字和下划线'
-      }
-
-      if (!password) {
-        errors.password = '请输入密码'
-      } else if (password.length < 8 || password.length > 30) {
-        errors.password = '密码长度必须在8-30个字符之间'
-      } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(password)) {
-        errors.password = '密码必须包含至少一个大写字母、一个小写字母、一个数字和一个特殊字符'
-      }
-
-      if (!confirmPassword) errors.confirmPassword = '请确认密码'
-      else if (password !== confirmPassword) errors.confirmPassword = '两次密码输入不一致'
-
-      if (!email) errors.email = '请输入邮箱'
-      else if (!isValidEmail(email)) errors.email = '请输入有效的邮箱地址'
-
-      validatePhone()
     }
 
     setFormErrors(errors)
@@ -282,14 +195,6 @@ export const useLogin = () => {
           code: smsCode,
         }
         success = await userStore.smsLogin(smsData)
-      } else if (authMode === 'register') {
-        const registerData: CreateUserDto = {
-          username,
-          email,
-          phoneNumber,
-          password,
-        }
-        success = await userStore.register(registerData)
       }
 
       if (success) {
@@ -345,8 +250,6 @@ export const useLogin = () => {
     formErrors,
     username,
     password,
-    confirmPassword,
-    email,
     phoneNumber,
     smsCode,
     rememberMe,
@@ -358,8 +261,7 @@ export const useLogin = () => {
     handleUsernameInput,
     handlePhoneInput,
     handlePasswordInput,
-    handleConfirmPasswordInput,
-    handleEmailInput,
+
     handleSmsCodeInput,
     handleRememberMeChange,
     handleSubmit,

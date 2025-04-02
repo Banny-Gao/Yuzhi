@@ -4,8 +4,8 @@
  */
 
 const routes = {
-  "Archives": {
-    "path": "/pages/Archives/index",
+  "archives": {
+    "path": "/pages/archives/index",
     "meta": {
       "title": "档案",
       "requiresAuth": true,
@@ -30,13 +30,6 @@ const routes = {
     "path": "/pages/login/index",
     "meta": {
       "title": "登录页面",
-      "requiresAuth": false
-    }
-  },
-  "login_components_AuthToggle": {
-    "path": "/pages/login/components/AuthToggle/index",
-    "meta": {
-      "title": "AuthToggle",
       "requiresAuth": false
     }
   },

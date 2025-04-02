@@ -1,8 +1,7 @@
 @import '@/styles/index.module.less';
 
 .toggle {
-  .horizontal-box(0, 0);
-  border-bottom: 1px solid var(--border-color-light);
+  .horizontal-box(@padding-lg, 0);
   position: relative;
 }
 
@@ -26,11 +25,13 @@
     content: '';
     position: absolute;
     bottom: -1px;
-    left: 0;
-    width: 100%;
+    width: 50%;
+    left: 25%;
+
     height: 2px;
     background-color: var(--primary-color);
     .themeTransition;
+    .scaleIn;
   }
 
   .text {

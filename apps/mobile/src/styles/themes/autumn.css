@@ -5,6 +5,11 @@
   --primary-dark: #d35400;
   --primary-light: #fff5eb;
 
+  --success-color: #2ecc71;
+  --warning-color: #f1c40f;
+  --error-color: #e74c3c;
+  --info-color: #e67e22;
+
   --text-primary: #2c3e50;
   --text-secondary: #34495e;
   --text-tertiary: #7f8c8d;
@@ -18,10 +23,6 @@
 
   --border-color: #ffd4b8;
   --border-color-light: #ffe4d0;
-
-  --success-color: #2ecc71;
-  --warning-color: #f1c40f;
-  --error-color: #e74c3c;
 
   --box-shadow: 0 2px 8px rgba(230, 126, 34, 0.15);
   --box-shadow-light: 0 2px 4px rgba(230, 126, 34, 0.1);

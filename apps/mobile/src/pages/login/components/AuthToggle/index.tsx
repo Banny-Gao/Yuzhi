@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text } from '@tarojs/components'
 import styles from './index.module.less'
 
-export type AuthMode = 'login' | 'register' | 'smsLogin'
+export type AuthMode = 'login' | 'smsLogin'
 
 interface AuthToggleProps {
   currentMode: AuthMode
@@ -22,10 +22,6 @@ const AuthToggle: React.FC<AuthToggleProps> = ({ currentMode, onChange }) => {
 
       <View className={getTabClass('smsLogin')} onClick={() => onChange('smsLogin')}>
         <Text className={styles.text}>短信登录</Text>
-      </View>
-
-      <View className={getTabClass('register')} onClick={() => onChange('register')}>
-        <Text className={styles.text}>注册账号</Text>
       </View>
     </View>
   )

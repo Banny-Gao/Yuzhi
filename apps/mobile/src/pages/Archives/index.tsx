@@ -15,7 +15,7 @@ export default function Archives () {
   })
 
   return (
-    <View className='Archives'>
+    <View className='archives'>
       <Text>Hello world!</Text>
     </View>
   )

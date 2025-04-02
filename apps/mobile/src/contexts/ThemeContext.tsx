@@ -1,9 +1,7 @@
-/**
- * 主题上下文
- */
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import Taro from '@tarojs/taro'
 import { ThemeType, getSeasonalTheme } from '../styles/themes/themeTypes'
+import { getStorage, setStorage, STORAGE_KEYS } from '@/utils/storage'
 import '../styles/themes/index.css'
 
 // 主题上下文接口
@@ -13,13 +11,10 @@ interface ThemeContextType {
   toggleTheme: (themes: ThemeType[]) => void
 }
 
-// 本地存储的主题类型键名
-const STORAGE_THEME_KEY = process.env.TARO_APP_STORAGE_THEME_KEY!
-
 // 创建主题上下文
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextType | null>(null)
 
-// 主题提供者的属性
+// 主题提供者属性接口
 interface ThemeProviderProps {
   children: React.ReactNode
   initialTheme?: ThemeType
@@ -34,9 +29,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialT
   const [themeType, setThemeType] = useState<ThemeType>(() => {
     // 尝试从存储中读取主题设置
     try {
-      const savedTheme = Taro.getStorageSync(STORAGE_THEME_KEY)
+      const savedTheme = getStorage<ThemeType>(STORAGE_KEYS.THEME)
       if (savedTheme) {
-        return savedTheme as ThemeType
+        return savedTheme
       }
 
       // 如果设置了使用季节性主题且没有保存的主题
@@ -51,12 +46,32 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialT
     return initialTheme
   })
 
-  // 更新DOM上的data-theme属性
+  // 更新主题
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', themeType)
-
     try {
-      Taro.setStorageSync(STORAGE_THEME_KEY, themeType)
+      // 保存主题设置
+      setStorage(STORAGE_KEYS.THEME, themeType)
+
+      // 根据环境设置主题
+      if (process.env.TARO_ENV === 'h5') {
+        // H5环境：设置CSS变量
+        const root = document.documentElement
+        if (root) {
+          root.setAttribute('data-theme', themeType)
+        }
+      } else {
+        // 小程序环境：设置页面根节点样式
+        const query = Taro.createSelectorQuery()
+        query
+          .select('#app')
+          .node()
+          .exec(res => {
+            if (res[0]?.node) {
+              const appNode = res[0].node
+              appNode.setAttribute('data-theme', themeType)
+            }
+          })
+      }
     } catch (e) {
       console.error('保存主题设置失败', e)
     }
@@ -81,17 +96,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialT
   return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>
 }
 
-/**
- * 使用主题的钩子
- * @returns 主题上下文
- */
-export const useTheme = (): ThemeContextType => {
+// 导出主题上下文
+export const useTheme = () => {
   const context = useContext(ThemeContext)
-
   if (!context) {
-    throw new Error('useTheme 必须在 ThemeProvider 内部使用')
+    throw new Error('useTheme must be used within a ThemeProvider')
   }
-
   return context
 }
 

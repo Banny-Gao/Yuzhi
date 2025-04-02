@@ -3,21 +3,88 @@
 .page {
   .bg-primary;
   .text-primary;
-  .vertical-box(@padding-lg, @gap-lg);
-
+  width: 100vw;
   height: 100vh;
   font-size: @font-size;
   line-height: 1.5;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar {
+  .bg-primary;
+  .text-primary;
+  height: 88px;
+  padding: 0 @padding-lg;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.backButton {
+  position: absolute;
+  left: @padding-lg;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.backIcon {
+  font-size: 24px;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .content {
   flex: 1;
   width: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
+}
+
+.tabbar {
+  .bg-primary;
+  .text-secondary;
+  height: 100px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabbarItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+
+.tabbarIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 4px;
+}
+
+.tabbarText {
+  font-size: 24px;
+}
+
+.active {
+  .tabbarText {
+    .text-primary;
+  }
 }
 
 .scrollContent {

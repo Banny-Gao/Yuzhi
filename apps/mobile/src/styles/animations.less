@@ -156,3 +156,16 @@
 .delay-5 {
   animation-delay: 0.5s;
 }
+
+.scaleIn(@duration: 0.25s) {
+  animation: scaleIn @duration ease-in-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

@@ -52,7 +52,7 @@ function parseMeta(filePath) {
 }
 
 /**
- * 递归获取目录下的所有页面
+ * 递归获取目录下的所有页面, 过滤 components 目录
  * @param {string} dir 目录路径
  * @param {string} baseDir 基础目录路径
  * @returns {Object} 路由配置对象
@@ -75,7 +75,7 @@ function getPages(dir, baseDir = '') {
     const stat = fs.statSync(fullPath)
 
     // 如果是目录，则作为页面处理
-    if (stat.isDirectory()) {
+    if (stat.isDirectory() && !file.includes('components')) {
       const pagePath = path.join(baseDir, file)
 
       // 检查是否存在 index.tsx 作为页面入口
