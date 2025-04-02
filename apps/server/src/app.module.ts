@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
@@ -13,6 +13,7 @@ import databaseConfig from './config/database.config'
 import jwtConfig from './config/jwt.config'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 import { ResponseInterceptor } from './common/interceptors/response.interceptor'
+import { CorsConfig } from './config/cors.config'
 
 /**
  * 主应用模块 - Bazi API服务器的根模块
@@ -34,7 +35,10 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     // 从.env文件和配置服务读取连接参数
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: () => databaseConfig(),
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        ...configService.get('database'),
+      }),
     }),
 
     // 用户管理模块 - 处理用户数据的CRUD操作和用户信息管理
@@ -60,6 +64,8 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
     },
+    CorsConfig,
   ], // 根服务 - 提供基本的应用功能
+  exports: [CorsConfig],
 })
 export class AppModule {}

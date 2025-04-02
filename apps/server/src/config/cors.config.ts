@@ -1,63 +1,27 @@
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface'
-import { Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
+import { CorsConfigService } from '../modules/system/services/cors-config.service'
 
-const logger = new Logger('CorsConfig')
+@Injectable()
+export class CorsConfig {
+  constructor(private readonly corsConfigService: CorsConfigService) {}
 
-/**
- * 允许的跨域请求来源
- * 开发环境和生产环境的前端域名列表
- */
-export const allowedOrigins = [
-  // 开发环境
-  'http://localhost:10086',
-  'http://192.168.72.31:10086',
+  async createCorsOptions(): Promise<CorsOptions> {
+    const configs = await this.corsConfigService.getAllowedOrigins()
+    const allowedOrigins = ['http://localhost:3000', ...configs.map(config => config.origin)]
 
-  // 可以添加生产环境域名
-  // 'https://example.com',
-]
-
-/**
- * CORS配置选项
- */
-export const corsOptions: CorsOptions = {
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  credentials: true, // 允许携带认证信息(cookies, headers等)
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-App-Version', 'X-Platform'],
-  exposedHeaders: ['X-Auth-Token'], // 允许浏览器访问这些响应头
-}
-
-/**
- * 添加允许的Origin到白名单
- * @param origin 新的Origin URL
- * @returns 当前白名单列表
- */
-export const addAllowedOrigin = (origin: string): string[] => {
-  if (!allowedOrigins.includes(origin)) {
-    allowedOrigins.push(origin)
-    logger.debug(`Added origin to CORS whitelist: ${origin}`)
+    return {
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true)
+        } else {
+          callback(new Error('Not allowed by CORS'))
+        }
+      },
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      exposedHeaders: ['Content-Disposition'],
+    }
   }
-  return allowedOrigins
-}
-
-/**
- * 从白名单中移除Origin
- * @param origin 要移除的Origin URL
- * @returns 当前白名单列表
- */
-export const removeAllowedOrigin = (origin: string): string[] => {
-  const index = allowedOrigins.indexOf(origin)
-  if (index !== -1) {
-    allowedOrigins.splice(index, 1)
-    logger.debug(`Removed origin from CORS whitelist: ${origin}`)
-  }
-  return allowedOrigins
-}
-
-/**
- * 获取当前允许的Origin列表
- * @returns 当前白名单列表
- */
-export const getAllowedOrigins = (): string[] => {
-  return [...allowedOrigins]
 }

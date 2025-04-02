@@ -3,9 +3,11 @@ import { ValidationPipe } from '@nestjs/common'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ConfigService } from '@nestjs/config'
 import { AppModule } from './app.module'
-import { corsOptions } from './config/cors.config'
+import { CorsConfig } from './config/cors.config'
 import { HttpExceptionFilter, AllExceptionsFilter } from './config/http-exception.filter'
 import { ValidationException } from './config/exceptions'
+import { ApiResponse } from './common/dto/api-response.dto'
+import { CorsConfigDto } from './modules/system/dto/cors.dto'
 
 /**
  * 应用程序引导函数 - 负责创建并配置NestJS应用实例
@@ -21,9 +23,9 @@ async function bootstrap() {
   // 获取配置服务，用于读取环境变量和配置
   const configService = app.get(ConfigService)
 
-  // 启用CORS(跨域资源共享)
-  // 允许前端应用从不同的域名/端口访问API
-  app.enableCors(corsOptions)
+  // 获取 CORS 配置
+  const corsConfig = app.get(CorsConfig)
+  app.enableCors(await corsConfig.createCorsOptions())
 
   // 注册全局异常过滤器
   // 确保所有响应异常都有统一的格式
@@ -48,16 +50,11 @@ async function bootstrap() {
 
   // 设置Swagger API文档
   // 为API提供交互式文档界面，便于开发和测试
-  const config = new DocumentBuilder()
-    .setTitle('Yuzhi API') // API标题
-    .setDescription('The Yuzhi API documentation') // API描述
-    .setVersion('1.0') // API版本
-    .addBearerAuth() // 添加Bearer认证支持(JWT)
-    .build()
+  const config = new DocumentBuilder().setTitle('API 文档').setDescription('API 接口文档').setVersion('1.0').addBearerAuth().build()
 
   // 自动扫描所有控制器和它们使用的 DTO
   const document = SwaggerModule.createDocument(app, config, {
-    deepScanRoutes: true, // 自动扫描所有路由和 DTO
+    extraModels: [ApiResponse, CorsConfigDto], // 添加额外的模型到 Swagger
   })
   SwaggerModule.setup('api', app, document) // 设置文档路径为/api
 

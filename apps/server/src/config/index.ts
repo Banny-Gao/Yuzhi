@@ -15,4 +15,7 @@ export * from './response.util'
 export * from './http-exception.filter'
 
 // 导出CORS配置
-export { corsOptions } from './cors.config'
+export { default as configuration } from './configuration'
+export { default as databaseConfig } from './database.config'
+export { default as jwtConfig } from './jwt.config'
+export { CorsConfig } from './cors.config'

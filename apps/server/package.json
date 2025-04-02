@@ -10,7 +10,6 @@
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -18,8 +17,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "clean": "rm -rf dist",
     "test:db": "node scripts/test-db-connection.js",
-    "fix:db": "node scripts/fix-database.js",
-    "migrate:run": "node scripts/run-migration.js"
+    "fix:db": "cd scripts/fix-database && pnpm install && node index.js",
+    "migration:run": "ts-node scripts/migration.ts",
+    "migration:revert": "ts-node scripts/migration.ts revert",
+    "migration:generate": "ts-node scripts/migration.ts generate"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -43,7 +44,8 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "inquirer": "^8.2.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.0.0",

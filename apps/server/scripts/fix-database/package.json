@@ -1,0 +1,11 @@
+{
+  "name": "fix-database",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "inquirer": "^8.2.5",
+    "mysql2": "^3.13.0",
+    "dotenv": "^16.3.1"
+  }
+}

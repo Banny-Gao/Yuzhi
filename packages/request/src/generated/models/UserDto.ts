@@ -39,5 +39,8 @@ export type UserDto = {
      * 用户更新时间
      */
     updatedAt: string;
+    nickname?: string;
+    roles: Array<string>;
+    isActive: boolean;
 };
 

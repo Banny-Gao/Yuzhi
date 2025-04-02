@@ -28,6 +28,15 @@ export class User {
   @Column({ nullable: true, length: 200 })
   refreshToken: string
 
+  @Column({ unique: true, nullable: true })
+  nickname: string
+
+  @Column('simple-array', { default: ['user'] })
+  roles: string[]
+
+  @Column({ default: true, name: 'is_active' })
+  isActive: boolean
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date
 

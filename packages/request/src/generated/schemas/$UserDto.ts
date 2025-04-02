@@ -50,5 +50,19 @@ export const $UserDto = {
             isRequired: true,
             format: 'date-time',
         },
+        nickname: {
+            type: 'string',
+        },
+        roles: {
+            type: 'array',
+            contains: {
+                type: 'string',
+            },
+            isRequired: true,
+        },
+        isActive: {
+            type: 'boolean',
+            isRequired: true,
+        },
     },
 } as const;

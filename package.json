@@ -46,7 +46,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "pnpm run lint"
+      "turbo run lint"
     ],
     "*.{json,md,yml}": [
       "prettier --write"
