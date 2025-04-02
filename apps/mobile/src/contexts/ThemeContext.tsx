@@ -14,7 +14,7 @@ interface ThemeContextType {
 }
 
 // 本地存储的主题类型键名
-const STORAGE_THEME_KEY = 'APP_THEME_TYPE'
+const STORAGE_THEME_KEY = process.env.TARO_APP_STORAGE_THEME_KEY!
 
 // 创建主题上下文
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
@@ -63,7 +63,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialT
   }, [themeType])
 
   // 切换主题的函数
-  const toggleTheme = (themes: ThemeType[] = ['default', 'spring', 'summer', 'autumn', 'winter', 'newYear']) => {
+  const toggleTheme = (themes: ThemeType[] = ['default', 'spring', 'summer', 'autumn', 'winter', 'newYear', 'dark']) => {
     setThemeType(currentTheme => {
       const currentIndex = themes.indexOf(currentTheme)
       const nextIndex = (currentIndex + 1) % themes.length

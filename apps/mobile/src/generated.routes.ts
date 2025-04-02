@@ -4,6 +4,14 @@
  */
 
 const routes = {
+  "Archives": {
+    "path": "/pages/Archives/index",
+    "meta": {
+      "title": "档案",
+      "requiresAuth": true,
+      "requiresPermission": " general"
+    }
+  },
   "forbidden": {
     "path": "/pages/forbidden/index",
     "meta": {
@@ -14,7 +22,7 @@ const routes = {
   "index": {
     "path": "/pages/index/index",
     "meta": {
-      "title": "首页",
+      "title": "排盘",
       "requiresAuth": true
     }
   },
@@ -22,6 +30,13 @@ const routes = {
     "path": "/pages/login/index",
     "meta": {
       "title": "登录页面",
+      "requiresAuth": false
+    }
+  },
+  "login_components_AuthToggle": {
+    "path": "/pages/login/components/AuthToggle/index",
+    "meta": {
+      "title": "AuthToggle",
       "requiresAuth": false
     }
   },
@@ -38,14 +53,6 @@ const routes = {
     "meta": {
       "title": "个人中心",
       "requiresAuth": true
-    }
-  },
-  "toggleTheme": {
-    "path": "/pages/toggleTheme/index",
-    "meta": {
-      "title": "主题切换",
-      "requiresAuth": false,
-      "requiresPermission": "more"
     }
   }
 }

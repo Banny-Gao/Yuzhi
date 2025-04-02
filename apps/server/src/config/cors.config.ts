@@ -7,12 +7,14 @@ export class CorsConfig {
   constructor(private readonly corsConfigService: CorsConfigService) {}
 
   async createCorsOptions(): Promise<CorsOptions> {
-    const configs = await this.corsConfigService.getAllowedOrigins()
-    const allowedOrigins = ['http://localhost:3000', ...configs.map(config => config.origin)]
-
     return {
-      origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+      origin: async (origin, callback) => {
+        const configs = await this.corsConfigService.getAllowedOrigins()
+        const allowedOrigins = ['http://localhost', ...configs.map(config => config.origin)]
+        const isAllowedOrigin = (origin: string): boolean => {
+          return allowedOrigins.some(allowedOrigin => origin.startsWith(allowedOrigin))
+        }
+        if (!origin || isAllowedOrigin(origin)) {
           callback(null, true)
         } else {
           callback(new Error('Not allowed by CORS'))

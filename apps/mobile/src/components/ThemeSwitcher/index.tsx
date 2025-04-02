@@ -5,7 +5,7 @@ import { FC, useCallback, useEffect, useState } from 'react'
 import { View, Button, Text } from '@tarojs/components'
 
 import { useTheme } from '@/contexts/ThemeContext'
-import { getAvailableThemes, ThemeType } from '@/styles/themes/themeTypes'
+import { themeTypes, ThemeType } from '@/styles/themes/themeTypes'
 import styles from './index.module.less'
 
 /**
@@ -33,9 +33,6 @@ const getThemeIcon = (themeType: ThemeType): string => {
 const ThemeSwitcher: FC = () => {
   const { themeType, setThemeType } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
-
-  // Available themes
-  const availableThemes = getAvailableThemes()
 
   // Handle theme change
   const handleThemeChange = useCallback(
@@ -80,7 +77,7 @@ const ThemeSwitcher: FC = () => {
       </Button>
 
       <View className={menuClass}>
-        {availableThemes.map((theme, index) => {
+        {themeTypes.map((theme, index) => {
           const itemClass = [styles.item, theme === themeType && styles.itemActive].filter(Boolean).join(' ')
 
           const iconClass = [styles.icon, theme === themeType && styles.activeIcon].filter(Boolean).join(' ')

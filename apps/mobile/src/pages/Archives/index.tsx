@@ -1,23 +1,22 @@
 import { View, Text } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
-
 import './index.less'
 
 export const pageMeta = {
-  title: '排盘',
+  title: '档案',
   requiresAuth: true,
-}
+  requiresPermission:' general',
+};
 
-const Index = () => {
+
+export default function Archives () {
   useLoad(() => {
     console.log('Page loaded.')
   })
 
   return (
-    <View className="index">
+    <View className='Archives'>
       <Text>Hello world!</Text>
     </View>
   )
 }
-
-export default Index

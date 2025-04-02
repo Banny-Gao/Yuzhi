@@ -2,9 +2,6 @@
  * 主题类型定义
  */
 
-// 主题类型
-export type ThemeType = 'default' | 'spring' | 'summer' | 'autumn' | 'winter' | 'newYear' | 'dark'
-
 // 主题的可读名称
 export const themeNames = {
   default: '默认',
@@ -16,10 +13,8 @@ export const themeNames = {
   dark: '暗黑',
 }
 
-// 获取所有可用主题
-export function getAvailableThemes(): ThemeType[] {
-  return ['default', 'spring', 'summer', 'autumn', 'winter', 'newYear', 'dark']
-}
+export const themeTypes = ['default', 'spring', 'summer', 'autumn', 'winter', 'newYear', 'dark'] as const
+export type ThemeType = (typeof themeTypes)[number]
 
 // 获取当前季节对应的主题
 export function getSeasonalTheme(): ThemeType {
