@@ -123,6 +123,9 @@ importers:
       '@workspace/request':
         specifier: workspace:*
         version: link:../../packages/request
+      classnames:
+        specifier: ^2.5.1
+        version: 2.5.1
       commander:
         specifier: ^12.0.0
         version: 12.1.0

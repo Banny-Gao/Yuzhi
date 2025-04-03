@@ -1,33 +1,68 @@
 /* 春季主题 - 清新绿 */
 [data-theme='spring'] {
   /* 主题色 */
-  --primary-color: #52c41a;
+  --primary-color: rgb(82, 196, 26);
   --primary-color-rgb: 82, 196, 26;
-  --primary-dark: #389e0d;
-  --primary-light: #f6ffed;
+  --primary-color-rgba: rgba(82, 196, 26, 0.75);
+  --primary-dark: rgb(56, 158, 13);
+  --primary-dark-rgb: 56, 158, 13;
+  --primary-dark-rgba: rgba(56, 158, 13, 0.75);
+  --primary-light: rgb(246, 255, 237);
+  --primary-light-rgb: 246, 255, 237;
+  --primary-light-rgba: rgba(246, 255, 237, 0.75);
 
   /* 功能色 */
-  --success-color: #52c41a;
-  --warning-color: #faad14;
-  --error-color: #ff4d4f;
-  --info-color: #13c2c2;
+  --success-color: rgb(82, 196, 26);
+  --success-color-rgb: 82, 196, 26;
+  --success-color-rgba: rgba(82, 196, 26, 0.75);
+  --warning-color: rgb(250, 173, 20);
+  --warning-color-rgb: 250, 173, 20;
+  --warning-color-rgba: rgba(250, 173, 20, 0.75);
+  --error-color: rgb(255, 77, 79);
+  --error-color-rgb: 255, 77, 79;
+  --error-color-rgba: rgba(255, 77, 79, 0.75);
+  --info-color: rgb(19, 194, 194);
+  --info-color-rgb: 19, 194, 194;
+  --info-color-rgba: rgba(19, 194, 194, 0.75);
 
   /* 文本颜色 */
-  --text-primary: #262626;
-  --text-secondary: #595959;
-  --text-tertiary: #8c8c8c;
-  --text-disabled: #bfbfbf;
+  --text-primary: rgb(38, 38, 38);
+  --text-primary-rgb: 38, 38, 38;
+  --text-primary-rgba: rgba(38, 38, 38, 0.75);
+  --text-secondary: rgb(89, 89, 89);
+  --text-secondary-rgb: 89, 89, 89;
+  --text-secondary-rgba: rgba(89, 89, 89, 0.75);
+  --text-tertiary: rgb(140, 140, 140);
+  --text-tertiary-rgb: 140, 140, 140;
+  --text-tertiary-rgba: rgba(140, 140, 140, 0.75);
+  --text-disabled: rgb(191, 191, 191);
+  --text-disabled-rgb: 191, 191, 191;
+  --text-disabled-rgba: rgba(191, 191, 191, 0.75);
 
   /* 背景颜色 */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f6ffed;
-  --bg-tertiary: #d9f7be;
-  --bg-tertiary-dark: #b7eb8f;
-  --bg-tertiary-dark-light: #f6ffed;
+  --bg-primary: rgb(255, 255, 255);
+  --bg-primary-rgb: 255, 255, 255;
+  --bg-primary-rgba: rgba(255, 255, 255, 0.75);
+  --bg-secondary: rgb(246, 255, 237);
+  --bg-secondary-rgb: 246, 255, 237;
+  --bg-secondary-rgba: rgba(246, 255, 237, 0.75);
+  --bg-tertiary: rgb(217, 247, 190);
+  --bg-tertiary-rgb: 217, 247, 190;
+  --bg-tertiary-rgba: rgba(217, 247, 190, 0.75);
+  --bg-tertiary-dark: rgb(183, 235, 143);
+  --bg-tertiary-dark-rgb: 183, 235, 143;
+  --bg-tertiary-dark-rgba: rgba(183, 235, 143, 0.75);
+  --bg-tertiary-dark-light: rgb(246, 255, 237);
+  --bg-tertiary-dark-light-rgb: 246, 255, 237;
+  --bg-tertiary-dark-light-rgba: rgba(246, 255, 237, 0.75);
 
   /* 边框颜色 */
-  --border-color: #b7eb8f;
-  --border-color-light: #d9f7be;
+  --border-color: rgb(183, 235, 143);
+  --border-color-rgb: 183, 235, 143;
+  --border-color-rgba: rgba(183, 235, 143, 0.75);
+  --border-color-light: rgb(217, 247, 190);
+  --border-color-light-rgb: 217, 247, 190;
+  --border-color-light-rgba: rgba(217, 247, 190, 0.75);
 
   /* 阴影 */
   --box-shadow: 0 2px 8px rgba(82, 196, 26, 0.15);

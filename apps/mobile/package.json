@@ -57,6 +57,7 @@
     "@tarojs/taro": "4.0.9",
     "@workspace/bazi": "workspace:*",
     "@workspace/request": "workspace:*",
+    "classnames": "^2.5.1",
     "commander": "^12.0.0",
     "inquirer": "^8.2.6",
     "mobx": "^6.13.7",

@@ -1,6 +1,7 @@
-import { showLoading, hideLoading } from '@tarojs/taro'
 import { setupApiClient, ApiClientOptions } from '@workspace/request'
 import { getStorage, removeStorage, STORAGE_KEYS } from './storage'
+
+import { loadingManager } from '@/components'
 
 /**
  * 格式化API响应
@@ -27,7 +28,7 @@ export function initApiClient(baseUrl: string): void {
     // 请求拦截器
     requestInterceptor: config => {
       // 显示加载提示
-      showLoading()
+      loadingManager.show()
 
       // 在这里可以添加额外的请求头
       return config
@@ -36,7 +37,7 @@ export function initApiClient(baseUrl: string): void {
     // 响应拦截器
     responseInterceptor: response => {
       // 隐藏加载提示
-      hideLoading()
+      loadingManager.hide()
 
       // 格式化响应数据
       return response
@@ -45,7 +46,7 @@ export function initApiClient(baseUrl: string): void {
     // 错误拦截器
     errorInterceptor: error => {
       // 隐藏加载提示
-      hideLoading()
+      loadingManager.hide()
 
       // 处理常见错误
       if (!error.response) {

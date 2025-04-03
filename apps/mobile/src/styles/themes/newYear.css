@@ -1,29 +1,70 @@
 /* 新年主题 - 中国红 */
 [data-theme='newYear'] {
-  --primary-color: #e74c3c;
-  --primary-color-rgb: 231, 76, 60;
-  --primary-dark: #c0392b;
-  --primary-light: #fff5f5;
+  /* 主题色 */
+  --primary-color: rgb(218, 41, 28);
+  --primary-color-rgb: 218, 41, 28;
+  --primary-color-rgba: rgba(218, 41, 28, 0.75);
+  --primary-dark: rgb(186, 24, 27);
+  --primary-dark-rgb: 186, 24, 27;
+  --primary-dark-rgba: rgba(186, 24, 27, 0.75);
+  --primary-light: rgb(255, 241, 240);
+  --primary-light-rgb: 255, 241, 240;
+  --primary-light-rgba: rgba(255, 241, 240, 0.75);
 
-  --success-color: #2ecc71;
-  --warning-color: #f1c40f;
-  --error-color: #e74c3c;
-  --info-color: #e74c3c;
+  /* 功能色 */
+  --success-color: rgb(82, 196, 26);
+  --success-color-rgb: 82, 196, 26;
+  --success-color-rgba: rgba(82, 196, 26, 0.75);
+  --warning-color: rgb(250, 173, 20);
+  --warning-color-rgb: 250, 173, 20;
+  --warning-color-rgba: rgba(250, 173, 20, 0.75);
+  --error-color: rgb(255, 77, 79);
+  --error-color-rgb: 255, 77, 79;
+  --error-color-rgba: rgba(255, 77, 79, 0.75);
+  --info-color: rgb(19, 194, 194);
+  --info-color-rgb: 19, 194, 194;
+  --info-color-rgba: rgba(19, 194, 194, 0.75);
 
-  --text-primary: #2c3e50;
-  --text-secondary: #34495e;
-  --text-tertiary: #7f8c8d;
-  --text-disabled: #bdc3c7;
+  /* 文本颜色 */
+  --text-primary: rgb(38, 38, 38);
+  --text-primary-rgb: 38, 38, 38;
+  --text-primary-rgba: rgba(38, 38, 38, 0.75);
+  --text-secondary: rgb(89, 89, 89);
+  --text-secondary-rgb: 89, 89, 89;
+  --text-secondary-rgba: rgba(89, 89, 89, 0.75);
+  --text-tertiary: rgb(140, 140, 140);
+  --text-tertiary-rgb: 140, 140, 140;
+  --text-tertiary-rgba: rgba(140, 140, 140, 0.75);
+  --text-disabled: rgb(191, 191, 191);
+  --text-disabled-rgb: 191, 191, 191;
+  --text-disabled-rgba: rgba(191, 191, 191, 0.75);
 
-  --bg-primary: #ffffff;
-  --bg-secondary: #fff5f5;
-  --bg-tertiary: #ffe4e4;
-  --bg-tertiary-dark: #ffd1d1;
-  --bg-tertiary-dark-light: #fff5f5;
+  /* 背景颜色 */
+  --bg-primary: rgb(255, 255, 255);
+  --bg-primary-rgb: 255, 255, 255;
+  --bg-primary-rgba: rgba(255, 255, 255, 0.75);
+  --bg-secondary: rgb(255, 241, 240);
+  --bg-secondary-rgb: 255, 241, 240;
+  --bg-secondary-rgba: rgba(255, 241, 240, 0.75);
+  --bg-tertiary: rgb(255, 219, 214);
+  --bg-tertiary-rgb: 255, 219, 214;
+  --bg-tertiary-rgba: rgba(255, 219, 214, 0.75);
+  --bg-tertiary-dark: rgb(255, 185, 179);
+  --bg-tertiary-dark-rgb: 255, 185, 179;
+  --bg-tertiary-dark-rgba: rgba(255, 185, 179, 0.75);
+  --bg-tertiary-dark-light: rgb(255, 241, 240);
+  --bg-tertiary-dark-light-rgb: 255, 241, 240;
+  --bg-tertiary-dark-light-rgba: rgba(255, 241, 240, 0.75);
 
-  --border-color: #ffd1d1;
-  --border-color-light: #ffe4e4;
+  /* 边框颜色 */
+  --border-color: rgb(255, 193, 187);
+  --border-color-rgb: 255, 193, 187;
+  --border-color-rgba: rgba(255, 193, 187, 0.75);
+  --border-color-light: rgb(255, 219, 214);
+  --border-color-light-rgb: 255, 219, 214;
+  --border-color-light-rgba: rgba(255, 219, 214, 0.75);
 
-  --box-shadow: 0 2px 8px rgba(231, 76, 60, 0.15);
-  --box-shadow-light: 0 2px 4px rgba(231, 76, 60, 0.1);
+  /* 阴影 */
+  --box-shadow: 0 2px 8px rgba(218, 41, 28, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(218, 41, 28, 0.1);
 }

@@ -1,29 +1,70 @@
 /* 暗色主题 */
 [data-theme='dark'] {
-  --primary-color: #7c3aed;
+  /* 主题色 */
+  --primary-color: rgb(124, 58, 237);
   --primary-color-rgb: 124, 58, 237;
-  --primary-dark: #6d28d9;
-  --primary-light: #1e1b4b;
+  --primary-color-rgba: rgba(124, 58, 237, 0.75);
+  --primary-dark: rgb(109, 40, 217);
+  --primary-dark-rgb: 109, 40, 217;
+  --primary-dark-rgba: rgba(109, 40, 217, 0.75);
+  --primary-light: rgb(30, 27, 75);
+  --primary-light-rgb: 30, 27, 75;
+  --primary-light-rgba: rgba(30, 27, 75, 0.75);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --text-disabled: #64748b;
+  /* 文本颜色 */
+  --text-primary: rgb(248, 250, 252);
+  --text-primary-rgb: 248, 250, 252;
+  --text-primary-rgba: rgba(248, 250, 252, 0.75);
+  --text-secondary: rgb(203, 213, 225);
+  --text-secondary-rgb: 203, 213, 225;
+  --text-secondary-rgba: rgba(203, 213, 225, 0.75);
+  --text-tertiary: rgb(148, 163, 184);
+  --text-tertiary-rgb: 148, 163, 184;
+  --text-tertiary-rgba: rgba(148, 163, 184, 0.75);
+  --text-disabled: rgb(100, 116, 139);
+  --text-disabled-rgb: 100, 116, 139;
+  --text-disabled-rgba: rgba(100, 116, 139, 0.75);
 
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --bg-tertiary-dark: #475569;
-  --bg-tertiary-dark-light: #1e293b;
+  /* 背景颜色 */
+  --bg-primary: rgb(15, 23, 42);
+  --bg-primary-rgb: 15, 23, 42;
+  --bg-primary-rgba: rgba(15, 23, 42, 0.75);
+  --bg-secondary: rgb(30, 41, 59);
+  --bg-secondary-rgb: 30, 41, 59;
+  --bg-secondary-rgba: rgba(30, 41, 59, 0.75);
+  --bg-tertiary: rgb(51, 65, 85);
+  --bg-tertiary-rgb: 51, 65, 85;
+  --bg-tertiary-rgba: rgba(51, 65, 85, 0.75);
+  --bg-tertiary-dark: rgb(71, 85, 105);
+  --bg-tertiary-dark-rgb: 71, 85, 105;
+  --bg-tertiary-dark-rgba: rgba(71, 85, 105, 0.75);
+  --bg-tertiary-dark-light: rgb(30, 41, 59);
+  --bg-tertiary-dark-light-rgb: 30, 41, 59;
+  --bg-tertiary-dark-light-rgba: rgba(30, 41, 59, 0.75);
 
-  --border-color: #334155;
-  --border-color-light: #1e293b;
+  /* 边框颜色 */
+  --border-color: rgb(51, 65, 85);
+  --border-color-rgb: 51, 65, 85;
+  --border-color-rgba: rgba(51, 65, 85, 0.75);
+  --border-color-light: rgb(30, 41, 59);
+  --border-color-light-rgb: 30, 41, 59;
+  --border-color-light-rgba: rgba(30, 41, 59, 0.75);
 
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --error-color: #ef4444;
-  --info-color: #3b82f6;
+  /* 功能色 */
+  --success-color: rgb(16, 185, 129);
+  --success-color-rgb: 16, 185, 129;
+  --success-color-rgba: rgba(16, 185, 129, 0.75);
+  --warning-color: rgb(245, 158, 11);
+  --warning-color-rgb: 245, 158, 11;
+  --warning-color-rgba: rgba(245, 158, 11, 0.75);
+  --error-color: rgb(239, 68, 68);
+  --error-color-rgb: 239, 68, 68;
+  --error-color-rgba: rgba(239, 68, 68, 0.75);
+  --info-color: rgb(59, 130, 246);
+  --info-color-rgb: 59, 130, 246;
+  --info-color-rgba: rgba(59, 130, 246, 0.75);
 
+  /* 阴影 */
   --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --box-shadow-light: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }

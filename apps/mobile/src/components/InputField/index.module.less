@@ -11,7 +11,7 @@
 
 .label {
   font-size: @font-size;
-  .text-primary;
+  color: var(--text-primary);
   .themeTransition;
 }
 
@@ -29,11 +29,11 @@
   width: 100%;
   height: 48px;
   border-radius: @border-radius;
-  .bg-secondary;
+  background-color: var(--bg-secondary);
   .border-light;
   padding: 0 @padding-lg;
   font-size: @font-size-md;
-  .text-primary;
+  color: var(--text-primary);
   .themeTransition;
   box-sizing: border-box;
   display: flex;
@@ -54,7 +54,7 @@
 
   .input {
     border-color: var(--primary-color);
-    .bg-primary;
+    background-color: var(--bg-primary);
     box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2);
   }
 }
@@ -69,7 +69,7 @@
   opacity: 0.7;
 
   .input {
-    .bg-tertiary;
+    background-color: var(--bg-tertiary);
     cursor: not-allowed;
   }
 }
@@ -77,22 +77,22 @@
 // Dark theme specific styles
 .dark {
   .label {
-    .text-secondary;
+    color: var(--text-secondary);
   }
 
   .input {
-    .bg-tertiary;
+    background-color: var(--bg-tertiary);
     .border;
-    .text-primary;
+    color: var(--text-primary);
 
     &::placeholder {
-      .text-tertiary;
+      color: var(--text-tertiary);
     }
   }
 
   &.focused {
     .input {
-      .bg-secondary;
+      background-color: var(--bg-secondary);
     }
   }
 }

@@ -1,13 +1,13 @@
 @import '@/styles/index.module.less';
 
 .button {
+  .themeTransition;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 500;
   border-radius: @border-radius;
-  .themeTransition;
   border: none !important;
   outline: none !important;
   cursor: pointer;
@@ -92,7 +92,7 @@
 
   &:disabled {
     border-color: var(--text-disabled) !important;
-    .text-disabled;
+    color: var(--text-disabled);
     opacity: 0.5;
     cursor: not-allowed;
   }
@@ -109,7 +109,7 @@
   }
 
   &:disabled {
-    .text-disabled;
+    color: var(--text-disabled);
     opacity: 0.5;
     cursor: not-allowed;
   }

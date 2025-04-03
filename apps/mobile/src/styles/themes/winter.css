@@ -1,29 +1,70 @@
-/* 冬季主题 - 冰雪白 */
+/* 冬季主题 - 深蓝紫 */
 [data-theme='winter'] {
-  --primary-color: #3498db;
-  --primary-color-rgb: 52, 152, 219;
-  --primary-dark: #2980b9;
-  --primary-light: #f0f9ff;
+  /* 主题色 */
+  --primary-color: rgb(114, 46, 209);
+  --primary-color-rgb: 114, 46, 209;
+  --primary-color-rgba: rgba(114, 46, 209, 0.75);
+  --primary-dark: rgb(92, 24, 184);
+  --primary-dark-rgb: 92, 24, 184;
+  --primary-dark-rgba: rgba(92, 24, 184, 0.75);
+  --primary-light: rgb(245, 240, 255);
+  --primary-light-rgb: 245, 240, 255;
+  --primary-light-rgba: rgba(245, 240, 255, 0.75);
 
-  --success-color: #2ecc71;
-  --warning-color: #f1c40f;
-  --error-color: #e74c3c;
-  --info-color: #3498db;
+  /* 功能色 */
+  --success-color: rgb(82, 196, 26);
+  --success-color-rgb: 82, 196, 26;
+  --success-color-rgba: rgba(82, 196, 26, 0.75);
+  --warning-color: rgb(250, 173, 20);
+  --warning-color-rgb: 250, 173, 20;
+  --warning-color-rgba: rgba(250, 173, 20, 0.75);
+  --error-color: rgb(255, 77, 79);
+  --error-color-rgb: 255, 77, 79;
+  --error-color-rgba: rgba(255, 77, 79, 0.75);
+  --info-color: rgb(19, 194, 194);
+  --info-color-rgb: 19, 194, 194;
+  --info-color-rgba: rgba(19, 194, 194, 0.75);
 
-  --text-primary: #2c3e50;
-  --text-secondary: #34495e;
-  --text-tertiary: #7f8c8d;
-  --text-disabled: #bdc3c7;
+  /* 文本颜色 */
+  --text-primary: rgb(38, 38, 38);
+  --text-primary-rgb: 38, 38, 38;
+  --text-primary-rgba: rgba(38, 38, 38, 0.75);
+  --text-secondary: rgb(89, 89, 89);
+  --text-secondary-rgb: 89, 89, 89;
+  --text-secondary-rgba: rgba(89, 89, 89, 0.75);
+  --text-tertiary: rgb(140, 140, 140);
+  --text-tertiary-rgb: 140, 140, 140;
+  --text-tertiary-rgba: rgba(140, 140, 140, 0.75);
+  --text-disabled: rgb(191, 191, 191);
+  --text-disabled-rgb: 191, 191, 191;
+  --text-disabled-rgba: rgba(191, 191, 191, 0.75);
 
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f9fc;
-  --bg-tertiary: #e8f2f8;
-  --bg-tertiary-dark: #d1e5f2;
-  --bg-tertiary-dark-light: #f0f9ff;
+  /* 背景颜色 */
+  --bg-primary: rgb(255, 255, 255);
+  --bg-primary-rgb: 255, 255, 255;
+  --bg-primary-rgba: rgba(255, 255, 255, 0.75);
+  --bg-secondary: rgb(245, 240, 255);
+  --bg-secondary-rgb: 245, 240, 255;
+  --bg-secondary-rgba: rgba(245, 240, 255, 0.75);
+  --bg-tertiary: rgb(229, 212, 255);
+  --bg-tertiary-rgb: 229, 212, 255;
+  --bg-tertiary-rgba: rgba(229, 212, 255, 0.75);
+  --bg-tertiary-dark: rgb(203, 173, 255);
+  --bg-tertiary-dark-rgb: 203, 173, 255;
+  --bg-tertiary-dark-rgba: rgba(203, 173, 255, 0.75);
+  --bg-tertiary-dark-light: rgb(245, 240, 255);
+  --bg-tertiary-dark-light-rgb: 245, 240, 255;
+  --bg-tertiary-dark-light-rgba: rgba(245, 240, 255, 0.75);
 
-  --border-color: #d1e5f2;
-  --border-color-light: #e8f2f8;
+  /* 边框颜色 */
+  --border-color: rgb(203, 173, 255);
+  --border-color-rgb: 203, 173, 255;
+  --border-color-rgba: rgba(203, 173, 255, 0.75);
+  --border-color-light: rgb(229, 212, 255);
+  --border-color-light-rgb: 229, 212, 255;
+  --border-color-light-rgba: rgba(229, 212, 255, 0.75);
 
-  --box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15);
-  --box-shadow-light: 0 2px 4px rgba(52, 152, 219, 0.1);
+  /* 阴影 */
+  --box-shadow: 0 2px 8px rgba(114, 46, 209, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(114, 46, 209, 0.1);
 }

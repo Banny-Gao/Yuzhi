@@ -1,29 +1,70 @@
-/* 夏季主题 - 清新蓝 */
+/* 夏季主题 - 天蓝色 */
 [data-theme='summer'] {
-  --primary-color: #4a90e2;
-  --primary-color-rgb: 74, 144, 226;
-  --primary-dark: #357abd;
-  --primary-light: #f0f7ff;
+  /* 主题色 */
+  --primary-color: rgb(24, 144, 255);
+  --primary-color-rgb: 24, 144, 255;
+  --primary-color-rgba: rgba(24, 144, 255, 0.75);
+  --primary-dark: rgb(0, 122, 255);
+  --primary-dark-rgb: 0, 122, 255;
+  --primary-dark-rgba: rgba(0, 122, 255, 0.75);
+  --primary-light: rgb(230, 244, 255);
+  --primary-light-rgb: 230, 244, 255;
+  --primary-light-rgba: rgba(230, 244, 255, 0.75);
 
-  --success-color: #2ecc71;
-  --warning-color: #f1c40f;
-  --error-color: #e74c3c;
-  --info-color: #4a90e2;
+  /* 功能色 */
+  --success-color: rgb(82, 196, 26);
+  --success-color-rgb: 82, 196, 26;
+  --success-color-rgba: rgba(82, 196, 26, 0.75);
+  --warning-color: rgb(250, 173, 20);
+  --warning-color-rgb: 250, 173, 20;
+  --warning-color-rgba: rgba(250, 173, 20, 0.75);
+  --error-color: rgb(255, 77, 79);
+  --error-color-rgb: 255, 77, 79;
+  --error-color-rgba: rgba(255, 77, 79, 0.75);
+  --info-color: rgb(19, 194, 194);
+  --info-color-rgb: 19, 194, 194;
+  --info-color-rgba: rgba(19, 194, 194, 0.75);
 
-  --text-primary: #2c3e50;
-  --text-secondary: #34495e;
-  --text-tertiary: #7f8c8d;
-  --text-disabled: #bdc3c7;
+  /* 文本颜色 */
+  --text-primary: rgb(38, 38, 38);
+  --text-primary-rgb: 38, 38, 38;
+  --text-primary-rgba: rgba(38, 38, 38, 0.75);
+  --text-secondary: rgb(89, 89, 89);
+  --text-secondary-rgb: 89, 89, 89;
+  --text-secondary-rgba: rgba(89, 89, 89, 0.75);
+  --text-tertiary: rgb(140, 140, 140);
+  --text-tertiary-rgb: 140, 140, 140;
+  --text-tertiary-rgba: rgba(140, 140, 140, 0.75);
+  --text-disabled: rgb(191, 191, 191);
+  --text-disabled-rgb: 191, 191, 191;
+  --text-disabled-rgba: rgba(191, 191, 191, 0.75);
 
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f9ff;
-  --bg-tertiary: #e8f2ff;
-  --bg-tertiary-dark: #d1e5ff;
-  --bg-tertiary-dark-light: #f0f7ff;
+  /* 背景颜色 */
+  --bg-primary: rgb(255, 255, 255);
+  --bg-primary-rgb: 255, 255, 255;
+  --bg-primary-rgba: rgba(255, 255, 255, 0.75);
+  --bg-secondary: rgb(230, 244, 255);
+  --bg-secondary-rgb: 230, 244, 255;
+  --bg-secondary-rgba: rgba(230, 244, 255, 0.75);
+  --bg-tertiary: rgb(186, 231, 255);
+  --bg-tertiary-rgb: 186, 231, 255;
+  --bg-tertiary-rgba: rgba(186, 231, 255, 0.75);
+  --bg-tertiary-dark: rgb(115, 202, 255);
+  --bg-tertiary-dark-rgb: 115, 202, 255;
+  --bg-tertiary-dark-rgba: rgba(115, 202, 255, 0.75);
+  --bg-tertiary-dark-light: rgb(230, 244, 255);
+  --bg-tertiary-dark-light-rgb: 230, 244, 255;
+  --bg-tertiary-dark-light-rgba: rgba(230, 244, 255, 0.75);
 
-  --border-color: #d1e5ff;
-  --border-color-light: #e8f2ff;
+  /* 边框颜色 */
+  --border-color: rgb(173, 223, 255);
+  --border-color-rgb: 173, 223, 255;
+  --border-color-rgba: rgba(173, 223, 255, 0.75);
+  --border-color-light: rgb(217, 239, 255);
+  --border-color-light-rgb: 217, 239, 255;
+  --border-color-light-rgba: rgba(217, 239, 255, 0.75);
 
-  --box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
-  --box-shadow-light: 0 2px 4px rgba(74, 144, 226, 0.1);
+  /* 阴影 */
+  --box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+  --box-shadow-light: 0 2px 4px rgba(24, 144, 255, 0.1);
 }

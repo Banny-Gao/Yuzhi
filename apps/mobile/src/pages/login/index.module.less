@@ -19,26 +19,26 @@
   margin-bottom: @padding-lg * 1.5;
   .border-light;
   border-radius: @border-radius-lg;
-  .bg-secondary;
+  background-color: var(--bg-secondary);
   .shadow-light;
 }
 
 .logoText {
   font-size: @font-size-lg * 2.2;
   font-weight: bold;
-  .text-primary;
+  color: var(--text-primary);
 }
 
 .title {
   font-size: @font-size-lg * 1.5;
   font-weight: bold;
-  .text-primary;
+  color: var(--text-primary);
   margin-bottom: @gap;
 }
 
 .subtitle {
   font-size: @font-size;
-  .text-tertiary;
+  color: var(--text-tertiary);
 }
 
 .content {
@@ -103,7 +103,7 @@
 
 .rememberText {
   font-size: @font-size;
-  .text-secondary;
+  color: var(--text-secondary);
   margin-left: @gap;
 }
 
@@ -127,7 +127,7 @@
 
 .verificationLabel {
   font-size: @font-size;
-  .text-primary;
+  color: var(--text-primary);
   margin-bottom: @gap;
   display: flex;
   align-items: center;
@@ -149,13 +149,13 @@
   height: 48px;
   .border-light;
   border-radius: @border-radius;
-  .bg-secondary;
+  background-color: var(--bg-secondary);
   text-align: left;
   font-size: @font-size-md;
-  .text-primary;
+  color: var(--text-primary);
   padding: 0 100px 0 @padding-lg;
   box-sizing: border-box;
-  .formTransition;
+  transition: all 0.3s ease-in-out;
 }
 
 .getCode {
@@ -189,7 +189,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  .bg-tertiary;
+  background-color: var(--bg-tertiary);
   overflow: hidden;
   display: flex;
   align-items: center;

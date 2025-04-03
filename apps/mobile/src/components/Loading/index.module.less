@@ -9,47 +9,34 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-mask);
   z-index: 1000;
 }
 
-.fadeIn {
-  animation: fadeInScale 0.3s ease-in-out;
-}
+.loadingWrapper {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  border-radius: 8px;
+  background-color: var(--bg-secondary-rgba);
 
-.fadeOut {
-  animation: fadeOutScale 0.3s ease-in-out;
-}
+  .object {
+    border-radius: 50%;
+    position: absolute;
+    border-left: 2px solid var(--primary-color);
+    border-right: 2px solid var(--primary-color);
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
 
-.canvas {
-  filter: drop-shadow(0 0 8px var(--primary-color));
-}
-
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
+    animation: loading-spining 2s infinite;
   }
 }
 
-@keyframes fadeOutScale {
-  from {
-    opacity: 1;
-    transform: scale(1);
+@keyframes loading-spining {
+  50% {
+    transform: rotate(180deg);
   }
-  to {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-}
 
-// Dark theme specific adjustments
-.dark {
-  .canvas {
-    filter: drop-shadow(0 0 10px var(--primary-color));
+  100% {
+    transform: rotate(0deg);
   }
 }
