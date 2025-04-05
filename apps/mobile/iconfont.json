@@ -1,0 +1,9 @@
+{
+  "symbol_url": "//at.alicdn.com/t/c/font_4881643_t0ymoy087f.js",
+  "save_dir": "./src/components/iconfont",
+  "use_typescript": true,
+  "platforms": "*",
+  "use_rpx": true,
+  "default_icon_size": 20,
+  "design_width": 750
+}
