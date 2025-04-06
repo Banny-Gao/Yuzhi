@@ -3,5 +3,6 @@
   "projectname": "Yuzhi",
   "setting": {
     "compileHotReLoad": false
-  }
+  },
+  "libVersion": "3.6.6"
 }

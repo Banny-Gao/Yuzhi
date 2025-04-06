@@ -74,7 +74,7 @@ export const useLogin = () => {
   // Scroll to top helper
   const scrollToTop = () => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({
+      scrollViewRef.current?.scrollTo({
         top: 0,
         duration: 300,
       })
