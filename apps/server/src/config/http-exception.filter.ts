@@ -1,6 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common'
 import { Request, Response } from 'express'
-import { getStatusMessage } from '@workspace/request'
+import { getStatusMessage } from './status'
 
 /**
  * 通用HTTP异常过滤器

@@ -4,4 +4,4 @@
  */
 
 // 导出所有状态码和工具函数
-export { ResponseStatus, StatusGroups, isSuccess, isRedirect, isClientError, isServerError, isRetryable, getStatusMessage } from '@workspace/request'
+export { ResponseStatus, StatusGroups, isSuccess, isRedirect, isClientError, isServerError, isRetryable, getStatusMessage } from './status'

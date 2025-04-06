@@ -1,5 +1,5 @@
 import { HttpException } from '@nestjs/common'
-import { ResponseStatus } from '@workspace/request'
+import { ResponseStatus } from './status'
 
 /**
  * 自定义异常基类

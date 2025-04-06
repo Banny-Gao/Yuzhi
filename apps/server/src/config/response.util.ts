@@ -1,4 +1,4 @@
-import { ResponseStatus, getStatusMessage } from '@workspace/request'
+import { ResponseStatus, getStatusMessage } from './status'
 
 /**
  * 标准API响应接口
