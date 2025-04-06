@@ -37,8 +37,16 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       828: 1.81 / 2,
     },
     sourceRoot: 'src',
-    outputRoot: 'dist',
-    plugins: ['@tarojs/plugin-http'],
+    outputRoot: `dist/${process.env.TARO_ENV}`,
+    plugins: [
+      [
+        '@tarojs/plugin-http',
+        {
+          disabledFormData: false,
+          disabledBlob: false,
+        },
+      ],
+    ],
     defineConstants: {
       'process.env': JSON.stringify(process.env),
     },
@@ -61,6 +69,9 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
             generateScopedName: '[name]__[local]___[hash:base64:5]',
           },
         },
+      },
+      miniCssExtractPluginOption: {
+        ignoreOrder: true,
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)

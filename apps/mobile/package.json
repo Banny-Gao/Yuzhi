@@ -31,11 +31,14 @@
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint --config eslint.config.cjs \"src/**/*.{ts,tsx}\" --fix",
     "clean": "rm -rf dist",
     "generateRoutes": "node scripts/generate-routes.js",
-    "createPage": "node scripts/create-page.js"
+    "createPage": "node scripts/create-page.js",
+    "iconfont:init": "npm run iconfont-init --output iconfont.json",
+    "iconfont:build": "npm run iconfont-taro --config iconfont.json"
   },
   "browserslist": [
-    "defaults and fully supports es6-module",
-    "maintained node versions"
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
   ],
   "author": "",
   "dependencies": {
@@ -89,6 +92,8 @@
     "postcss": "^8.4.38",
     "react-refresh": "^0.14.0",
     "stylelint": "^16.4.0",
+    "taro-iconfont-cli": "^3.3.0",
+    "mini-program-iconfont-cli": "^0.6.1",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^5.7.2",
     "webpack": "5.91.0",

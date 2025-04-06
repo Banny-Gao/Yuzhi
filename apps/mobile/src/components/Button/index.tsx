@@ -1,6 +1,9 @@
 import React from 'react'
 import { Button as TaroButton, View } from '@tarojs/components'
+import classNames from 'classnames'
+
 import { useTheme } from '@/contexts/ThemeContext'
+
 import styles from './index.module.less'
 
 export interface ThemedButtonProps {
@@ -29,12 +32,19 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
   const { themeType } = useTheme()
 
   // Generate button class name based on props using CSS Modules
-  const buttonClass = [styles.button, styles[type], styles[size], styles[themeType], block && styles.block, animated && styles.animated, className]
-    .filter(Boolean)
-    .join(' ')
+  const buttonClass = classNames(
+    styles.button,
+    styles[type],
+    styles[size],
+    styles[themeType],
+    block && styles.block,
+    animated && styles.animated,
+    disabled && styles.disabled,
+    className
+  )
 
   return (
-    <TaroButton className={buttonClass} onClick={disabled || loading ? undefined : onClick} disabled={disabled} loading={loading}>
+    <TaroButton className={buttonClass} onClick={disabled || loading ? undefined : onClick} loading={loading}>
       {loading ? <View className={styles.loading} /> : children}
     </TaroButton>
   )

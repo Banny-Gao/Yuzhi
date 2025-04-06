@@ -86,7 +86,7 @@ function getPages(dir, baseDir = '') {
         const routeKey = pagePath.replace(/\//g, '_') || 'index'
 
         // 构建路由路径
-        const routePath = `/pages/${pagePath}/index`
+        const routePath = `pages/${pagePath}/index`
 
         // 获取页面元数据
         const meta = parseMeta(indexFile)

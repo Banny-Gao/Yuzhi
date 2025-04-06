@@ -13,8 +13,6 @@ export default {
        * @docs https://github.com/webpack-contrib/webpack-bundle-analyzer
        */
       chain.plugin('analyzer').use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin, [])
-
-      chain.plugin('prefetch').use(require('webpack').PrefetchPlugin, ['/pages/index/index'])
     },
   },
 } satisfies UserConfigExport<'webpack5'>

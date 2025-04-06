@@ -1,8 +1,10 @@
 import React, { ReactNode, useEffect, useState } from 'react'
-import Taro, { getCurrentInstance, useRouter, navigateBack, navigateTo } from '@tarojs/taro'
-import { View, Text, Image } from '@tarojs/components'
-import styles from './index.module.less'
+import Taro, { getCurrentInstance } from '@tarojs/taro'
+
+import { View } from '@tarojs/components'
 import routes from '@/generated.routes'
+
+import styles from './index.module.less'
 
 interface PageWrapperProps {
   children: ReactNode
@@ -12,33 +14,9 @@ interface PageWrapperProps {
   contentStyle?: React.CSSProperties
 }
 
-// TabBar配置
-const tabbarList = [
-  {
-    pagePath: '/pages/index/index',
-    text: '排盘',
-    iconPath: '/assets/icons/home.png',
-    selectedIconPath: '/assets/icons/home-active.png',
-  },
-  {
-    pagePath: '/pages/archives/index',
-    text: '档案',
-    iconPath: '/assets/icons/archives.png',
-    selectedIconPath: '/assets/icons/archives-active.png',
-  },
-  {
-    pagePath: '/pages/owner/index',
-    text: '我的',
-    iconPath: '/assets/icons/user.png',
-    selectedIconPath: '/assets/icons/user-active.png',
-  },
-]
-
 const PageWrapper: React.FC<PageWrapperProps> = ({ children, className = '', contentClassName = '', style, contentStyle }) => {
-  const router = useRouter()
   const [showBack, setShowBack] = useState(false)
   const [pageTitle, setPageTitle] = useState('')
-  const [isTabBar, setIsTabBar] = useState(false)
 
   useEffect(() => {
     const instance = getCurrentInstance()
@@ -53,47 +31,16 @@ const PageWrapper: React.FC<PageWrapperProps> = ({ children, className = '', con
     // 判断是否显示返回按钮
     const pages = Taro.getCurrentPages()
     setShowBack(pages.length > 1)
-
-    // 判断是否在tabbar中
-    setIsTabBar(tabbarList.some(tab => tab.pagePath === currentPath))
   }, [])
-
-  const handleBack = () => {
-    navigateBack()
-  }
 
   return (
     <View className={`${styles.page} ${className}`} style={style}>
       {/* NavBar */}
-      <View className={styles.navbar}>
-        {showBack && (
-          <View className={styles.backButton} onClick={handleBack}>
-            <Text className={styles.backIcon}>←</Text>
-          </View>
-        )}
-        <Text className={styles.title}>{pageTitle}</Text>
-      </View>
 
       {/* Content */}
       <View className={`${styles.content} ${contentClassName}`} style={contentStyle}>
         {children}
       </View>
-
-      {/* TabBar */}
-      {isTabBar && (
-        <View className={styles.tabbar}>
-          {tabbarList.map(tab => (
-            <View
-              key={tab.pagePath}
-              className={`${styles.tabbarItem} ${router.path === tab.pagePath ? styles.active : ''}`}
-              onClick={() => navigateTo({ url: tab.pagePath })}
-            >
-              <Image className={styles.tabbarIcon} src={router.path === tab.pagePath ? tab.selectedIconPath : tab.iconPath} />
-              <Text className={styles.tabbarText}>{tab.text}</Text>
-            </View>
-          ))}
-        </View>
-      )}
     </View>
   )
 }

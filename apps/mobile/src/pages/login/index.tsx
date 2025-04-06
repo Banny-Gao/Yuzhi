@@ -4,6 +4,7 @@ import { useLoad } from '@tarojs/taro'
 
 import InputField from '@/components/InputField'
 import ThemedButton from '@/components/Button'
+import ContentWrapper from '@/components/ContentWrapper'
 import AuthToggle from './components/AuthToggle'
 
 import { useLogin } from './useLogin'
@@ -138,7 +139,7 @@ const Login: React.FC = () => {
   }
 
   return (
-    <>
+    <ContentWrapper>
       <div className={styles.header}>
         <div className={styles.logoContainer}>
           <Text className={styles.logoText}>禹智</Text>
@@ -158,7 +159,7 @@ const Login: React.FC = () => {
           </div>
         </ScrollView>
       </div>
-    </>
+    </ContentWrapper>
   )
 }
 

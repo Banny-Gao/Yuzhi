@@ -7,8 +7,6 @@ import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'fs'
 import dotenv from 'dotenv'
-import https from 'https'
-import http from 'http'
 
 // 加载环境变量
 dotenv.config()
@@ -20,40 +18,6 @@ const API_URL = process.env.API_URL || 'http://localhost:3000'
 const OUTPUT_DIR = join(__dirname, '../src/generated')
 const MODELS_DIR = join(OUTPUT_DIR, 'models')
 const INDEX_PATH = join(OUTPUT_DIR, 'index.ts')
-
-/**
- * 从API服务器获取Swagger文档
- * @returns {Promise<Object>} - Swagger文档对象
- */
-async function fetchSwaggerDoc() {
-  return new Promise((resolve, reject) => {
-    const url = `${API_URL}/api-json`
-    console.log(`Fetching Swagger documentation from: ${url}`)
-
-    const client = url.startsWith('https') ? https : http
-
-    client
-      .get(url, res => {
-        let data = ''
-
-        res.on('data', chunk => {
-          data += chunk
-        })
-
-        res.on('end', () => {
-          try {
-            const jsonData = JSON.parse(data)
-            resolve(jsonData)
-          } catch (error) {
-            reject(new Error(`Failed to parse Swagger documentation: ${error.message}`))
-          }
-        })
-      })
-      .on('error', error => {
-        reject(new Error(`Failed to fetch Swagger documentation: ${error.message}`))
-      })
-  })
-}
 
 /**
  * 修复ApiResponse类型定义
