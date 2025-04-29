@@ -18,7 +18,12 @@ export default defineAppConfig({
   },
   tabBar: {
     custom: true,
-    list: tabBarList,
+    list: tabBarList.map(item => ({
+      pagePath: item.pagePath,
+      text: item.text,
+      iconPath: item.iconPath,
+      selectedIconPath: item.selectedIconPath,
+    })),
     color: '#707070',
     selectedColor: '#2c2c2c',
     backgroundColor: '#ffffff',
