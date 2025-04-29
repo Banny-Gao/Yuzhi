@@ -3,6 +3,7 @@ import Taro, { getCurrentInstance } from '@tarojs/taro'
 
 import { View } from '@tarojs/components'
 import routes from '@/generated.routes'
+import CustomTabBar from '@/custom-tab-bar'
 
 import { ThemeSwitcher, Loading } from '@/components'
 
@@ -46,6 +47,8 @@ const PageWrapper: React.FC<PageWrapperProps> = ({ children, className = '', con
 
       <ThemeSwitcher />
       <Loading />
+
+      {process.env.TARO_ENV === 'h5' && <CustomTabBar />}
     </View>
   )
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { CoverView } from '@tarojs/components'
+import { CoverView, CoverImage } from '@tarojs/components'
 
-import IconFont, { type IconNames } from '@/components/iconfont'
 import { router } from '@/utils/router'
 import { tabBarList } from './constants'
 
@@ -18,7 +17,7 @@ const TabBar = () => {
       {tabBarList.map((item, index) => {
         return (
           <CoverView key={index} className={styles['tab-bar-item']} onClick={() => router.switchTab({ url: item.pagePath })}>
-            <IconFont name={item.iconName as IconNames} />
+            <CoverImage src={selected === index ? item.selectedIconPath : item.iconPath} />
             <CoverView style={{ color: selected === index ? selectedColor : color }}>{item.text}</CoverView>
           </CoverView>
         )

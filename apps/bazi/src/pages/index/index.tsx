@@ -1,6 +1,8 @@
 import { View, Text } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
 
+import { PageWrapper } from '@/components'
+
 import './index.less'
 
 export const pageMeta = {
@@ -14,9 +16,9 @@ const Index = () => {
   })
 
   return (
-    <View className="index">
+    <PageWrapper>
       <Text>Hello world!</Text>
-    </View>
+    </PageWrapper>
   )
 }
 

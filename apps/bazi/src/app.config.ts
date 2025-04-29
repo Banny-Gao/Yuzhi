@@ -17,7 +17,7 @@ export default defineAppConfig({
     },
   },
   tabBar: {
-    // custom: true,
+    custom: true,
     list: tabBarList.map(item => ({
       pagePath: item.pagePath,
       text: item.text,
