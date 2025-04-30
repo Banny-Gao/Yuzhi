@@ -29,7 +29,6 @@ const routes = {
   "login": {
     "path": "pages/login/index",
     "meta": {
-      "title": "登录页面",
       "requiresAuth": false
     }
   },

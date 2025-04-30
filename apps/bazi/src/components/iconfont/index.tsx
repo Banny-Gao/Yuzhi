@@ -3,7 +3,7 @@
 
 import React, { FunctionComponent } from 'react';
 
-export type IconNames = 'icon-bagua' | 'icon-danganguanli' | 'icon-wode';
+export type IconNames = 'icon-shezhi' | 'icon-record' | 'icon-bagua' | 'icon-wode';
 
 export interface IconProps {
   name: IconNames;

@@ -3,6 +3,7 @@
 
 import React, { FunctionComponent } from 'react';
 import Taro from '@tarojs/taro';
+import Icon from './h5';
 
 export type IconNames = 'icon-shezhi' | 'icon-record' | 'icon-bagua' | 'icon-wode';
 
@@ -16,8 +17,7 @@ interface Props {
 const IconFont: FunctionComponent<Props> = (props) => {
   const { name, size, color, style } = props;
 
-  // @ts-ignore
-  return <iconfont name={name} size={parseFloat(Taro.pxTransform(size))} color={color} style={style} />;
+  return <Icon name={name} size={parseFloat(Taro.pxTransform(size, 750))} color={color} style={style} />;
 };
 
 IconFont.defaultProps = {

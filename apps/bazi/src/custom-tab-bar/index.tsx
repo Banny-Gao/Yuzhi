@@ -1,24 +1,37 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import classNames from 'classnames'
 import { CoverView, CoverImage } from '@tarojs/components'
 
 import { router } from '@/utils/router'
 import { tabBarList } from './constants'
+import { IconFont, type IconNames } from '@/components'
 
 import styles from './index.module.less'
 
 const TabBar = () => {
   const [selected, setSelected] = useState(0)
-  const [color, setColor] = useState('#000000')
-  const [selectedColor, setSelectedColor] = useState('#DC143C')
+
+  useEffect(() => {
+    const currentIndex = tabBarList.findIndex(item => router.path.includes(item.pagePath))
+
+    setSelected(currentIndex)
+  }, [])
 
   return (
     <CoverView className={styles['tab-bar']}>
-      <CoverView className={styles['tab-bar-border']}></CoverView>
       {tabBarList.map((item, index) => {
         return (
-          <CoverView key={index} className={styles['tab-bar-item']} onClick={() => router.switchTab({ url: item.pagePath })}>
-            <CoverImage src={selected === index ? item.selectedIconPath : item.iconPath} />
-            <CoverView style={{ color: selected === index ? selectedColor : color }}>{item.text}</CoverView>
+          <CoverView
+            key={index}
+            className={classNames(styles['tab-bar-item'], selected === index && styles.active)}
+            onClick={() => router.switchTab({ url: item.pagePath })}
+          >
+            {process.env.TARO_ENV === 'h5' ? (
+              <IconFont name={item.iconName as IconNames} />
+            ) : (
+              <CoverImage src={selected === index ? item.selectedIconPath : item.iconPath} />
+            )}
+            <CoverView>{item.text}</CoverView>
           </CoverView>
         )
       })}

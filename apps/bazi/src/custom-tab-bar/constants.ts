@@ -1,4 +1,5 @@
 import { default as routes } from '@/generated.routes'
+import { fixedRouteInclude } from '@/utils/router'
 
 export const tabBarList = [
   {
@@ -13,7 +14,7 @@ export const tabBarList = [
     text: routes.archives.meta.title,
     iconPath: 'images/archive_gray.png',
     selectedIconPath: 'images/archive.png',
-    iconName: 'icon-danganguanli',
+    iconName: 'icon-record',
   },
   {
     pagePath: routes.owner.path,
@@ -23,3 +24,9 @@ export const tabBarList = [
     iconName: 'icon-wode',
   },
 ]
+
+export const isH5ShowTabBar = (currentPath: string) =>
+  fixedRouteInclude(
+    tabBarList.map(item => item.pagePath),
+    currentPath
+  ) && process.env.TARO_ENV === 'h5'

@@ -1,8 +1,8 @@
 {
   "symbol_url": "//at.alicdn.com/t/c/font_4881643_atiib7a5flw.js",
-  "save_dir": "./src/components/iconfont",
+  "save_dir": "./src/components/Iconfont",
   "use_typescript": true,
-  "platforms": "*",
+  "platforms": ["weapp", "swan", "alipay", "h5", "tt", "qq"],
   "use_rpx": true,
   "default_icon_size": 20,
   "design_width": 750

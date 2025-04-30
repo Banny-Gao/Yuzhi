@@ -10,7 +10,6 @@ import { useLogin } from './useLogin'
 import styles from './index.module.less'
 
 export const pageMeta = {
-  title: '登录页面',
   requiresAuth: false,
 }
 

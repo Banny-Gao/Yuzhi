@@ -22,7 +22,7 @@ type NavigateToOption = {
 }
 
 type RouterProps = 'path' | 'navigateTo' | 'redirectTo' | 'switchTab' | 'navigateBack'
-export const pagesStack: string[] = []
+export const PAGE_STACK: string[] = getStorage(STORAGE_KEYS.PAGES_STACK) || []
 
 export const fixedRouteInclude = (rs: string[], route: string) => {
   /* route 一般以 / 开头
@@ -44,7 +44,7 @@ const checkAuthorized = (route: string) =>
 
     if (!token && fixedRouteInclude(authRequiredPages, route)) {
       redirectTo({ url: routes.login.path })
-      pagesStack.splice(0, pagesStack.length, routes.login.path)
+      PAGE_STACK.splice(0, PAGE_STACK.length, routes.login.path)
 
       return reject(new AppError('未登录'))
     }
@@ -52,7 +52,7 @@ const checkAuthorized = (route: string) =>
     // 当前在登录页并且是已登录，跳转首页
     if (route === routes.login.path && token) {
       redirectTo({ url: routes.index.path })
-      pagesStack.splice(0, pagesStack.length, routes.index.path)
+      PAGE_STACK.splice(0, PAGE_STACK.length, routes.index.path)
 
       return reject(new AppError('已登录'))
     }
@@ -64,7 +64,7 @@ const checkExisted = (route: string) =>
   new Promise((resolve, reject) => {
     if (!fixedRouteInclude(pages, route)) {
       redirectTo({ url: routes.notFound.path })
-      pagesStack.push(routes.notFound.path)
+      PAGE_STACK.push(routes.notFound.path)
 
       return reject(new AppError('页面不存在'))
     }
@@ -79,23 +79,23 @@ export const withRouteGuard = async (route: string, callback?: () => Promise<any
 
     switch (type) {
       case 'navigateTo':
-        pagesStack.push(route)
+        PAGE_STACK.push(route)
         break
       case 'redirectTo':
-        pagesStack.pop()
-        pagesStack.push(route)
+        PAGE_STACK.pop()
+        PAGE_STACK.push(route)
         break
       case 'switchTab':
-        pagesStack.splice(0, pagesStack.length, route)
+        PAGE_STACK.splice(0, PAGE_STACK.length, route)
         break
       case 'navigateBack':
-        pagesStack.pop()
+        PAGE_STACK.pop()
         break
     }
 
     return callback?.()
   } finally {
-    setStorage(STORAGE_KEYS.PAGES_STACK, pagesStack)
+    setStorage(STORAGE_KEYS.PAGES_STACK, PAGE_STACK)
   }
 }
 
@@ -111,10 +111,10 @@ export const router = new Proxy(
     get(target, prop: RouterProps) {
       switch (prop) {
         case 'path':
-          return pagesStack[pagesStack.length - 1]
+          return PAGE_STACK[PAGE_STACK.length - 1]
         default:
           return async (option: NavigateToOption) => {
-            await withRouteGuard(option.url, () => target[prop](option))
+            await withRouteGuard(option.url, () => target[prop](option), prop)
           }
       }
     },

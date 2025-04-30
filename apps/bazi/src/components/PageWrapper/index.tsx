@@ -1,14 +1,16 @@
-import React, { ReactNode, useEffect, useState } from 'react'
-import Taro, { getCurrentInstance } from '@tarojs/taro'
+import React, { ReactNode } from 'react'
 
 import { View } from '@tarojs/components'
-import routes from '@/generated.routes'
-import CustomTabBar from '@/custom-tab-bar'
+
+import TabBar from '@/custom-tab-bar'
+import Navbar from '@/custom-navbar'
+import { isH5ShowTabBar } from '@/custom-tab-bar/constants'
 
 import { ThemeSwitcher, Loading } from '@/components'
+import { PAGE_STACK, router } from '@/utils/router'
+import routes from '@/generated.routes'
 
 import styles from './index.module.less'
-
 interface PageWrapperProps {
   children: ReactNode | ReactNode[]
   className?: string
@@ -18,28 +20,15 @@ interface PageWrapperProps {
 }
 
 const PageWrapper: React.FC<PageWrapperProps> = ({ children, className = '', contentClassName = '', style, contentStyle }) => {
-  const [showBack, setShowBack] = useState(false)
-  const [pageTitle, setPageTitle] = useState('')
-
-  useEffect(() => {
-    const instance = getCurrentInstance()
-    const currentPath = instance.router?.path || ''
-
-    // 设置页面标题
-    const routeKey = Object.keys(routes).find(key => routes[key].path === currentPath)
-    if (routeKey) {
-      setPageTitle(routes[routeKey].meta.title)
-    }
-
-    // 判断是否显示返回按钮
-    const pages = Taro.getCurrentPages()
-    setShowBack(pages.length > 1)
-  }, [])
+  const currentRouteKey = Object.keys(routes).find(key => router.path.includes(routes[key].path))
+  const currentRoute = currentRouteKey ? routes[currentRouteKey] : null
 
   return (
     <View className={`${styles.page} ${className}`} style={style}>
       {/* NavBar */}
-
+      {currentRoute?.meta?.title && (
+        <Navbar title={currentRoute.meta.title} back={PAGE_STACK.length > 1} home={!isH5ShowTabBar(router.path) && PAGE_STACK.length === 1} />
+      )}
       {/* Content */}
       <View className={`${styles.content} ${contentClassName}`} style={contentStyle}>
         {children}
@@ -48,7 +37,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({ children, className = '', con
       <ThemeSwitcher />
       <Loading />
 
-      {process.env.TARO_ENV === 'h5' && <CustomTabBar />}
+      {isH5ShowTabBar(router.path) && <TabBar />}
     </View>
   )
 }

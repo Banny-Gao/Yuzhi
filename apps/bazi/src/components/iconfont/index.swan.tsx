@@ -4,7 +4,7 @@
 import React, { FunctionComponent } from 'react';
 import Taro from '@tarojs/taro';
 
-export type IconNames = 'icon-bagua' | 'icon-danganguanli' | 'icon-wode';
+export type IconNames = 'icon-shezhi' | 'icon-record' | 'icon-bagua' | 'icon-wode';
 
 interface Props {
   name: IconNames;

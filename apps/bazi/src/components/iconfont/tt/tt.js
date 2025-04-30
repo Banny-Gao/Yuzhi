@@ -10,7 +10,7 @@ Component({
       value: '',
       observer: function(color) {
         this.setData({
-          colors: this.fixColor(color),
+          colors: this.fixColor(),
           isStr: typeof color === 'string',
         });
       }
@@ -20,14 +20,14 @@ Component({
       value: 20,
       observer: function(size) {
         this.setData({
-          svgSize: size / 750 * swan.getSystemInfoSync().windowWidth,
+          svgSize: size / 750 * tt.getSystemInfoSync().windowWidth,
         });
       },
     },
   },
   data: {
     colors: '',
-    svgSize: 20 / 750 * swan.getSystemInfoSync().windowWidth,
+    svgSize: 20 / 750 * tt.getSystemInfoSync().windowWidth,
     quot: '"',
     isStr: true,
   },

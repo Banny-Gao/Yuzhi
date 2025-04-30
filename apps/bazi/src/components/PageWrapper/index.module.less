@@ -1,7 +1,7 @@
 @import '@/styles/index.module.less';
 
 .page {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-secondary);
   color: var(--text-primary);
   width: 100vw;
   height: 100vh;
@@ -12,36 +12,6 @@
   flex-direction: column;
 }
 
-.navbar {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  height: 88px;
-  padding: 0 @padding-lg;
-  display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.backButton {
-  position: absolute;
-  left: @padding-lg;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  z-index: 1;
-}
-
-.backIcon {
-  font-size: 24px;
-}
-
-.title {
-  flex: 1;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 500;
-}
-
 .content {
   flex: 1;
   width: 100%;
@@ -50,41 +20,6 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-}
-
-.tabbar {
-  background-color: var(--bg-primary);
-  color: var(--text-secondary);
-  height: 100px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.tabbarItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  height: 100%;
-}
-
-.tabbarIcon {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 4px;
-}
-
-.tabbarText {
-  font-size: 24px;
-}
-
-.active {
-  .tabbarText {
-    color: var(--text-primary);
-  }
 }
 
 .scrollContent {

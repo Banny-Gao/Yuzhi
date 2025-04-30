@@ -4,9 +4,6 @@
  */
 import Taro from '@tarojs/taro'
 
-// 加密密钥 - 实际应用中应从环境变量或安全配置获取
-const ENCRYPTION_KEY = process.env.TARO_APP_ENCRYPTION_KEY
-
 // 存储键定义 - 集中管理所有存储键
 export const STORAGE_KEYS = {
   TOKEN: 'YUZHI_AUTH_TOKEN',
@@ -29,7 +26,7 @@ export const setStorage = <T>(key: string, data: T): void => {
   try {
     const value = typeof data === 'string' ? data : JSON.stringify(data)
 
-    Taro.setStorageSync(key, value)
+    Taro.setStorageSync ? Taro.setStorageSync(key, value) : window.localStorage.setItem(key, value)
   } catch (error) {
     console.error(`保存数据到 ${key} 失败:`, error)
   }
@@ -44,7 +41,7 @@ export const setStorage = <T>(key: string, data: T): void => {
  */
 export const getStorage = <T>(key: string, defaultValue: T | null = null): T | null => {
   try {
-    const value = Taro.getStorageSync(key)
+    const value = Taro.getStorageSync ? Taro.getStorageSync(key) : window.localStorage.getItem(key)
 
     if (!value) return defaultValue
 
@@ -70,7 +67,7 @@ export const getStorage = <T>(key: string, defaultValue: T | null = null): T | n
  */
 export const removeStorage = (key: string): void => {
   try {
-    Taro.removeStorageSync(key)
+    Taro.removeStorageSync ? Taro.removeStorageSync(key) : window.localStorage.removeItem(key)
   } catch (error) {
     console.error(`移除数据 ${key} 失败:`, error)
   }
@@ -81,7 +78,7 @@ export const removeStorage = (key: string): void => {
  */
 export const clearStorage = (): void => {
   try {
-    Taro.clearStorageSync()
+    Taro.clearStorageSync ? Taro.clearStorageSync() : window.localStorage.clear()
   } catch (error) {
     console.error('清除所有存储失败:', error)
   }
