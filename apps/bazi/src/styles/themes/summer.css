@@ -1,5 +1,5 @@
 /* 夏季主题 - 天蓝色 */
-[data-theme='summer'] {
+.theme-summer {
   /* 主题色 */
   --primary-color: rgb(24, 144, 255);
   --primary-color-rgb: 24, 144, 255;

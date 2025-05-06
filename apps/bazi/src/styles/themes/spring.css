@@ -1,5 +1,5 @@
 /* 春季主题 - 清新绿 */
-[data-theme='spring'] {
+.theme-spring {
   /* 主题色 */
   --primary-color: rgb(82, 196, 26);
   --primary-color-rgb: 82, 196, 26;

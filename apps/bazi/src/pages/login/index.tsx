@@ -137,25 +137,23 @@ const Login: React.FC = () => {
 
   return (
     <PageWrapper>
-      <div className={styles.header}>
-        <div className={styles.logoContainer}>
-          <Text className={styles.logoText}>禹智</Text>
-        </div>
-        <Text className={styles.title}>欢迎回来</Text>
-        <Text className={styles.subtitle}>请选择一种方式登录或注册您的账号</Text>
-      </div>
+      <View className={styles.header}>
+        <View className={styles.logoContainer}>
+          <Text className={styles.logoText}>豫知八字</Text>
+        </View>
+      </View>
 
       <AuthToggle currentMode={authMode} onChange={handleAuthModeChange} />
 
-      <div className={styles.scrollArea}>
+      <View className={styles.scrollArea}>
         <ScrollView scrollY scrollWithAnimation className={styles.form} ref={scrollViewRef} enhanced showScrollbar={false} enableFlex>
-          <div className={styles.scrollContent}>
-            <div key={animKey} className={styles.formContainer}>
+          <View className={styles.scrollContent}>
+            <View key={animKey} className={styles.formContainer}>
               {renderAuthForm()}
-            </div>
-          </div>
+            </View>
+          </View>
         </ScrollView>
-      </div>
+      </View>
     </PageWrapper>
   )
 }

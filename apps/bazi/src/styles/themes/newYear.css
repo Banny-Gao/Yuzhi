@@ -1,5 +1,5 @@
 /* 新年主题 - 中国红 */
-[data-theme='newYear'] {
+.theme-newYear {
   /* 主题色 */
   --primary-color: rgb(218, 41, 28);
   --primary-color-rgb: 218, 41, 28;

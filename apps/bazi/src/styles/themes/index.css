@@ -1,5 +1,5 @@
 /* 导入所有主题样式 */
-@import './base.css';
+@import './default.css';
 @import './spring.css';
 @import './summer.css';
 @import './autumn.css';

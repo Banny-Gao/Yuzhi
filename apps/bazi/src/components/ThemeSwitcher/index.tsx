@@ -6,6 +6,8 @@ import { View, Button, Text } from '@tarojs/components'
 
 import { useTheme } from '@/contexts/ThemeContext'
 import { themeTypes, ThemeType } from '@/styles/themes/themeTypes'
+import { getNavbarInfo } from '@/utils/util'
+
 import styles from './index.module.less'
 
 /**
@@ -33,6 +35,7 @@ const getThemeIcon = (themeType: ThemeType): string => {
 const ThemeSwitcher: FC = () => {
   const { themeType, setThemeType } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
+  const { navBarHeight } = getNavbarInfo()
 
   // Handle theme change
   const handleThemeChange = useCallback(
@@ -71,16 +74,24 @@ const ThemeSwitcher: FC = () => {
   const menuClass = [styles.menu, isOpen && styles.menuOpen].filter(Boolean).join(' ')
 
   return (
-    <View className={switcherClass} onClick={e => e.stopPropagation()}>
+    <View
+      className={switcherClass}
+      onClick={e => e.stopPropagation()}
+      style={{ top: navBarHeight }}
+    >
       <Button className={fabClass} onClick={toggleMenu}>
         <Text className={styles.currentIcon}>{getThemeIcon(themeType)}</Text>
       </Button>
 
       <View className={menuClass}>
         {themeTypes.map((theme, index) => {
-          const itemClass = [styles.item, theme === themeType && styles.itemActive].filter(Boolean).join(' ')
+          const itemClass = [styles.item, theme === themeType && styles.itemActive]
+            .filter(Boolean)
+            .join(' ')
 
-          const iconClass = [styles.icon, theme === themeType && styles.activeIcon].filter(Boolean).join(' ')
+          const iconClass = [styles.icon, theme === themeType && styles.activeIcon]
+            .filter(Boolean)
+            .join(' ')
 
           return (
             <View

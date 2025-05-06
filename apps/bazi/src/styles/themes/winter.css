@@ -1,5 +1,5 @@
 /* 冬季主题 - 深蓝紫 */
-[data-theme='winter'] {
+.theme-winter {
   /* 主题色 */
   --primary-color: rgb(114, 46, 209);
   --primary-color-rgb: 114, 46, 209;

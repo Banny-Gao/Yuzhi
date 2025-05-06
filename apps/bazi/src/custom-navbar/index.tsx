@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react'
 import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { AtIcon } from 'taro-ui'
+
+import { getNavbarInfo } from '@/utils/util'
+
+import routes from '@/generated.routes'
+
 import styles from './index.module.less'
 
 interface Props {
@@ -35,39 +40,8 @@ const Navbar: React.FC<Props> = ({ title = '', back = false, home = false, onBac
   })
 
   useEffect(() => {
-    getSystemInfo()
+    setState(getNavbarInfo())
   }, [])
-
-  const getSystemInfo = () => {
-    const systemInfo = Taro.getSystemInfoSync()
-    const menuButtonInfo =
-      process.env.TARO_ENV === 'h5'
-        ? {
-            height: 0,
-            top: 0,
-            width: 0,
-          }
-        : Taro.getMenuButtonBoundingClientRect?.()
-
-    // 计算导航栏高度
-    const statusBarHeight = systemInfo.statusBarHeight || 0
-    const menuButtonHeight = menuButtonInfo.height
-    const menuButtonTop = menuButtonInfo.top
-    const menuButtonWidth = menuButtonInfo.width
-    const windowWidth = systemInfo.windowWidth
-
-    // 导航栏高度 = 状态栏高度 + 44
-    const navBarHeight = statusBarHeight + 44
-
-    setState({
-      statusBarHeight,
-      navBarHeight,
-      menuButtonHeight,
-      menuButtonTop,
-      menuButtonWidth,
-      windowWidth,
-    })
-  }
 
   const handleBack = () => {
     if (onBack) {
@@ -82,7 +56,7 @@ const Navbar: React.FC<Props> = ({ title = '', back = false, home = false, onBac
       onHome()
     } else {
       Taro.switchTab({
-        url: '/pages/index/index',
+        url: routes.index.path,
       })
     }
   }
@@ -98,7 +72,6 @@ const Navbar: React.FC<Props> = ({ title = '', back = false, home = false, onBac
       className={styles.navbar}
       style={{
         paddingTop: `${statusBarHeight}px`,
-        height: `${navBarHeight}px`,
       }}
     >
       <View

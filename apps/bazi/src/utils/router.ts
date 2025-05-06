@@ -43,7 +43,7 @@ const checkAuthorized = (route: string) =>
     const token = getStorage(STORAGE_KEYS.TOKEN)
 
     if (!token && fixedRouteInclude(authRequiredPages, route)) {
-      redirectTo({ url: routes.login.path })
+      redirectTo({ url: `/${routes.login.path}` })
       PAGE_STACK.splice(0, PAGE_STACK.length, routes.login.path)
 
       return reject(new AppError('未登录'))
@@ -51,7 +51,7 @@ const checkAuthorized = (route: string) =>
 
     // 当前在登录页并且是已登录，跳转首页
     if (route === routes.login.path && token) {
-      redirectTo({ url: routes.index.path })
+      redirectTo({ url: `/${routes.index.path}` })
       PAGE_STACK.splice(0, PAGE_STACK.length, routes.index.path)
 
       return reject(new AppError('已登录'))
@@ -63,7 +63,7 @@ const checkAuthorized = (route: string) =>
 const checkExisted = (route: string) =>
   new Promise((resolve, reject) => {
     if (!fixedRouteInclude(pages, route)) {
-      redirectTo({ url: routes.notFound.path })
+      redirectTo({ url: `/${routes.notFound.path}` })
       PAGE_STACK.push(routes.notFound.path)
 
       return reject(new AppError('页面不存在'))
@@ -72,7 +72,11 @@ const checkExisted = (route: string) =>
     return resolve(true)
   })
 
-export const withRouteGuard = async (route: string, callback?: () => Promise<any>, type?: string) => {
+export const withRouteGuard = async (
+  route: string,
+  callback?: () => Promise<any>,
+  type?: string
+) => {
   try {
     await checkAuthorized(route)
     await checkExisted(route)
@@ -123,7 +127,7 @@ export const router = new Proxy(
 
 // 导出常用的路由方法
 export const goTo = {
-  home: () => router.redirectTo({ url: routes.index.path }),
-  login: () => router.redirectTo({ url: routes.login.path }),
-  notFound: () => router.redirectTo({ url: routes.notFound.path }),
+  home: () => router.redirectTo({ url: `/${routes.index.path}` }),
+  login: () => router.redirectTo({ url: `/${routes.login.path}` }),
+  notFound: () => router.redirectTo({ url: `/${routes.notFound.path}` }),
 }

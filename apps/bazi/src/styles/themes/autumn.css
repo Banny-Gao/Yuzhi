@@ -1,5 +1,5 @@
 /* 秋季主题 - 暖橙色 */
-[data-theme='autumn'] {
+.theme-autumn {
   /* 主题色 */
   --primary-color: rgb(250, 140, 22);
   --primary-color-rgb: 250, 140, 22;

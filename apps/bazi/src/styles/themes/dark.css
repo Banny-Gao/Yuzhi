@@ -1,5 +1,5 @@
 /* 暗色主题 */
-[data-theme='dark'] {
+.theme-dark {
   /* 主题色 */
   --primary-color: rgb(124, 58, 237);
   --primary-color-rgb: 124, 58, 237;

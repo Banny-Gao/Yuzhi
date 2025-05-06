@@ -1,13 +1,16 @@
-import React, { ReactNode } from 'react'
-
+import React, { ReactNode, Suspense, lazy } from 'react'
 import { View } from '@tarojs/components'
+import classNames from 'classnames'
 
-import TabBar from '@/custom-tab-bar'
+// import TabBar from '@/custom-tab-bar'
 import Navbar from '@/custom-navbar'
 import { isH5ShowTabBar } from '@/custom-tab-bar/constants'
 
 import { ThemeSwitcher, Loading } from '@/components'
+import { useTheme } from '@/contexts/ThemeContext'
+
 import { PAGE_STACK, router } from '@/utils/router'
+
 import routes from '@/generated.routes'
 
 import styles from './index.module.less'
@@ -19,17 +22,27 @@ interface PageWrapperProps {
   contentStyle?: React.CSSProperties
 }
 
-const PageWrapper: React.FC<PageWrapperProps> = ({ children, className = '', contentClassName = '', style, contentStyle }) => {
-  const currentRouteKey = Object.keys(routes).find(key => router.path.includes(routes[key].path))
+const PageWrapper: React.FC<PageWrapperProps> = ({
+  children,
+  className = '',
+  contentClassName = '',
+  style,
+  contentStyle,
+}) => {
+  const currentRouteKey = Object.keys(routes).find(key => router.path?.includes(routes[key].path))
   const currentRoute = currentRouteKey ? routes[currentRouteKey] : null
+  const { themeType } = useTheme()
+
+  const DynamicTabBar = lazy(() => import('@/custom-tab-bar'))
 
   return (
-    <View className={`${styles.page} ${className}`} style={style}>
-      {/* NavBar */}
-      {currentRoute?.meta?.title && (
-        <Navbar title={currentRoute.meta.title} back={PAGE_STACK.length > 1} home={!isH5ShowTabBar(router.path) && PAGE_STACK.length === 1} />
-      )}
-      {/* Content */}
+    <View className={classNames(styles.page, className, `theme-${themeType}`)} style={style}>
+      <Navbar
+        title={currentRoute?.meta.title}
+        back={PAGE_STACK.length > 1}
+        home={!isH5ShowTabBar(router.path) && currentRoute.meta.home}
+      />
+
       <View className={`${styles.content} ${contentClassName}`} style={contentStyle}>
         {children}
       </View>
@@ -37,7 +50,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({ children, className = '', con
       <ThemeSwitcher />
       <Loading />
 
-      {isH5ShowTabBar(router.path) && <TabBar />}
+      <Suspense fallback={null}>{isH5ShowTabBar(router.path) && <DynamicTabBar />}</Suspense>
     </View>
   )
 }

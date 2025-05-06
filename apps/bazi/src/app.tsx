@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react'
-import { useLaunch, useRouter, useError } from '@tarojs/taro'
+import { useLaunch, useRouter } from '@tarojs/taro'
 
 import { setupRequest } from '@/utils/request'
 import { withRouteGuard } from '@/utils/router'
@@ -14,10 +14,6 @@ const App = ({ children }: PropsWithChildren<any>) => {
   useLaunch(() => {
     setupRequest()
     withRouteGuard(router.path)
-  })
-
-  useError(error => {
-    console.log(error)
   })
 
   return <ThemeProvider useSeasonalThemeByDefault>{children}</ThemeProvider>
