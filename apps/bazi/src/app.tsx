@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react'
 import { useLaunch, useRouter } from '@tarojs/taro'
 
-import { setupRequest } from '@/utils/request'
+import { setupRequest } from '@/utils/request/request'
 import { withRouteGuard } from '@/utils/router'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 

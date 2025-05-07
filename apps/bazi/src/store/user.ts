@@ -1,8 +1,9 @@
 import { makeAutoObservable } from 'mobx'
-import { withErrorHandling } from '@/utils/requestHelpers'
-import { AuthService } from '@workspace/request'
+import { withErrorHandling } from '@/utils/request/requestHelpers'
 import { getStorage, setStorage, removeStorage, STORAGE_KEYS } from '@/utils/storage'
 import { goTo } from '@/utils/router'
+
+import * as OpenAPI from '@/utils/openapi'
 
 import type {
   LoginUserDto,
@@ -10,7 +11,7 @@ import type {
   LoginResponseDto,
   RegisterResponseDto,
   UserDto,
-} from '@workspace/request'
+} from '@/utils/openapi'
 export class UserStore {
   private token: string | null = null
   private userInfo: UserDto | null = null
@@ -80,7 +81,7 @@ export class UserStore {
 
     try {
       const response = await withErrorHandling<LoginResponseDto>(
-        async () => await AuthService.authControllerLogin({ requestBody: loginData }),
+        async () => await OpenAPI.authControllerLogin({ body: loginData }),
         '登录失败，请检查您的用户名和密码'
       )
 
@@ -99,7 +100,7 @@ export class UserStore {
 
     try {
       const response = await withErrorHandling<LoginResponseDto>(
-        async () => await AuthService.authControllerSmsLogin({ requestBody: smsData }),
+        async () => await OpenAPI.authControllerSmsLogin({ requestBody: smsData }),
         '登录失败，请检查您的验证码'
       )
 

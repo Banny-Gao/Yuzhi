@@ -1,5 +1,5 @@
 import { navigateTo, navigateBack, redirectTo, switchTab } from '@tarojs/taro'
-import { AppError } from '@/utils/error'
+import { AppError } from '@/utils/request/error'
 
 import { default as routes, authRequiredPages, pages } from '@/generated.routes'
 import { STORAGE_KEYS, getStorage, setStorage } from '@/utils/storage'

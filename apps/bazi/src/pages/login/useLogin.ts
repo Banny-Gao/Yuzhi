@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { router } from '@/utils/router'
 import routes from '@/generated.routes'
 import { userStore } from '@/store/user'
-import type { LoginUserDto, SmsLoginDto } from '@workspace/request'
+import type { LoginUserDto, SmsLoginDto } from '@/utils/openapi/types.gen'
 
 // Validation utilities
 export const isValidEmail = (email: string) => {
@@ -253,19 +253,14 @@ export const useLogin = () => {
     countdown,
     scrollViewRef,
 
-    // Handlers
+    // Methods
     handleAuthModeChange,
     handleUsernameInput,
-    handlePhoneInput,
     handlePasswordInput,
-
+    handlePhoneInput,
     handleSmsCodeInput,
     handleRememberMeChange,
     handleSubmit,
     requestSmsCode,
-
-    // Utils
-    validateForm,
-    resetForm,
   }
 }

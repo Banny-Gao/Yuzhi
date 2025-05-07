@@ -34,7 +34,8 @@
     "generateRoutes": "node scripts/generate-routes.js",
     "createPage": "node scripts/create-page.js",
     "iconfont:init": "npx iconfont-init --output iconfont.json",
-    "iconfont:build": "npx iconfont-taro --config iconfont.json"
+    "iconfont:build": "npx iconfont-taro --config iconfont.json",
+    "openapi-ts": "openapi-ts"
   },
   "browserslist": [
     "last 3 versions",
@@ -44,6 +45,7 @@
   "author": "",
   "dependencies": {
     "@babel/runtime": "^7.21.5",
+    "@hey-api/client-axios": "^0.7.0",
     "@tarojs/components": "4.0.12",
     "@tarojs/helper": "4.0.12",
     "@tarojs/plugin-framework-react": "4.0.12",
@@ -59,7 +61,7 @@
     "@tarojs/shared": "4.0.12",
     "@tarojs/taro": "4.0.12",
     "@workspace/bazi": "workspace:*",
-    "@workspace/request": "workspace:*",
+    "axios": "^1.9.0",
     "classnames": "^2.5.1",
     "mobx": "^6.13.7",
     "mobx-react-lite": "^4.1.0",
@@ -71,6 +73,7 @@
   "devDependencies": {
     "@babel/core": "^7.8.0",
     "@eslint/js": "^9.22.0",
+    "@hey-api/openapi-ts": "^0.67.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
     "@tarojs/cli": "4.0.12",
     "@tarojs/plugin-http": "^4.0.9",
