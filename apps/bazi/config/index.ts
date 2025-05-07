@@ -1,28 +1,43 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
-import dotenv from 'dotenv'
 
+import dotenv from 'dotenv'
 import devConfig from './dev'
 import prodConfig from './prod'
 
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
-export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
-  console.log('command', command)
-  console.log('mode', mode)
+export default defineConfig<'webpack5'>(async (merge, { mode }) => {
   const isDev = mode === 'development'
 
   dotenv.config({ path: [isDev ? '.env.local' : '.env'] })
 
-  const pxtransform = {
-    enable: true,
-    config: {
-      onePxTransform: true,
-      unitPrecision: 3,
-      propList: ['*'],
-      selectorBlackList: ['ignore'],
-      replace: true,
-      mediaQuery: true,
-      baseFontSize: 20,
+  const conmmonConfig: UserConfigExport<'webpack5'> = {
+    postcss: {
+      pxtransform: {
+        enable: true,
+        config: {
+          onePxTransform: true,
+          unitPrecision: 3,
+          propList: ['*'],
+          selectorBlackList: ['ignore'],
+          replace: true,
+          mediaQuery: true,
+          baseFontSize: 20,
+        },
+      },
+      cssModules: {
+        enable: true, // 默认为 false，如需使用 css modules 功能，则设为 true
+        config: {
+          namingPattern: 'module', // 转换模式，取值为 global/module
+          generateScopedName: '[name]__[local]___[hash:base64:5]',
+        },
+      },
+    },
+    miniCssExtractPluginOption: {
+      ignoreOrder: true,
+    },
+    webpackChain(chain) {
+      chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
     },
   }
 
@@ -58,22 +73,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       enable: isDev, // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
     },
     mini: {
-      postcss: {
-        pxtransform,
-        cssModules: {
-          enable: true, // 默认为 false，如需使用 css modules 功能，则设为 true
-          config: {
-            namingPattern: 'module', // 转换模式，取值为 global/module
-            generateScopedName: '[name]__[local]___[hash:base64:5]',
-          },
-        },
-      },
-      miniCssExtractPluginOption: {
-        ignoreOrder: true,
-      },
-      webpackChain(chain) {
-        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
-      },
+      ...conmmonConfig,
     },
     h5: {
       publicPath: '/',
@@ -82,29 +82,8 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         filename: 'js/[name].[contenthash:8].js',
         chunkFilename: 'js/[name].[contenthash:8].js',
       },
-      miniCssExtractPluginOption: {
-        ignoreOrder: true,
-        filename: 'css/[name].[contenthash].css',
-        chunkFilename: 'css/[name].[contenthash].css',
-      },
-      postcss: {
-        autoprefixer: {
-          enable: true,
-          config: {},
-        },
-        cssModules: {
-          enable: true, // 默认为 false，如需使用 css modules 功能，则设为 true
-          config: {
-            namingPattern: 'module', // 转换模式，取值为 global/module
-            generateScopedName: '[name]__[local]___[hash:base64:5]',
-          },
-        },
-        pxtransform,
-      },
-      webpackChain(chain) {
-        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
-      },
       esnextModules: ['taro-ui'],
+      ...conmmonConfig,
     },
     rn: {
       appName: 'taroDemo',

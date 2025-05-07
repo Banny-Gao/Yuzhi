@@ -1,4 +1,4 @@
-@import '@/styles/variables.less';
+@import '../styles/variables.less';
 
 .tab-bar {
   .themeTransition;
@@ -6,25 +6,25 @@
   display: flex;
   color: var(--text-secondary);
   font-size: @font-size;
-}
 
-.tab-bar-item {
-  flex: 1;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: @padding;
-  gap: @gap;
-}
+  &-item {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: @padding;
+    gap: @gap;
 
-.tab-bar-item cover-image {
-  width: 32px;
-  height: 32px;
-}
+    &.active {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
 
-.active {
-  font-weight: 500;
-  color: var(--text-primary);
+    cover-image {
+      width: 32px;
+      height: 32px;
+    }
+  }
 }

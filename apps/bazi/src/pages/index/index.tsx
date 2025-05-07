@@ -1,7 +1,8 @@
-import { View, Text } from '@tarojs/components'
+import { View, Text, Image } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
 
 import { PageWrapper } from '@/components'
+import userImg from '@/assets/images/user.png'
 
 import './index.less'
 
@@ -18,6 +19,7 @@ const Index = () => {
   return (
     <PageWrapper>
       <Text>Hello world!</Text>
+      <Image src={userImg} />
     </PageWrapper>
   )
 }

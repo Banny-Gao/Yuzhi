@@ -1,8 +1,7 @@
-import React, { ReactNode, Suspense, lazy } from 'react'
+import React, { ReactNode, Suspense, lazy, Fragment } from 'react'
 import { View } from '@tarojs/components'
 import classNames from 'classnames'
 
-// import TabBar from '@/custom-tab-bar'
 import Navbar from '@/custom-navbar'
 import { isH5ShowTabBar } from '@/custom-tab-bar/constants'
 
@@ -33,7 +32,9 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
   const currentRoute = currentRouteKey ? routes[currentRouteKey] : null
   const { themeType } = useTheme()
 
-  const DynamicTabBar = lazy(() => import('@/custom-tab-bar'))
+  const DynamicTabBar = isH5ShowTabBar(router.path)
+    ? lazy(() => import('@/custom-tab-bar'))
+    : Fragment
 
   return (
     <View className={classNames(styles.page, className, `theme-${themeType}`)} style={style}>
@@ -50,7 +51,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
       <ThemeSwitcher />
       <Loading />
 
-      <Suspense fallback={null}>{isH5ShowTabBar(router.path) && <DynamicTabBar />}</Suspense>
+      <Suspense fallback={null}>{<DynamicTabBar />}</Suspense>
     </View>
   )
 }

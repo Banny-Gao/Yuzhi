@@ -20,6 +20,7 @@ const TabBar = () => {
   return (
     <CoverView className={styles['tab-bar']}>
       {tabBarList.map((item, index) => {
+        const iconPath = `/${selected === index ? item.selectedIconPath : item.iconPath}`
         return (
           <CoverView
             key={index}
@@ -29,7 +30,7 @@ const TabBar = () => {
             {process.env.TARO_ENV === 'h5' ? (
               <IconFont name={item.iconName as IconNames} />
             ) : (
-              <CoverImage src={selected === index ? item.selectedIconPath : item.iconPath} />
+              <CoverImage src={iconPath} />
             )}
             <CoverView>{item.text}</CoverView>
           </CoverView>
