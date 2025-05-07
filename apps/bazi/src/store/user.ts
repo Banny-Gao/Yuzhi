@@ -4,7 +4,13 @@ import { AuthService } from '@workspace/request'
 import { getStorage, setStorage, removeStorage, STORAGE_KEYS } from '@/utils/storage'
 import { goTo } from '@/utils/router'
 
-import type { LoginUserDto, SmsLoginDto, LoginResponseDto, RegisterResponseDto, UserDto } from '@workspace/request'
+import type {
+  LoginUserDto,
+  SmsLoginDto,
+  LoginResponseDto,
+  RegisterResponseDto,
+  UserDto,
+} from '@workspace/request'
 export class UserStore {
   private token: string | null = null
   private userInfo: UserDto | null = null

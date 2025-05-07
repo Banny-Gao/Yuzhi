@@ -2,7 +2,7 @@ import React, { ReactNode, Suspense, lazy, Fragment } from 'react'
 import { View } from '@tarojs/components'
 import classNames from 'classnames'
 
-import Navbar from '@/custom-navbar'
+import Navbar from '@/custom-nav-bar'
 import { isH5ShowTabBar } from '@/custom-tab-bar/constants'
 
 import { ThemeSwitcher, Loading } from '@/components'

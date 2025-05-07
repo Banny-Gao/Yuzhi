@@ -28,7 +28,10 @@ export const showApiError = (error: unknown, defaultMessage = '请求失败'): v
  * @param requestFn 原始请求函数
  * @param errorMessage 发生错误时显示的消息
  */
-export const withErrorHandling = async <T>(requestFn: () => Promise<ApiResponse<T>>, errorMessage = '请求出错，请稍后重试'): Promise<T> => {
+export const withErrorHandling = async <T>(
+  requestFn: () => Promise<ApiResponse<T>>,
+  errorMessage = '请求出错，请稍后重试'
+): Promise<T> => {
   try {
     // 使用请求包中的重试工具函数
     const response = await withRetry(requestFn, DEFAULT_RETRY_CONFIG)
@@ -71,7 +74,13 @@ export const withNetworkCheck = <T>(requestFn: () => Promise<T>): Promise<T> => 
     }
 
     // 处理网络错误
-    if (!error.response && (error.request || error.message?.includes('network') || error.message?.includes('Network') || error.name === 'AbortError')) {
+    if (
+      !error.response &&
+      (error.request ||
+        error.message?.includes('network') ||
+        error.message?.includes('Network') ||
+        error.name === 'AbortError')
+    ) {
       // 网络错误
       const networkError = new AppError('网络连接不可用，请检查您的网络设置')
       showToast({

@@ -38,6 +38,23 @@ export default defineConfig<'webpack5'>(async (merge, { mode }) => {
     },
     webpackChain(chain) {
       chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+
+      if (process.env.TARO_ENV !== 'h5') {
+        chain.module
+          .rule('replace')
+          .test(/\.(j|t)sx?$/)
+          .use('webpack-replace-loader')
+          .loader('webpack-replace-loader')
+          .options({
+            arr: [
+              {
+                search: "lazy(() => import('@/custom-tab-bar'))",
+                replace: 'Fragment',
+                attr: 'g',
+              },
+            ],
+          })
+      }
     },
   }
 
