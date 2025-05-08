@@ -1,17 +1,11 @@
 import { makeAutoObservable } from 'mobx'
-import { withErrorHandling } from '@/utils/request/requestHelpers'
+
 import { getStorage, setStorage, removeStorage, STORAGE_KEYS } from '@/utils/storage'
 import { goTo } from '@/utils/router'
 
 import * as OpenAPI from '@/utils/openapi'
 
-import type {
-  LoginUserDto,
-  SmsLoginDto,
-  LoginResponseDto,
-  RegisterResponseDto,
-  UserDto,
-} from '@/utils/openapi'
+import type { LoginUserDto, SmsLoginDto, LoginResponseDto, UserDto } from '@/utils/openapi'
 export class UserStore {
   private token: string | null = null
   private userInfo: UserDto | null = null
@@ -58,8 +52,8 @@ export class UserStore {
   }
 
   // Handle successful authentication
-  private async handleSuccessfulAuth(response: LoginResponseDto | RegisterResponseDto) {
-    const { accessToken, refreshToken, user } = response
+  private async handleSuccessfulAuth(response) {
+    const { accessToken, refreshToken, user } = response.data as LoginResponseDto
 
     // Store tokens
     setStorage(STORAGE_KEYS.TOKEN, accessToken)
@@ -80,10 +74,7 @@ export class UserStore {
     this.setLoading(true)
 
     try {
-      const response = await withErrorHandling<LoginResponseDto>(
-        async () => await OpenAPI.authControllerLogin({ body: loginData }),
-        '登录失败，请检查您的用户名和密码'
-      )
+      const response = await OpenAPI.authControllerLogin({ body: loginData })
 
       return await this.handleSuccessfulAuth(response)
     } catch (error) {
@@ -99,10 +90,7 @@ export class UserStore {
     this.setLoading(true)
 
     try {
-      const response = await withErrorHandling<LoginResponseDto>(
-        async () => await OpenAPI.authControllerSmsLogin({ requestBody: smsData }),
-        '登录失败，请检查您的验证码'
-      )
+      const response = await OpenAPI.authControllerSmsLogin({ body: smsData })
 
       return await this.handleSuccessfulAuth(response)
     } catch (error) {

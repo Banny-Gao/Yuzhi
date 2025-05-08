@@ -83,7 +83,6 @@ export default defineConfig<'webpack5'>(async (merge, { mode }) => {
       type: 'webpack5',
       prebundle: {
         enable: true,
-        exclude: ['form-data'], // 排除form-data包，解决预构建问题
       },
     },
     cache: {

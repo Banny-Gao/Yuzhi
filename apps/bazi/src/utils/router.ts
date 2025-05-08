@@ -127,7 +127,7 @@ export const router = new Proxy(
 
 // 导出常用的路由方法
 export const goTo = {
-  home: () => router.redirectTo({ url: `/${routes.index.path}` }),
+  home: () => router.switchTab({ url: `/${routes.index.path}` }),
   login: () => router.redirectTo({ url: `/${routes.login.path}` }),
   notFound: () => router.redirectTo({ url: `/${routes.notFound.path}` }),
 }

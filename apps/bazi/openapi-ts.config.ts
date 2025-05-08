@@ -13,6 +13,7 @@ export default defineConfig({
   plugins: [
     '@hey-api/client-axios',
     '@hey-api/schemas',
+    'legacy/xhr',
     {
       dates: true,
       name: '@hey-api/transformers',

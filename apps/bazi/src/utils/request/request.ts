@@ -1,4 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import xhrAdapter from 'axios/unsafe/adapters/xhr'
+
+import { showToast } from '@tarojs/taro'
 
 import { getStorage, removeStorage, STORAGE_KEYS } from '../storage'
 import { client } from '../openapi/client.gen'
@@ -14,10 +17,13 @@ import { loadingManager } from '@/components'
  * 初始化API客户端
  */
 export function initApiClient(baseURL: string): void {
+  console.log(xhrAdapter)
+
   client.setConfig({
     baseURL,
     timeout: 10000, // 10秒超时
     withCredentials: true,
+    adapter: process.env.TARO_PLATFORM === 'mini' ? xhrAdapter : axios.defaults.adapter,
   })
 
   client.instance.interceptors.request.use(config => {
@@ -34,7 +40,17 @@ export function initApiClient(baseURL: string): void {
       // 隐藏加载提示
       loadingManager.hide()
 
-      return response
+      if (response.data.code !== 200) {
+        showToast({
+          title: response.data.message,
+          icon: 'none',
+          duration: 2000,
+        })
+
+        throw new Error(response.data.message)
+      }
+
+      return response.data
     },
     async error => {
       const retryConfig = {
