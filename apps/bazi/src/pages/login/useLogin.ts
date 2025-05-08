@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { router } from '@/utils/router'
-import routes from '@/generated.routes'
+
 import { userStore } from '@/store/user'
-import type { LoginUserDto, SmsLoginDto } from '@/utils/openapi/types.gen'
+import type { LoginUserDto, SmsLoginDto } from '@/utils/request/openapi/types.gen'
 
 // Validation utilities
 export const isValidEmail = (email: string) => {
@@ -177,25 +176,19 @@ export const useLogin = () => {
     setIsLoading(true)
 
     try {
-      let success = false
-
       if (authMode === 'login') {
         const loginData: LoginUserDto = {
           usernameOrPhone: username,
           password,
           rememberMe,
         }
-        success = await userStore.login(loginData)
+        await userStore.login(loginData)
       } else if (authMode === 'smsLogin') {
         const smsData: SmsLoginDto = {
           phoneNumber,
           code: smsCode,
         }
-        success = await userStore.smsLogin(smsData)
-      }
-
-      if (success) {
-        router.redirectTo({ url: routes.index.path })
+        await userStore.smsLogin(smsData)
       }
     } finally {
       setIsLoading(false)

@@ -83,6 +83,7 @@ export default defineConfig<'webpack5'>(async (merge, { mode }) => {
       type: 'webpack5',
       prebundle: {
         enable: true,
+        exclude: ['axios'],
       },
     },
     cache: {

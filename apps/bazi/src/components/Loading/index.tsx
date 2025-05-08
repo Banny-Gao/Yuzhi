@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { View } from '@tarojs/components'
 
-import { useTheme } from '@/contexts/ThemeContext'
 import styles from './index.module.less'
+
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface LoadingProps {
   show?: boolean
@@ -35,29 +36,29 @@ class LoadingManager {
   }
 
   // 开始一个请求
-  public show(): void {
+  public async show(): Promise<void> {
     this.counter++
     if (this.counter === 1 && this.onChange) {
-      this.onChange(true)
+      await this.onChange(true)
     }
   }
 
   // 结束一个请求
-  public hide(): void {
+  public async hide(): Promise<void> {
     if (this.counter > 0) {
       this.counter--
     }
 
     if (this.counter === 0 && this.onChange) {
-      this.onChange(false)
+      await this.onChange(false)
     }
   }
 
   // 强制重置状态，用于处理异常情况
-  public reset(): void {
+  public async reset(): Promise<void> {
     this.counter = 0
     if (this.onChange) {
-      this.onChange(false)
+      await this.onChange(false)
     }
   }
 
@@ -73,6 +74,7 @@ const Loading: React.FC<LoadingProps> = () => {
   const { themeType } = useTheme()
   const [shouldShow, setShouldShow] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
+  const duration = 1000
 
   useEffect(() => {
     shouldShow
@@ -80,13 +82,14 @@ const Loading: React.FC<LoadingProps> = () => {
       : isVisible &&
         setTimeout(() => {
           setIsVisible(false)
-        }, 1000)
+        }, duration)
   }, [shouldShow])
 
   // 使用LoadingManager控制组件状态
   useEffect(() => {
-    loadingManager.registerCallback(show => {
+    loadingManager.registerCallback(async show => {
       setShouldShow(show)
+      if (!show) await new Promise(resolve => setTimeout(resolve, duration))
     })
 
     return () => {
@@ -95,7 +98,13 @@ const Loading: React.FC<LoadingProps> = () => {
   }, [])
 
   // 组装容器类名
-  const containerClassName = [styles.container, shouldShow ? styles.fadeIn : styles.fadeOut, styles[themeType]].filter(Boolean).join(' ')
+  const containerClassName = [
+    styles.container,
+    shouldShow ? styles.fadeIn : styles.fadeOut,
+    styles[themeType],
+  ]
+    .filter(Boolean)
+    .join(' ')
   const length = 6
   const delay = 0.1
 

@@ -44,10 +44,20 @@ export const ResponseStatus = {
  */
 export const StatusGroups = {
   // 成功状态码（2xx）
-  SUCCESS_CODES: [ResponseStatus.SUCCESS, ResponseStatus.CREATED, ResponseStatus.ACCEPTED, ResponseStatus.NO_CONTENT],
+  SUCCESS_CODES: [
+    ResponseStatus.SUCCESS,
+    ResponseStatus.CREATED,
+    ResponseStatus.ACCEPTED,
+    ResponseStatus.NO_CONTENT,
+  ],
 
   // 重定向状态码（3xx）
-  REDIRECT_CODES: [ResponseStatus.MOVED_PERMANENTLY, ResponseStatus.FOUND, ResponseStatus.SEE_OTHER, ResponseStatus.NOT_MODIFIED],
+  REDIRECT_CODES: [
+    ResponseStatus.MOVED_PERMANENTLY,
+    ResponseStatus.FOUND,
+    ResponseStatus.SEE_OTHER,
+    ResponseStatus.NOT_MODIFIED,
+  ],
 
   // 客户端错误状态码（4xx）
   CLIENT_ERROR_CODES: [

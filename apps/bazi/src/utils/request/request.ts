@@ -1,29 +1,33 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import xhrAdapter from 'axios/unsafe/adapters/xhr'
-
 import { showToast } from '@tarojs/taro'
 
 import { getStorage, removeStorage, STORAGE_KEYS } from '../storage'
-import { client } from '../openapi/client.gen'
+import { goTo } from '../router'
+
+import { client } from './openapi/client.gen'
+import { AppError, showError } from './error'
+import { withRetry } from './utils'
 
 import { loadingManager } from '@/components'
-
 /**
  * 格式化API响应
  * 处理新旧两种格式的API响应
  */
 
-/**
- * 初始化API客户端
- */
-export function initApiClient(baseURL: string): void {
-  console.log(xhrAdapter)
+const CancelToken = axios.CancelToken
+const source = CancelToken.source()
+export const cancelRequest = (message?: string) => source.cancel(message)
 
+const adapterEnhancer = adapter => async config => withRetry(async () => await adapter(config))
+
+export function initApiClient(baseURL: string): void {
   client.setConfig({
     baseURL,
     timeout: 10000, // 10秒超时
     withCredentials: true,
-    adapter: process.env.TARO_PLATFORM === 'mini' ? xhrAdapter : axios.defaults.adapter,
+    adapter: adapterEnhancer(xhrAdapter),
+    cancelToken: source.token,
   })
 
   client.instance.interceptors.request.use(config => {
@@ -47,54 +51,28 @@ export function initApiClient(baseURL: string): void {
           duration: 2000,
         })
 
-        throw new Error(response.data.message)
+        throw new AppError(response.data.message)
       }
 
       return response.data
     },
     async error => {
-      const retryConfig = {
-        retryCount: 0,
-        maxRetries: 2,
-        retryDelay: 1000,
-        statusCodes: [408, 500, 502, 503, 504],
-      }
-      // 实现请求重试逻辑
-      const { config, response } = error as AxiosError
-
-      if (config && response) {
-        // 获取当前重试次数
-        retryConfig.retryCount = retryConfig.retryCount || 0
-
-        // 检查是否应该重试 - 使用可选链确保安全访问
-        const shouldRetry =
-          retryConfig.retryCount < retryConfig.maxRetries &&
-          retryConfig.statusCodes.includes(response.status)
-
-        if (shouldRetry) {
-          // 增加重试计数
-          retryConfig.retryCount += 1
-
-          // 延迟后重试
-          await new Promise(resolve => setTimeout(resolve, retryConfig.retryDelay))
-
-          // 重新发送请求
-          return axios(retryConfig as AxiosRequestConfig)
-        }
-      }
-
       // 隐藏加载提示
-      loadingManager.hide()
+      await loadingManager.hide()
+
+      showError(error)
 
       // 处理常见错误
-      if (!error.response) {
-        console.error('网络连接失败:', error.message)
-        // 可以在这里显示全局网络错误提示
-      } else if (error.response.status === 401) {
-        // 处理未授权错误，可能需要重新登录
-        console.error('需要重新登录')
-        removeStorage(STORAGE_KEYS.TOKEN) // 使用存储工具移除令牌
-        // 可以在这里重定向到登录页面
+      switch (error.response?.status) {
+        case 401:
+          // 处理未授权错误，可能需要重新登录
+          console.error('需要重新登录')
+          removeStorage(STORAGE_KEYS.TOKEN) // 使用存储工具移除令牌
+          // 可以在这里重定向到登录页面
+          goTo.login()
+          break
+        default:
+          break
       }
 
       return Promise.reject(error)

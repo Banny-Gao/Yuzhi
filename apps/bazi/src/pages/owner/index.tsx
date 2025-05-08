@@ -5,16 +5,15 @@ import './index.less'
 export const pageMeta = {
   title: '个人中心',
   requiresAuth: true,
-};
+}
 
-
-export default function Owner () {
+export default function Owner() {
   useLoad(() => {
     console.log('Page loaded.')
   })
 
   return (
-    <View className='owner'>
+    <View className="owner">
       <Text>Hello world!</Text>
     </View>
   )

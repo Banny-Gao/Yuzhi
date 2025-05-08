@@ -2,17 +2,15 @@ import React, { ReactNode, Suspense, lazy, Fragment } from 'react'
 import { View } from '@tarojs/components'
 import classNames from 'classnames'
 
+import styles from './index.module.less'
+
 import Navbar from '@/custom-nav-bar'
 import { isH5ShowTabBar } from '@/custom-tab-bar/constants'
-
 import { ThemeSwitcher, Loading } from '@/components'
 import { useTheme } from '@/contexts/ThemeContext'
-
 import { PAGE_STACK, router } from '@/utils/router'
-
 import routes from '@/generated.routes'
 
-import styles from './index.module.less'
 interface PageWrapperProps {
   children: ReactNode | ReactNode[]
   className?: string
@@ -41,7 +39,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
       <Navbar
         title={currentRoute?.meta.title}
         back={PAGE_STACK.length > 1}
-        home={!isH5ShowTabBar(router.path) && currentRoute.meta.home}
+        home={!isH5ShowTabBar(router.path) && currentRoute?.meta.home}
       />
 
       <View className={`${styles.content} ${contentClassName}`} style={contentStyle}>

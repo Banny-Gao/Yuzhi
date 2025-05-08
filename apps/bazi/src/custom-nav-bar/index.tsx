@@ -3,11 +3,10 @@ import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { AtIcon } from 'taro-ui'
 
-import { getNavbarInfo } from '@/utils/util'
-
-import routes from '@/generated.routes'
-
 import styles from './index.module.less'
+
+import { getNavbarInfo } from '@/utils/util'
+import routes from '@/generated.routes'
 
 interface Props {
   title?: string
@@ -29,7 +28,16 @@ interface NavBarState {
   windowWidth: number
 }
 
-const Navbar: React.FC<Props> = ({ title = '', back = false, home = false, onBack, onHome, renderLeft, renderRight, renderCenter }) => {
+const Navbar: React.FC<Props> = ({
+  title = '',
+  back = false,
+  home = false,
+  onBack,
+  onHome,
+  renderLeft,
+  renderRight,
+  renderCenter,
+}) => {
   const [state, setState] = useState<NavBarState>({
     statusBarHeight: 0,
     navBarHeight: 0,

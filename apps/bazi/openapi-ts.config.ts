@@ -8,7 +8,7 @@ export default defineConfig({
   output: {
     format: 'prettier',
     lint: 'eslint',
-    path: './src/utils/openapi',
+    path: './src/utils/request/openapi',
   },
   plugins: [
     '@hey-api/client-axios',

@@ -5,17 +5,16 @@ import './index.less'
 export const pageMeta = {
   title: '档案',
   requiresAuth: true,
-  requiresPermission:' general',
-};
+  requiresPermission: ' general',
+}
 
-
-export default function Archives () {
+export default function Archives() {
   useLoad(() => {
     console.log('Page loaded.')
   })
 
   return (
-    <View className='archives'>
+    <View className="archives">
       <Text>Hello world!</Text>
     </View>
   )

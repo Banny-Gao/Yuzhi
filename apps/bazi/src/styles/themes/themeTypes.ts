@@ -8,7 +8,15 @@ export const themeNames = {
   dark: '暗黑',
 }
 
-export const themeTypes = ['default', 'spring', 'summer', 'autumn', 'winter', 'newYear', 'dark'] as const
+export const themeTypes = [
+  'default',
+  'spring',
+  'summer',
+  'autumn',
+  'winter',
+  'newYear',
+  'dark',
+] as const
 export type ThemeType = (typeof themeTypes)[number]
 
 // 获取当前季节对应的主题

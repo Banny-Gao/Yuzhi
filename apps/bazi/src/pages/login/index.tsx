@@ -2,12 +2,11 @@ import React from 'react'
 import { View, Text, Switch, ScrollView, Input } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
 
-import { PageWrapper, InputField, ThemedButton } from '@/components'
 import AuthToggle from './components/AuthToggle'
-
 import { useLogin } from './useLogin'
-
 import styles from './index.module.less'
+
+import { PageWrapper, InputField, ThemedButton } from '@/components'
 
 export const pageMeta = {
   requiresAuth: false,
@@ -60,17 +59,37 @@ const Login: React.FC = () => {
           />
         </View>
 
-        <InputField label="密码" value={password} onInput={handlePasswordInput} placeholder="请输入密码" type="password" required error={formErrors.password} />
+        <InputField
+          label="密码"
+          value={password}
+          onInput={handlePasswordInput}
+          placeholder="请输入密码"
+          type="password"
+          required
+          error={formErrors.password}
+        />
 
         <View className={styles.options}>
           <View className={styles.remember}>
-            <Switch checked={rememberMe} onChange={e => handleRememberMeChange(e.detail.value)} color="var(--primary-color)" className={styles.switch} />
+            <Switch
+              checked={rememberMe}
+              onChange={e => handleRememberMeChange(e.detail.value)}
+              color="var(--primary-color)"
+              className={styles.switch}
+            />
             <Text className={styles.rememberText}>记住我</Text>
           </View>
           <Text className={styles.forgotPassword}>忘记密码?</Text>
         </View>
 
-        <ThemedButton type="primary" size="large" onClick={handleSubmit} loading={isLoading} disabled={isLoading} block>
+        <ThemedButton
+          type="primary"
+          size="large"
+          onClick={handleSubmit}
+          loading={isLoading}
+          disabled={isLoading}
+          block
+        >
           登录
         </ThemedButton>
       </View>
@@ -116,7 +135,14 @@ const Login: React.FC = () => {
           {formErrors.smsCode && <Text className={styles.errorText}>{formErrors.smsCode}</Text>}
         </View>
 
-        <ThemedButton type="primary" size="large" onClick={handleSubmit} loading={isLoading} disabled={isLoading} block>
+        <ThemedButton
+          type="primary"
+          size="large"
+          onClick={handleSubmit}
+          loading={isLoading}
+          disabled={isLoading}
+          block
+        >
           登录
         </ThemedButton>
       </View>
@@ -139,14 +165,22 @@ const Login: React.FC = () => {
     <PageWrapper>
       <View className={styles.header}>
         <View className={styles.logoContainer}>
-          <Text className={styles.logoText}>豫知八字</Text>
+          <Text className={styles.logoText}>豫知</Text>
         </View>
       </View>
 
       <AuthToggle currentMode={authMode} onChange={handleAuthModeChange} />
 
       <View className={styles.scrollArea}>
-        <ScrollView scrollY scrollWithAnimation className={styles.form} ref={scrollViewRef} enhanced showScrollbar={false} enableFlex>
+        <ScrollView
+          scrollY
+          scrollWithAnimation
+          className={styles.form}
+          ref={scrollViewRef}
+          enhanced
+          showScrollbar={false}
+          enableFlex
+        >
           <View className={styles.scrollContent}>
             <View key={animKey} className={styles.formContainer}>
               {renderAuthForm()}

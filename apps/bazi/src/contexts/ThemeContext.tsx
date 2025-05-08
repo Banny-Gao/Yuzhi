@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import Taro from '@tarojs/taro'
+
 import { ThemeType, getSeasonalTheme } from '../styles/themes/themeTypes'
+
 import { getStorage, setStorage, STORAGE_KEYS } from '@/utils/storage'
 import '../styles/themes/index.css'
 
@@ -24,7 +26,11 @@ interface ThemeProviderProps {
 /**
  * 主题提供者组件
  */
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialTheme = 'default', useSeasonalThemeByDefault = true }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+  children,
+  initialTheme = 'default',
+  useSeasonalThemeByDefault = true,
+}) => {
   // 初始化主题类型状态
   const [themeType, setThemeType] = useState<ThemeType>(() => {
     // 尝试从存储中读取主题设置
@@ -78,7 +84,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, initialT
   }, [themeType])
 
   // 切换主题的函数
-  const toggleTheme = (themes: ThemeType[] = ['default', 'spring', 'summer', 'autumn', 'winter', 'newYear', 'dark']) => {
+  const toggleTheme = (
+    themes: ThemeType[] = ['default', 'spring', 'summer', 'autumn', 'winter', 'newYear', 'dark']
+  ) => {
     setThemeType(currentTheme => {
       const currentIndex = themes.indexOf(currentTheme)
       const nextIndex = (currentIndex + 1) % themes.length

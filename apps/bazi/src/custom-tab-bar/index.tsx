@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import classNames from 'classnames'
 import { CoverView, CoverImage } from '@tarojs/components'
 
-import { router } from '@/utils/router'
 import { tabBarList } from './constants'
-import { IconFont, type IconNames } from '@/components'
-
 import styles from './index.module.less'
+
+import { router } from '@/utils/router'
+import { IconFont, type IconNames } from '@/components'
 
 const TabBar = () => {
   const [selected, setSelected] = useState(0)

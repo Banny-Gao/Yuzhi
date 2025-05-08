@@ -1,10 +1,10 @@
 import js from '@eslint/js'
 import globals from 'globals'
-import typescript from 'typescript-eslint'
+import { eslint as tseslint } from '@typescript-eslint/eslint-plugin'
 
 export default [
   js.configs.recommended,
-  ...typescript.configs.recommended,
+  ...tseslint.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {

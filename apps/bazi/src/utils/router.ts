@@ -1,6 +1,6 @@
 import { navigateTo, navigateBack, redirectTo, switchTab } from '@tarojs/taro'
-import { AppError } from '@/utils/request/error'
 
+import { AppError } from '@/utils/request/error'
 import { default as routes, authRequiredPages, pages } from '@/generated.routes'
 import { STORAGE_KEYS, getStorage, setStorage } from '@/utils/storage'
 interface EventChannel {
@@ -24,19 +24,16 @@ type NavigateToOption = {
 type RouterProps = 'path' | 'navigateTo' | 'redirectTo' | 'switchTab' | 'navigateBack'
 export const PAGE_STACK: string[] = getStorage(STORAGE_KEYS.PAGES_STACK) || []
 
-export const fixedRouteInclude = (rs: string[], route: string) => {
-  /* route 一般以 / 开头
-   *  rs 中不会以 / 开头，
-   * 如 route 为  /pages/index/index， rs 为 ['pages/index/index', 'pages/login/index']， 怎认为 route 在 rs 中
-   **/
-
+const purifyRoute = (route: string) => {
   // 去掉 route 开头的斜杠以便与 rs 数组元素进行比较
   const normalizedRoute = route.startsWith('/') ? route.substring(1) : route
   // 去掉 normalizedRoute 后的参数
   const normalizedRouteWithoutParams = normalizedRoute.split('?')[0]
-
-  return rs.some(r => r === normalizedRouteWithoutParams)
+  return normalizedRouteWithoutParams
 }
+
+export const fixedRouteInclude = (rs: string[], route: string) =>
+  rs.some(r => purifyRoute(r) === purifyRoute(route))
 
 const checkAuthorized = (route: string) =>
   new Promise((resolve, reject) => {
@@ -50,7 +47,7 @@ const checkAuthorized = (route: string) =>
     }
 
     // 当前在登录页并且是已登录，跳转首页
-    if (route === routes.login.path && token) {
+    if (purifyRoute(route) === routes.login.path && token) {
       redirectTo({ url: `/${routes.index.path}` })
       PAGE_STACK.splice(0, PAGE_STACK.length, routes.index.path)
 
@@ -103,9 +100,15 @@ export const withRouteGuard = async (
   }
 }
 
-export const router = new Proxy(
+export const router = new Proxy<{
+  path?: string
+  navigateTo: (option: NavigateToOption) => Promise<any>
+  redirectTo: (option: NavigateToOption) => Promise<any>
+  switchTab: (option: NavigateToOption) => Promise<any>
+  navigateBack: (option: NavigateToOption) => Promise<any>
+}>(
   {
-    path: '',
+    path: void 0,
     navigateTo,
     redirectTo,
     switchTab,

@@ -2,10 +2,8 @@ import { makeAutoObservable } from 'mobx'
 
 import { getStorage, setStorage, removeStorage, STORAGE_KEYS } from '@/utils/storage'
 import { goTo } from '@/utils/router'
-
-import * as OpenAPI from '@/utils/openapi'
-
-import type { LoginUserDto, SmsLoginDto, LoginResponseDto, UserDto } from '@/utils/openapi'
+import { withCache, OpenAPI } from '@/utils/request'
+import type { LoginUserDto, SmsLoginDto, LoginResponseDto, UserDto } from '@/utils/request'
 export class UserStore {
   private token: string | null = null
   private userInfo: UserDto | null = null
@@ -74,12 +72,15 @@ export class UserStore {
     this.setLoading(true)
 
     try {
-      const response = await OpenAPI.authControllerLogin({ body: loginData })
+      const response = await withCache(
+        async () => await OpenAPI.authControllerLogin({ body: loginData }),
+        {
+          key: 'login',
+          ttl: 1000 * 60 * 10,
+        }
+      )
 
       return await this.handleSuccessfulAuth(response)
-    } catch (error) {
-      console.error('Login failed:', error)
-      return false
     } finally {
       this.setLoading(false)
     }
@@ -93,9 +94,6 @@ export class UserStore {
       const response = await OpenAPI.authControllerSmsLogin({ body: smsData })
 
       return await this.handleSuccessfulAuth(response)
-    } catch (error) {
-      console.error('SMS login failed:', error)
-      return false
     } finally {
       this.setLoading(false)
     }

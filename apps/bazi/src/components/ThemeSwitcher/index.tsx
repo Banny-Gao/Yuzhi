@@ -4,11 +4,11 @@
 import { FC, useCallback, useEffect, useState } from 'react'
 import { View, Button, Text } from '@tarojs/components'
 
+import styles from './index.module.less'
+
 import { useTheme } from '@/contexts/ThemeContext'
 import { themeTypes, ThemeType } from '@/styles/themes/themeTypes'
 import { getNavbarInfo } from '@/utils/util'
-
-import styles from './index.module.less'
 
 /**
  * 获取主题图标

@@ -45,8 +45,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "turbo run lint"
+      "prettier --write"
     ],
     "*.{json,md,yml}": [
       "prettier --write"

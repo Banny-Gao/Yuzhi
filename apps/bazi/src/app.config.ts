@@ -1,5 +1,4 @@
 import { useGlobalIconFont } from './components/Iconfont/helper'
-
 import { default as routes, pages } from './generated.routes'
 import { tabBarList } from './custom-tab-bar/constants'
 

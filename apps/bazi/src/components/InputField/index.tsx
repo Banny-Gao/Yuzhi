@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { View, Text, Input } from '@tarojs/components'
-import { useTheme } from '@/contexts/ThemeContext'
+
 import styles from './index.module.less'
+
+import { useTheme } from '@/contexts/ThemeContext'
 
 export interface InputFieldProps {
   label: string
@@ -40,7 +42,14 @@ const InputField: React.FC<InputFieldProps> = ({
   const hasError = error !== ''
 
   // Generate the class names based on state using CSS Modules
-  const fieldClass = [styles.field, styles[themeType], focused && styles.focused, hasError && styles.error, disabled && styles.disabled, className]
+  const fieldClass = [
+    styles.field,
+    styles[themeType],
+    focused && styles.focused,
+    hasError && styles.error,
+    disabled && styles.disabled,
+    className,
+  ]
     .filter(Boolean)
     .join(' ')
 

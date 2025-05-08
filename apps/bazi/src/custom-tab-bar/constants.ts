@@ -25,8 +25,10 @@ export const tabBarList = [
   },
 ]
 
-export const isH5ShowTabBar = (currentPath: string) =>
+export const isH5ShowTabBar = (currentPath?: string) =>
+  currentPath &&
   fixedRouteInclude(
     tabBarList.map(item => item.pagePath),
     currentPath
-  ) && process.env.TARO_ENV === 'h5'
+  ) &&
+  process.env.TARO_ENV === 'h5'
