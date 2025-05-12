@@ -1,18 +1,19 @@
 import React from 'react'
-import { View, Text, Switch, ScrollView, Input } from '@tarojs/components'
-import { useLoad } from '@tarojs/taro'
+import { View, Text, Switch, ScrollView } from '@tarojs/components'
+import classNames from 'classnames'
 
 import AuthToggle from './components/AuthToggle'
 import { useLogin } from './useLogin'
 import styles from './index.module.less'
 
 import { PageWrapper, InputField, ThemedButton } from '@/components'
-
+import { useTheme } from '@/contexts/ThemeContext'
 export const pageMeta = {
   requiresAuth: false,
 }
 
 const Login: React.FC = () => {
+  const { themeType } = useTheme()
   const {
     // State
     authMode,
@@ -39,10 +40,6 @@ const Login: React.FC = () => {
     handleSubmit,
     requestSmsCode,
   } = useLogin()
-
-  useLoad(() => {
-    console.log('登录页面加载完成')
-  })
 
   // Render account login form
   const renderAccountLoginForm = () => {
@@ -111,19 +108,16 @@ const Login: React.FC = () => {
           maxLength={11}
         />
 
-        <View className={styles.verificationRow}>
-          <Text className={styles.verificationLabel}>
-            验证码<Text className={styles.required}>*</Text>
-          </Text>
-          <View className={styles.verificationInputContainer}>
-            <Input
-              className={styles.verificationInput}
-              type="text"
-              placeholder="请输入验证码"
-              value={smsCode}
-              onInput={e => handleSmsCodeInput(e.detail.value)}
-              maxlength={6}
-            />
+        <InputField
+          label="验证码"
+          type="text"
+          required
+          placeholder="请输入验证码"
+          value={smsCode}
+          onInput={handleSmsCodeInput}
+          maxLength={6}
+          error={formErrors.smsCode}
+          suffix={
             <Text
               className={styles.getCode}
               onClick={countdown === 0 ? requestSmsCode : undefined}
@@ -131,9 +125,8 @@ const Login: React.FC = () => {
             >
               {countdown > 0 ? `${countdown}秒后重新获取` : '获取验证码'}
             </Text>
-          </View>
-          {formErrors.smsCode && <Text className={styles.errorText}>{formErrors.smsCode}</Text>}
-        </View>
+          }
+        />
 
         <ThemedButton
           type="primary"
@@ -164,8 +157,8 @@ const Login: React.FC = () => {
   return (
     <PageWrapper>
       <View className={styles.header}>
-        <View className={styles.logoContainer}>
-          <Text className={styles.logoText}>豫知</Text>
+        <View className={classNames(styles.logoContainer, styles[themeType])}>
+          <Text className={classNames(styles.logoText, styles[themeType])}>豫知</Text>
         </View>
       </View>
 

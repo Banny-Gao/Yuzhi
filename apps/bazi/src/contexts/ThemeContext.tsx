@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import { ThemeType, getSeasonalTheme } from '../styles/themes/themeTypes'
 
 import { getStorage, setStorage, STORAGE_KEYS } from '@/utils/storage'
-import '../styles/themes/index.css'
+import { emitter } from '@/utils/emitter'
 
 // 主题上下文接口
 interface ThemeContextType {
@@ -92,12 +92,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       const nextIndex = (currentIndex + 1) % themes.length
       return themes[nextIndex]
     })
+
+    emitter.emit('themeChange', themeType)
+  }
+
+  const handleChangeTheme = (theme: ThemeType) => {
+    setThemeType(theme)
+    emitter.emit('themeChange', theme)
   }
 
   // 上下文值
   const contextValue: ThemeContextType = {
     themeType,
-    setThemeType,
+    setThemeType: handleChangeTheme,
     toggleTheme,
   }
 

@@ -1,5 +1,8 @@
-import { View, Text } from '@tarojs/components'
+import { Text } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
+
+import { PageWrapper } from '@/components'
+
 import './index.less'
 
 export const pageMeta = {
@@ -13,8 +16,8 @@ export default function Owner() {
   })
 
   return (
-    <View className="owner">
-      <Text>Hello world!</Text>
-    </View>
+    <PageWrapper>
+      <Text>个人中心</Text>
+    </PageWrapper>
   )
 }

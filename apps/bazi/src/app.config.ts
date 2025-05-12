@@ -31,4 +31,5 @@ export default defineAppConfig({
   usingComponents: {
     ...useGlobalIconFont(),
   },
+  lazyCodeLoading: 'requiredComponents',
 })

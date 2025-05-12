@@ -16,6 +16,7 @@ export interface InputFieldProps {
   maxLength?: number
   disabled?: boolean
   className?: string
+  suffix?: string | React.ReactNode
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -29,6 +30,7 @@ const InputField: React.FC<InputFieldProps> = ({
   maxLength,
   disabled = false,
   className = '',
+  suffix = '',
 }) => {
   const { themeType } = useTheme()
   const [focused, setFocused] = useState(false)
@@ -73,6 +75,8 @@ const InputField: React.FC<InputFieldProps> = ({
           maxlength={maxLength}
           disabled={disabled}
         />
+
+        {suffix}
       </View>
 
       {hasError && <Text className={styles.errorText}>{error}</Text>}

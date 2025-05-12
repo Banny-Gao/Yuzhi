@@ -59,21 +59,7 @@ textarea::placeholder {
   color: var(--text-disabled, #999);
 }
 
-/* Fix Taro page visibility issues */
-.taro_page_shade {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 10 !important;
-}
-
 .taro_router {
+  width: 100vw;
   height: 100vh !important;
-}
-
-.taro_router > .taro_page.taro_page_show.taro_page_stationed:not(.taro_page_shade):not(.taro_tabbar_page):not(:last-child) {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 10 !important;
 }

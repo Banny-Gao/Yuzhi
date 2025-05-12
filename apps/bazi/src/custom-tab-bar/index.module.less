@@ -1,11 +1,9 @@
-@import '../styles/variables.less';
-
 .tab-bar {
-  .themeTransition;
-  background: var(--bg-primary);
   display: flex;
-  color: var(--text-secondary);
-  font-size: @font-size;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow:
+    0 0 3px var(--primary-light),
+    0 0 6px var(--primary-color);
 
   &-item {
     flex: 1;
@@ -14,17 +12,33 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: @padding;
-    gap: @gap;
-
-    &.active {
-      font-weight: 500;
-      color: var(--text-primary);
-    }
+    padding: 8px;
 
     cover-image {
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .text {
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    &.active {
+      .text {
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+    }
+  }
+
+  &.dark {
+    box-shadow:
+      0 0 3px var(--text-secondary),
+      0 0 6px var(--text-primary);
+
+    .text {
+      margin-top: 0;
     }
   }
 }

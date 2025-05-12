@@ -123,6 +123,17 @@ function generateRoutes() {
  * 请勿手动修改此文件，修改将在下次生成时被覆盖
  */
 
+export type Route = {
+  path: string
+  meta: {
+    title?: string
+    requiresAuth?: boolean
+    requiresPermission?: string
+    homeButton?: boolean
+  }
+}
+
+
 const routes = ${JSON.stringify(routes, null, 2)}
 
 export default routes

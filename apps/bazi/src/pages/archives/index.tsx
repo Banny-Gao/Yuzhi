@@ -1,5 +1,8 @@
-import { View, Text } from '@tarojs/components'
+import { Text } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
+
+import { PageWrapper } from '@/components'
+
 import './index.less'
 
 export const pageMeta = {
@@ -10,12 +13,12 @@ export const pageMeta = {
 
 export default function Archives() {
   useLoad(() => {
-    console.log('Page loaded.')
+    console.log('档案')
   })
 
   return (
-    <View className="archives">
-      <Text>Hello world!</Text>
-    </View>
+    <PageWrapper>
+      <Text>档案</Text>
+    </PageWrapper>
   )
 }

@@ -13,6 +13,18 @@ export default {
        * @docs https://github.com/webpack-contrib/webpack-bundle-analyzer
        */
       chain.plugin('analyzer').use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin, [])
+
+      // 分包
+      chain.plugin('splitChunks').use(require('webpack').optimize.SplitChunksPlugin, [
+        {
+          chunks: 'all',
+          minSize: 20000,
+          maxSize: 0,
+          minChunks: 1,
+          maxAsyncRequests: 5,
+          maxInitialRequests: 3,
+        },
+      ])
     },
   },
 } satisfies UserConfigExport<'webpack5'>

@@ -1,8 +1,10 @@
 import { navigateTo, navigateBack, redirectTo, switchTab } from '@tarojs/taro'
 
-import { AppError } from '@/utils/request/error'
+import { STORAGE_KEYS, getStorage, setStorage } from './storage'
+import { emitter } from './emitter'
 import { default as routes, authRequiredPages, pages } from '@/generated.routes'
-import { STORAGE_KEYS, getStorage, setStorage } from '@/utils/storage'
+import { isTabBarPath } from '@/custom-tab-bar/constants'
+
 interface EventChannel {
   emit(eventName: string, ...args: any): void
   on(eventName: string, fn: TaroGeneral.EventCallback): void
@@ -11,7 +13,7 @@ interface EventChannel {
 }
 
 type NavigateToOption = {
-  url: string
+  url?: string
   events?: TaroGeneral.IAnyObject
   routeType?: string
   routeConfig?: TaroGeneral.IAnyObject
@@ -24,7 +26,7 @@ type NavigateToOption = {
 type RouterProps = 'path' | 'navigateTo' | 'redirectTo' | 'switchTab' | 'navigateBack'
 export const PAGE_STACK: string[] = getStorage(STORAGE_KEYS.PAGES_STACK) || []
 
-const purifyRoute = (route: string) => {
+export const purifyRoute = (route: string) => {
   // 去掉 route 开头的斜杠以便与 rs 数组元素进行比较
   const normalizedRoute = route.startsWith('/') ? route.substring(1) : route
   // 去掉 normalizedRoute 后的参数
@@ -32,69 +34,60 @@ const purifyRoute = (route: string) => {
   return normalizedRouteWithoutParams
 }
 
-export const fixedRouteInclude = (rs: string[], route: string) =>
-  rs.some(r => purifyRoute(r) === purifyRoute(route))
+export const fixedRouteInclude = (rs: string[], route?: string) =>
+  route && rs.some(r => purifyRoute(r) === purifyRoute(route))
 
-const checkAuthorized = (route: string) =>
-  new Promise((resolve, reject) => {
-    const token = getStorage(STORAGE_KEYS.TOKEN)
+const checkAuthorized = (route?: string) => {
+  const token = getStorage(STORAGE_KEYS.TOKEN)
 
-    if (!token && fixedRouteInclude(authRequiredPages, route)) {
-      redirectTo({ url: `/${routes.login.path}` })
-      PAGE_STACK.splice(0, PAGE_STACK.length, routes.login.path)
+  if (!token && fixedRouteInclude(authRequiredPages, route)) {
+    PAGE_STACK.splice(0, PAGE_STACK.length, `/${routes.login.path}`)
 
-      return reject(new AppError('未登录'))
-    }
+    return
+  }
 
-    // 当前在登录页并且是已登录，跳转首页
-    if (purifyRoute(route) === routes.login.path && token) {
-      redirectTo({ url: `/${routes.index.path}` })
-      PAGE_STACK.splice(0, PAGE_STACK.length, routes.index.path)
+  // 当前在登录页并且是已登录，跳转首页
+  if (token && fixedRouteInclude([routes.login.path], route)) {
+    PAGE_STACK.splice(0, PAGE_STACK.length, `/${routes.index.path}`)
 
-      return reject(new AppError('已登录'))
-    }
+    return
+  }
+}
 
-    return resolve(true)
-  })
+const checkExisted = (route?: string) =>
+  route && !fixedRouteInclude(pages, route) && PAGE_STACK.push(`/${routes.notFound.path}`)
 
-const checkExisted = (route: string) =>
-  new Promise((resolve, reject) => {
-    if (!fixedRouteInclude(pages, route)) {
-      redirectTo({ url: `/${routes.notFound.path}` })
-      PAGE_STACK.push(routes.notFound.path)
-
-      return reject(new AppError('页面不存在'))
-    }
-
-    return resolve(true)
-  })
-
-export const withRouteGuard = async (
-  route: string,
-  callback?: () => Promise<any>,
-  type?: string
-) => {
+export const withRouteGuard = async (route?: string, type?: string, option?: NavigateToOption) => {
   try {
-    await checkAuthorized(route)
-    await checkExisted(route)
+    checkAuthorized(route)
+    checkExisted(route)
 
     switch (type) {
       case 'navigateTo':
-        PAGE_STACK.push(route)
+        route && PAGE_STACK.push(route)
         break
       case 'redirectTo':
-        PAGE_STACK.pop()
-        PAGE_STACK.push(route)
+        route && PAGE_STACK.pop()
+        route && PAGE_STACK.push(route)
         break
       case 'switchTab':
-        PAGE_STACK.splice(0, PAGE_STACK.length, route)
+        route && PAGE_STACK.splice(0, PAGE_STACK.length, route)
         break
       case 'navigateBack':
         PAGE_STACK.pop()
         break
     }
 
-    return callback?.()
+    emitter.emit('routeChange', type, route)
+
+    const currentRoute = PAGE_STACK[PAGE_STACK.length - 1]
+
+    if (isTabBarPath(currentRoute)) {
+      switchTab({ ...option, url: currentRoute })
+      return
+    }
+
+    redirectTo({ ...option, url: currentRoute })
   } finally {
     setStorage(STORAGE_KEYS.PAGES_STACK, PAGE_STACK)
   }
@@ -105,7 +98,7 @@ export const router = new Proxy<{
   navigateTo: (option: NavigateToOption) => Promise<any>
   redirectTo: (option: NavigateToOption) => Promise<any>
   switchTab: (option: NavigateToOption) => Promise<any>
-  navigateBack: (option: NavigateToOption) => Promise<any>
+  navigateBack: (option?: NavigateToOption) => Promise<any>
 }>(
   {
     path: void 0,
@@ -115,13 +108,19 @@ export const router = new Proxy<{
     navigateBack,
   },
   {
-    get(target, prop: RouterProps) {
+    get(_, prop: RouterProps) {
       switch (prop) {
         case 'path':
           return PAGE_STACK[PAGE_STACK.length - 1]
         default:
-          return async (option: NavigateToOption) => {
-            await withRouteGuard(option.url, () => target[prop](option), prop)
+          return async (option?: NavigateToOption) => {
+            const fixedUrl =
+              option?.url && !option.url.startsWith('/') ? `/${option?.url}` : option?.url
+
+            await withRouteGuard(fixedUrl, prop, {
+              ...option,
+              url: fixedUrl,
+            })
           }
       }
     },
@@ -130,7 +129,7 @@ export const router = new Proxy<{
 
 // 导出常用的路由方法
 export const goTo = {
-  home: () => router.switchTab({ url: `/${routes.index.path}` }),
-  login: () => router.redirectTo({ url: `/${routes.login.path}` }),
-  notFound: () => router.redirectTo({ url: `/${routes.notFound.path}` }),
+  home: () => router.switchTab({ url: routes.index.path }),
+  login: () => router.redirectTo({ url: routes.login.path }),
+  notFound: () => router.redirectTo({ url: routes.notFound.path }),
 }

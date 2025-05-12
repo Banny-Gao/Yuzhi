@@ -1,10 +1,11 @@
-import { View, Text, Image } from '@tarojs/components'
+import { Text } from '@tarojs/components'
 import { useLoad } from '@tarojs/taro'
 
-import { PageWrapper } from '@/components'
-import userImg from '@/assets/images/user.png'
+import { PageWrapper, Button } from '@/components'
+import { router } from '@/utils/router'
+import routes from '@/generated.routes'
 
-import './index.less'
+import './index.module.less'
 
 export const pageMeta = {
   title: '排盘',
@@ -18,8 +19,11 @@ const Index = () => {
 
   return (
     <PageWrapper>
-      <Text>Hello world!</Text>
-      <Image src={userImg} />
+      <Text>排盘</Text>
+      <Button onClick={() => router.navigateTo({ url: routes.notFound.path })}>To Not Found</Button>
+      <Button onClick={() => router.navigateTo({ url: routes.forbidden.path })}>
+        To Forbidden
+      </Button>
     </PageWrapper>
   )
 }

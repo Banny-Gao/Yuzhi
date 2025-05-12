@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react'
 import { View, Text } from '@tarojs/components'
-import Taro from '@tarojs/taro'
 import { AtIcon } from 'taro-ui'
 
-import styles from './index.module.less'
-
 import { getNavbarInfo } from '@/utils/util'
-import routes from '@/generated.routes'
+import { goTo, router } from '@/utils/router'
+
+import styles from './index.module.less'
 
 interface Props {
   title?: string
   back?: boolean
   home?: boolean
   onBack?: () => void
-  onHome?: () => void
   renderLeft?: React.ReactNode
   renderRight?: React.ReactNode
   renderCenter?: React.ReactNode
@@ -33,7 +31,6 @@ const Navbar: React.FC<Props> = ({
   back = false,
   home = false,
   onBack,
-  onHome,
   renderLeft,
   renderRight,
   renderCenter,
@@ -52,21 +49,11 @@ const Navbar: React.FC<Props> = ({
   }, [])
 
   const handleBack = () => {
-    if (onBack) {
-      onBack()
-    } else {
-      Taro.navigateBack()
-    }
+    onBack?.() || router.navigateBack()
   }
 
   const handleHome = () => {
-    if (onHome) {
-      onHome()
-    } else {
-      Taro.switchTab({
-        url: routes.index.path,
-      })
-    }
+    goTo.home()
   }
 
   const { statusBarHeight, navBarHeight, menuButtonWidth, windowWidth } = state

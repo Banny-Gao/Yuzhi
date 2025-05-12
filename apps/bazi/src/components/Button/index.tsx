@@ -44,11 +44,7 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
   )
 
   return (
-    <TaroButton
-      className={buttonClass}
-      onClick={disabled || loading ? undefined : onClick}
-      loading={loading}
-    >
+    <TaroButton className={buttonClass} onClick={disabled || loading ? undefined : onClick}>
       {loading ? <View className={styles.loading} /> : children}
     </TaroButton>
   )
