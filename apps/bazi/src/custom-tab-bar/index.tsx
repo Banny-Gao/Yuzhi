@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { CoverView, CoverImage } from '@tarojs/components'
 
 import { tabBarList } from './constants'
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 import { router, purifyRoute } from '@/utils/router'
 import { IconFont, type IconNames } from '@/components'
@@ -48,7 +48,7 @@ const TabBar = () => {
           >
             {!isDark &&
               (process.env.TARO_ENV === 'h5' ? (
-                <IconFont name={item.iconName as IconNames} />
+                <IconFont name={item.iconName as IconNames} size={48} />
               ) : (
                 <CoverImage src={iconPath} />
               ))}

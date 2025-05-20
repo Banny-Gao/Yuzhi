@@ -3,7 +3,7 @@ import { useLoad } from '@tarojs/taro'
 
 import { PageWrapper } from '@/components'
 
-import './index.less'
+import './index.scss'
 
 export const pageMeta = {
   title: '档案',

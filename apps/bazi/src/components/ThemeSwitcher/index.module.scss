@@ -1,20 +1,20 @@
-@import '@/styles/index.module.less';
+@import '@/styles/index.module.scss';
 
 .switcher {
   position: fixed;
   z-index: 999;
   --size: 38px;
   top: 50px;
-  margin-top: @gap-lg;
-  right: @padding-lg;
+  margin-top: $gap-lg;
+  right: $spacing-h-lg;
   transform: none;
 }
 
 .fab {
   background-color: var(--bg-tertiary);
-  .shadow-light;
-  .themeTransition;
-  padding: @gap-sm;
+  @extend .shadow-light;
+  @extend .themeTransition;
+  padding: $gap-sm;
   width: var(--size) !important;
   height: var(--size) !important;
   border-radius: 50%;
@@ -39,11 +39,11 @@
 
 .fabActive {
   background-color: var(--bg-tertiary);
-  .shadow-light;
+  @extend .shadow-light;
 }
 
 .currentIcon {
-  font-size: @font-size-lg + 2px;
+  font-size: $font-size-xl + 2px;
   color: var(--text-primary);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -54,9 +54,9 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: @gap-sm;
+  gap: $gap-sm;
   z-index: 1000;
-  border-radius: @border-radius-lg;
+  border-radius: $border-radius-lg;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   top: calc(var(--size) + 10px);
   right: 0;
@@ -95,11 +95,11 @@
 
 .itemActive {
   background-color: var(--bg-tertiary);
-  .shadow-light;
+  @extend .shadow-light;
 }
 
 .icon {
-  font-size: @font-size-lg + 2px;
+  font-size: $font-size-xl + 2px;
   line-height: 1;
 }
 
@@ -118,12 +118,12 @@
 @media screen and (max-width: 375px) {
   .switcher {
     --size: 32px;
-    top: @padding-lg;
-    right: @padding-lg;
+    top: $spacing-h-lg;
+    right: $spacing-h-lg;
   }
 
   .menu {
-    gap: @gap-md;
-    padding: @padding-md;
+    gap: $gap-md;
+    padding: $spacing-h-md;
   }
 }

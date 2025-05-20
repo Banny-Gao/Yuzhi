@@ -1,7 +1,7 @@
-@import '@/styles/index.module.less';
+@import '@/styles/index.module.scss';
 
 .toggle {
-  .horizontal-box(@padding-lg, 0);
+  @include horizontal-box($spacing-h-lg, 0);
   position: relative;
 }
 
@@ -10,10 +10,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: @padding-md 0;
+  padding: $spacing-v-md 0;
   position: relative;
   cursor: pointer;
-  .themeTransition;
+  @extend .themeTransition;
 
   &:hover {
     color: var(--primary-color);
@@ -30,8 +30,8 @@
 
     height: 2px;
     background-color: var(--primary-color);
-    .themeTransition;
-    .scaleIn;
+    @extend .themeTransition;
+    @include scaleIn();
   }
 
   .text {
@@ -41,7 +41,7 @@
 }
 
 .text {
-  font-size: @font-size-md - 1px;
+  font-size: $font-size-lg - 1px;
   color: var(--text-secondary);
-  .themeTransition;
+  @extend .themeTransition;
 }

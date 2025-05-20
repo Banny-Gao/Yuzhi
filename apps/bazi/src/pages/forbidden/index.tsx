@@ -4,7 +4,7 @@ import { useLoad } from '@tarojs/taro'
 import { PageWrapper } from '@/components'
 import { goTo } from '@/utils/router'
 
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 export const pageMeta = {
   title: '暂无权限',

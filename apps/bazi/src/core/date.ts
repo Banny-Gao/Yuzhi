@@ -10,17 +10,19 @@ import type { SolarTerm } from '@/utils/request/openapi'
 
 type SolarTermWithDate = SolarTerm & {
   date: dayjs.Dayjs
+  introduction: string // 节气简介
+  yangSheng: string // 节气养生建议
 }
 
 Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP }) // 设置小数精度
 
 /** 四季 */
-export type SeasonName = NameConst<typeof SEASON_NAME>
-export const SEASON_NAME = ['春', '夏', '秋', '冬'] as const
+type SeasonName = NameConst<typeof SEASON_NAME>
+const SEASON_NAME = ['春', '夏', '秋', '冬'] as const
 
 /** 农历月份 */
-export type LunarMonth = NameConst<typeof LUNAR_MONTH> | NameConst<typeof LUNAR_MONTH_WITH_LEAP>
-export const LUNAR_MONTH = [
+type LunarMonth = NameConst<typeof LUNAR_MONTH> | NameConst<typeof LUNAR_MONTH_WITH_LEAP>
+const LUNAR_MONTH = [
   '正',
   '二',
   '三',
@@ -37,8 +39,8 @@ export const LUNAR_MONTH = [
 const LUNAR_MONTH_WITH_LEAP = [...LUNAR_MONTH.map(item => `闰${item}`)] as const
 
 /** 农历日期 */
-export type LunarDay = NameConst<typeof LUNAR_DAY>
-export const LUNAR_DAY = [
+type LunarDay = NameConst<typeof LUNAR_DAY>
+const LUNAR_DAY = [
   '初一',
   '初二',
   '初三',
@@ -72,14 +74,14 @@ export const LUNAR_DAY = [
 ] as const
 
 /** 获取闰月月份 */
-export const getLeapMonth = (lunarInfo: number): number => lunarInfo & 0xf
+const getLeapMonth = (lunarInfo: number): number => lunarInfo & 0xf
 
 /** 获取闰月天数 */
-export const getLeapDays = (lunarInfo: number): number =>
+const getLeapDays = (lunarInfo: number): number =>
   getLeapMonth(lunarInfo) ? (lunarInfo & 0x10000 ? 30 : 29) : 0
 
 /** 计算农历年天数 */
-export const getLunarYearDays = (lunarInfo: number): number => {
+const getLunarYearDays = (lunarInfo: number): number => {
   let total = 0
   let monthInfo = 0x8000
   for (let i = 0; i < 12; i++) {
@@ -91,10 +93,10 @@ export const getLunarYearDays = (lunarInfo: number): number => {
 }
 
 /** 获取农历某月的天数 */
-export const getLunarMonthDays = (lunarInfo: number, month: number): number =>
+const getLunarMonthDays = (lunarInfo: number, month: number): number =>
   lunarInfo & (0x10000 >> month) ? 30 : 29
 
-export type BaseDate<T = object> = T & {
+type BaseDate<T = object> = T & {
   year: number
   month: number
   day: number
@@ -103,17 +105,18 @@ export type BaseDate<T = object> = T & {
   second: number
 }
 
-export type SolarDate = BaseDate<{
+type SolarDate = BaseDate<{
   date: Date
   format: (pattern?: string) => string
-  lunarDate?: LunarDate // 农历日期
+  lunar?: LunarDate // 农历日期
 }>
 
 /** 农历日期接口 */
-export type LunarDate = BaseDate<{
+type LunarDate = BaseDate<{
+  lunarMonth: LunarMonth
+  lunarDay: LunarDay
   isLeap: boolean // 是否闰月
-  solarDate: SolarDate // 真太阳时日期
-  text: string // 农历日期文本
+  lunarDateString: string // 农历日期文本
   monthIndex: number // 当月在本年索引
   dateIndex: number // 当天在本月索引
   currentSolarTerms: [SolarTermWithDate, SolarTermWithDate] // 当前前后节气
@@ -121,7 +124,7 @@ export type LunarDate = BaseDate<{
 }>
 
 /** 计算时差方程修正值（分钟） */
-export const getEquationOfTime = (date: Date): number => {
+const getEquationOfTime = (date: Date): number => {
   // 计算当年的第几天（1月1日为第0天）
   const dayOfYear = Math.floor(
     (date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
@@ -138,6 +141,87 @@ export const getEquationOfTime = (date: Date): number => {
     .sub(new Decimal(7.53).times(Math.cos(B)))
     .sub(new Decimal(1.5).times(Math.sin(B)))
     .toNumber()
+}
+
+const solarTermsCache: Record<number, SolarTermWithDate[]> = {}
+const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> => {
+  if (solarTermsCache[year]) {
+    return solarTermsCache[year]
+  }
+
+  try {
+    const res = await solarTermsControllerGetSolarTerms({
+      query: {
+        year,
+      },
+    })
+    // pub_date 为 10月23日形式， 通过正则提取月和日的数字， 返回 10 23
+    const getMonthAndDay = (date: string) => {
+      const match = date.match(/(\d+)月(\d+)日/)
+      return `${match?.[1] || ''} ${match?.[2] || ''}`
+    }
+
+    return (
+      res.data?.map(item => ({
+        ...item,
+        introduction: item.des,
+        yangSheng: item.heath,
+        date: dayjs(
+          `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
+          'YYYY MM DD HH:mm',
+          'zh-cn'
+        ),
+      })) ?? []
+    )
+  } catch (error) {
+    console.error(error)
+    return []
+  }
+}
+
+/** 获取某月某天前后的节气 */
+const getPrevAndNextSolarTerm = async (
+  date: Date
+): Promise<[SolarTermWithDate, SolarTermWithDate]> => {
+  const year = date.getFullYear()
+  // 获取前年、当年、后年的节气（处理跨年边界情况）
+  const [prevYearTerms, currentYearTerms, nextYearTerms] = await Promise.all([
+    getSolarTermsFormApi(year - 1),
+    getSolarTermsFormApi(year),
+    getSolarTermsFormApi(year + 1),
+  ])
+
+  // 合并并排序所有相关节气（保留三年数据确保覆盖所有情况）
+  const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort((a, b) =>
+    a.date.diff(b.date)
+  )
+
+  const targetTime = date.getTime()
+  let prevTerm = allTerms[0]
+  let nextTerm = allTerms[allTerms.length - 1]
+
+  // 优化查找逻辑：从后往前找第一个小于目标时间的节气
+  for (let i = allTerms.length - 1; i >= 0; i--) {
+    const termTime = allTerms[i].date.valueOf()
+
+    if (termTime <= targetTime) {
+      prevTerm = allTerms[i]
+      nextTerm = allTerms[i + 1] || allTerms[0] // 处理最后节气的情况
+      break
+    }
+  }
+
+  // 特殊处理年初情况（可能属于前一年的节气）
+  if (date.getMonth() < 2) {
+    // 1-3月需要检查前一年
+    const firstTermOfYear = currentYearTerms[0]
+    if (targetTime < firstTermOfYear.date.valueOf()) {
+      prevTerm = prevYearTerms[prevYearTerms.length - 1]
+      nextTerm = firstTermOfYear
+    }
+  }
+
+  return [prevTerm, nextTerm]
 }
 
 /** 计算真太阳时 */
@@ -199,88 +283,9 @@ export const getSolarDate = async (date: Date, longitude: number = 120): Promise
     format,
   }
 
-  solarDate.lunarDate = await getLunarDate(solarDate)
+  solarDate.lunar = await getLunarDate(solarDate)
 
   return solarDate
-}
-
-const solarTermsCache: Record<number, SolarTermWithDate[]> = {}
-const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> => {
-  if (solarTermsCache[year]) {
-    return solarTermsCache[year]
-  }
-
-  try {
-    const res = await solarTermsControllerGetSolarTerms({
-      query: {
-        year,
-      },
-    })
-    // pub_date 为 10月23日形式， 通过正则提取月和日的数字， 返回 10 23
-    const getMonthAndDay = (date: string) => {
-      const match = date.match(/(\d+)月(\d+)日/)
-      return `${match?.[1] || ''} ${match?.[2] || ''}`
-    }
-
-    return (
-      res.data?.map(item => ({
-        ...item,
-        date: dayjs(
-          `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
-          'YYYY MM DD HH:mm',
-          'zh-cn'
-        ),
-      })) ?? []
-    )
-  } catch (error) {
-    console.error(error)
-    return []
-  }
-}
-
-/** 获取某月某天前后的节气 */
-export const getPrevAndNextSolarTerm = async (
-  date: Date
-): Promise<[SolarTermWithDate, SolarTermWithDate]> => {
-  const year = date.getFullYear()
-  // 获取前年、当年、后年的节气（处理跨年边界情况）
-  const [prevYearTerms, currentYearTerms, nextYearTerms] = await Promise.all([
-    getSolarTermsFormApi(year - 1),
-    getSolarTermsFormApi(year),
-    getSolarTermsFormApi(year + 1),
-  ])
-
-  // 合并并排序所有相关节气（保留三年数据确保覆盖所有情况）
-  const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort((a, b) =>
-    a.date.diff(b.date)
-  )
-
-  const targetTime = date.getTime()
-  let prevTerm = allTerms[0]
-  let nextTerm = allTerms[allTerms.length - 1]
-
-  // 优化查找逻辑：从后往前找第一个小于目标时间的节气
-  for (let i = allTerms.length - 1; i >= 0; i--) {
-    const termTime = allTerms[i].date.valueOf()
-
-    if (termTime <= targetTime) {
-      prevTerm = allTerms[i]
-      nextTerm = allTerms[i + 1] || allTerms[0] // 处理最后节气的情况
-      break
-    }
-  }
-
-  // 特殊处理年初情况（可能属于前一年的节气）
-  if (date.getMonth() < 2) {
-    // 1-3月需要检查前一年
-    const firstTermOfYear = currentYearTerms[0]
-    if (targetTime < firstTermOfYear.date.valueOf()) {
-      prevTerm = prevYearTerms[prevYearTerms.length - 1]
-      nextTerm = firstTermOfYear
-    }
-  }
-
-  return [prevTerm, nextTerm]
 }
 
 /** 将真太阳时转换为农历日期 */
@@ -349,13 +354,14 @@ export const getLunarDate = async (solarDate: SolarDate): Promise<LunarDate> => 
   return {
     year: lunarYear,
     month: lunarMonth,
+    lunarMonth: monthText,
     day: lunarDay,
+    lunarDay: LUNAR_DAY[lunarDay - 1],
     hour: solarDate.hour,
     minute: solarDate.minute,
     second: solarDate.second,
     isLeap,
-    solarDate,
-    text: `${lunarYearText}年 ${monthText}月 ${LUNAR_DAY[lunarDay - 1]}`,
+    lunarDateString: `${lunarYearText}年 ${monthText}月 ${LUNAR_DAY[lunarDay - 1]}`,
     monthIndex: lunarMonth - 1,
     dateIndex: lunarDay - 1,
     currentSolarTerms,

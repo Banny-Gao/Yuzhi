@@ -2,7 +2,7 @@ import React, { ReactNode, Suspense, lazy, Fragment, useState, useEffect, useCal
 import { View } from '@tarojs/components'
 import classNames from 'classnames'
 
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 import Navbar from '@/custom-nav-bar'
 import { isH5ShowTabBar } from '@/custom-tab-bar/constants'

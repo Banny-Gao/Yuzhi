@@ -5,8 +5,8 @@ import { setupRequest } from '@/utils/request/request'
 import { withRouteGuard, router } from '@/utils/router'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 
-import './app.less'
 import 'taro-ui/dist/style/index.scss'
+import './app.scss'
 
 const App = ({ children }: PropsWithChildren<any>) => {
   const taroRouter = useRouter()

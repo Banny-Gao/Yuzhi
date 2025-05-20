@@ -1,4 +1,5 @@
-.notFoundContainer {
+@import '@/styles/index.module.scss';
+.forbiddenContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -19,7 +20,7 @@
 .errorCode {
   font-size: 80px;
   font-weight: bold;
-  color: var(--primary-color);
+  color: var(--error-color);
   opacity: 0.6;
   line-height: 1;
   margin: 20px 0;
@@ -28,14 +29,14 @@
 .title {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 16px;
+  margin-bottom: $spacing-v-lg;
   color: var(--text-primary);
 }
 
 .description {
-  font-size: 16px;
+  font-size: $font-size-lg;
   color: var(--text-secondary);
-  margin-bottom: 40px;
+  margin-bottom: $spacing-v-lg * 2;
   text-align: center;
   max-width: 300px;
 }
@@ -47,9 +48,9 @@
 .backButton {
   padding: 12px 30px;
   border-radius: 20px;
-  background-color: var(--primary-color);
+  background-color: var(--error-color);
   color: var(--bg-primary);
-  font-size: 16px;
+  font-size: $font-size-lg;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;

@@ -1,13 +1,13 @@
-@import '@/styles/index.module.less';
+@import '@/styles/index.module.scss';
 
 .button {
-  .themeTransition;
+  @extend .themeTransition;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 500;
-  border-radius: @border-radius;
+  border-radius: $border-radius-lg;
   border: none !important;
   outline: none !important;
   cursor: pointer;
@@ -35,25 +35,25 @@
 // Button sizes
 .small {
   height: 32px;
-  padding: 0 @padding-md;
-  font-size: @font-size;
+  padding: 0 $spacing-h-md;
+  font-size: $font-size-base;
 }
 
 .medium {
   height: 40px;
-  padding: 0 @padding-lg;
-  font-size: @font-size-md;
+  padding: 0 $spacing-h-lg;
+  font-size: $font-size-lg;
 }
 
 .large {
   height: 48px;
-  padding: 0 @padding-lg * 1.5;
-  font-size: @font-size-lg;
+  padding: 0 $spacing-h-lg * 1.5;
+  font-size: $font-size-xl;
 }
 
 // Button types
 .primary {
-  .btn-primary;
+  @extend .btn-primary;
 
   &:active {
     background-color: var(--primary-dark);
@@ -67,7 +67,7 @@
 }
 
 .secondary {
-  .btn-secondary;
+  @extend .btn-secondary;
 
   &:active {
     background-color: var(--bg-tertiary-dark);
@@ -82,7 +82,7 @@
 
 .outlined {
   background-color: transparent;
-  .border;
+  @extend .border;
   border-color: var(--primary-color) !important;
   color: var(--primary-color);
 
@@ -132,7 +132,7 @@
       height: 100%;
       background-color: transparent;
       border-radius: inherit;
-      .themeTransition;
+      @extend .themeTransition;
     }
 
     &:active:after {
@@ -143,5 +143,5 @@
 
 // Loading state
 .loading {
-  .loading-spinner;
+  @include loading-spinner();
 }

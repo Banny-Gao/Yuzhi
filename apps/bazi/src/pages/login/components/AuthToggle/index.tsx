@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text } from '@tarojs/components'
 
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 export type AuthMode = 'login' | 'smsLogin'
 

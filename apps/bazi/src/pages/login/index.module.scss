@@ -1,4 +1,4 @@
-@import '@/styles/index.module.less';
+@import '@/styles/index.module.scss';
 
 .header {
   width: 100%;
@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-top: @padding-lg * 1.5;
+  margin-top: $spacing-h-lg * 1.5;
 
   .logoContainer {
     width: 100px;
@@ -14,9 +14,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: @padding-lg * 1.5;
-    .border;
-    border-radius: @border-radius-lg;
+    margin-bottom: $spacing-h-lg * 1.5;
+    @extend .border;
+    border-radius: $border-radius-lg;
     background-color: var(--bg-secondary);
     box-shadow:
       0 0 4px var(--primary-light),
@@ -28,7 +28,7 @@
     }
 
     .logoText {
-      font-size: @font-size-lg * 2.2;
+      font-size: $font-size-xl * 2.2;
       font-family: 'daoliti';
       font-weight: bold;
       transition: text-shadow 0.3s ease;
@@ -48,14 +48,14 @@
   }
 
   .title {
-    font-size: @font-size-lg * 1.5;
+    font-size: $font-size-xl * 1.5;
     font-weight: bold;
     color: var(--text-primary);
-    margin-bottom: @gap;
+    margin-bottom: $gap;
   }
 
   .subtitle {
-    font-size: @font-size;
+    font-size: $font-size-base;
     color: var(--text-tertiary);
   }
 }
@@ -65,11 +65,11 @@
   position: relative;
   overflow: visible;
   max-height: 60vh;
-  padding: 0 @padding-lg;
+  padding: 0 $spacing-h-lg;
 }
 
 .scrollContent {
-  padding-bottom: @padding-lg * 3.5;
+  padding-bottom: $spacing-h-lg * 3.5;
 }
 
 .form {
@@ -81,12 +81,12 @@
 .formContainer {
   width: 100%;
   box-sizing: border-box;
-  padding: 0 @padding-sm;
-  .popIn;
+  padding: 0 $spacing-h-sm;
+  @extend .popIn;
   transform-origin: center;
   backface-visibility: hidden;
   will-change: transform, opacity;
-  margin-top: @padding-lg;
+  margin-top: $spacing-h-lg;
 }
 
 .formContent {
@@ -99,9 +99,9 @@
 }
 
 .options {
-  .horizontal-box(0, 0);
+  @include horizontal-box(0, 0);
   justify-content: space-between;
-  margin-bottom: @padding-lg * 1.5;
+  margin-bottom: $spacing-h-lg * 1.5;
 }
 
 .remember {
@@ -110,16 +110,16 @@
 }
 
 .rememberText {
-  font-size: @font-size;
+  font-size: $font-size-base;
   color: var(--text-secondary);
-  margin-left: @gap;
+  margin-left: $gap;
 }
 
 .forgotPassword {
-  font-size: @font-size;
+  font-size: $font-size-base;
   color: var(--primary-color);
   cursor: pointer;
-  .themeTransition;
+  @extend .themeTransition;
 
   &:active {
     opacity: 0.7;
@@ -128,15 +128,15 @@
 
 .getCode {
   position: absolute;
-  right: @padding-lg;
+  right: $spacing-h-lg;
   top: 50%;
   transform: translateY(-50%);
   color: var(--primary-color);
-  font-size: @font-size;
+  font-size: $font-size-base;
   white-space: nowrap;
   cursor: pointer;
   z-index: 2;
-  .themeTransition;
+  @extend .themeTransition;
 
   &:active {
     opacity: 0.7;

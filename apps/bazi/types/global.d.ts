@@ -6,7 +6,7 @@ declare module '*.jpg'
 declare module '*.jpeg'
 declare module '*.svg'
 declare module '*.css'
-declare module '*.less'
+declare module '*.scss'
 declare module '*.scss'
 declare module '*.sass'
 declare module '*.styl'
@@ -29,16 +29,9 @@ declare namespace NodeJS {
 declare module 'taro-ui' {
   import { ComponentClass } from 'react'
 
-  export interface AtIconProps {
-    prefixClass?: string
-    value: string
-    size?: number
-    color?: string
-    className?: string
-    customStyle?: object
-  }
-
-  export const AtIcon: ComponentClass<AtIconProps>
+  export const AtIcon: ComponentClass<any>
+  export const AtList: ComponentClass<any>
+  export const AtListItem: ComponentClass<any>
 }
 
 declare module 'axios/unsafe/adapters/xhr'

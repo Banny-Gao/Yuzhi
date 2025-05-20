@@ -170,8 +170,8 @@
   animation-delay: 0.5s;
 }
 
-.scaleIn(@duration: 0.25s) {
-  animation: scaleIn @duration ease-in-out;
+@mixin scaleIn($duration: 0.25s) {
+  animation: scaleIn $duration ease-in-out;
 }
 
 @keyframes scaleIn {

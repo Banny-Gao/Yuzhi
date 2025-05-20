@@ -4,7 +4,7 @@ import { View } from '@tarojs/components'
 import { loadingManager } from './manager'
 import { useTheme } from '@/contexts/ThemeContext'
 
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 interface LoadingProps {
   show?: boolean

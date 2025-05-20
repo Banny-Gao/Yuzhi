@@ -3,8 +3,9 @@
  */
 import { FC, useCallback, useEffect, useState } from 'react'
 import { View, Button, Text } from '@tarojs/components'
+import { pxTransform } from '@tarojs/taro'
 
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 import { useTheme } from '@/contexts/ThemeContext'
 import { themeTypes, ThemeType } from '@/styles/themes/themeTypes'
@@ -77,7 +78,7 @@ const ThemeSwitcher: FC = () => {
     <View
       className={switcherClass}
       onClick={e => e.stopPropagation()}
-      style={{ top: navBarHeight }}
+      style={{ top: pxTransform(navBarHeight * 2) }}
     >
       <Button className={fabClass} onClick={toggleMenu}>
         <Text className={styles.currentIcon}>{getThemeIcon(themeType)}</Text>

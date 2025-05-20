@@ -1,9 +1,11 @@
+@import '~taro-ui/dist/style/variables/default.scss';
 .tab-bar {
+  z-index: 100;
   display: flex;
   padding-bottom: env(safe-area-inset-bottom);
   box-shadow:
-    0 0 3px var(--primary-light),
-    0 0 6px var(--border-color);
+    0 0 $spacing-v-sm var(--primary-light),
+    0 0 $spacing-v-sm * 2 var(--border-color);
 
   &-item {
     flex: 1;
@@ -12,16 +14,16 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 8px;
+    padding: $spacing-v-sm;
 
     cover-image {
-      width: 24px;
-      height: 24px;
+      width: 48px;
+      height: 48px;
     }
 
     .text {
       color: var(--text-secondary);
-      margin-top: 6px;
+      margin-top: $spacing-v-sm;
     }
 
     &.active {
@@ -34,8 +36,8 @@
 
   &.dark {
     box-shadow:
-      0 0 3px var(--text-secondary),
-      0 0 6px var(--text-primary);
+      0 0 $spacing-v-sm var(--text-secondary),
+      0 0 $spacing-v-sm * 2 var(--text-primary);
 
     .text {
       margin-top: 0;

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
+import { pxTransform } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtIcon } from 'taro-ui'
 
 import { getNavbarInfo } from '@/utils/util'
 import { goTo, router } from '@/utils/router'
 
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 interface Props {
   title?: string
@@ -66,14 +67,14 @@ const Navbar: React.FC<Props> = ({
     <View
       className={styles.navbar}
       style={{
-        paddingTop: `${statusBarHeight}px`,
+        paddingTop: pxTransform(statusBarHeight * 2),
       }}
     >
       <View
         className={styles.navbar__inner}
         style={{
-          height: `${navBarHeight - statusBarHeight}px`,
-          paddingRight: `${leftWidth}px`,
+          height: pxTransform((navBarHeight - statusBarHeight) * 2),
+          paddingRight: pxTransform(leftWidth * 2),
         }}
       >
         <View className={styles.navbar__left}>
@@ -102,7 +103,10 @@ const Navbar: React.FC<Props> = ({
 
         <View className={styles.navbar__center}>{title ? <Text>{title}</Text> : renderCenter}</View>
 
-        <View className={styles.navbar__right} style={{ marginRight: `${rightDistance}px` }}>
+        <View
+          className={styles.navbar__right}
+          style={{ marginRight: pxTransform(rightDistance * 2) }}
+        >
           {renderRight}
         </View>
       </View>

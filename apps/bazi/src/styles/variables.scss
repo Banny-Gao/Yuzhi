@@ -1,22 +1,9 @@
-@padding-sm: 6px;
-@padding: 8px;
-@padding-md: 12px;
-@padding-lg: 16px;
+@import '~taro-ui/dist/style/variables/default.scss';
 
-@gap-sm: 4px;
-@gap: 6px;
-@gap-md: 8px;
-@gap-lg: 12px;
-
-@font-size-sm: 12px;
-@font-size: 14px;
-@font-size-md: 16px;
-@font-size-lg: 18px;
-
-@border-radius-sm: 4px;
-@border-radius: 8px;
-@border-radius-md: 12px;
-@border-radius-lg: 16px;
+$gap-sm: 4px * $hd !default;
+$gap: 6px * $hd !default;
+$gap-md: 8px * $hd !default;
+$gap-lg: 12px * $hd !default;
 
 @font-face {
   font-family: 'daoliti';
@@ -38,35 +25,35 @@
 
 /* 按钮颜色类 */
 .btn-primary {
-  .themeTransition;
+  @extend .themeTransition;
   background-color: var(--primary-color);
   color: #fff;
   border: none;
 }
 
 .btn-secondary {
-  .themeTransition;
+  @extend .themeTransition;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   border: none;
 }
 
 .btn-success {
-  .themeTransition;
+  @extend .themeTransition;
   background-color: var(--success-color);
   color: #fff;
   border: none;
 }
 
 .btn-warning {
-  .themeTransition;
+  @extend .themeTransition;
   background-color: var(--warning-color);
   color: #fff;
   border: none;
 }
 
 .btn-error {
-  .themeTransition;
+  @extend .themeTransition;
   background-color: var(--error-color);
   color: #fff;
   border: none;
@@ -74,43 +61,43 @@
 
 /* 边框类 */
 .border {
-  .themeTransition;
+  @extend .themeTransition;
   border: 1px solid var(--border-color);
 }
 
 .border-light {
-  .themeTransition;
+  @extend .themeTransition;
   border: 1px solid var(--border-color-light);
 }
 
 /* 阴影类 */
 .shadow {
-  .themeTransition;
+  @extend .themeTransition;
   box-shadow: var(--box-shadow);
 }
 
 .shadow-light {
-  .themeTransition;
+  @extend .themeTransition;
   box-shadow: var(--box-shadow-light);
 }
 
 // 常用类名
-.vertical-box(@padding: @padding, @gap: @gap) {
+@mixin vertical-box($padding: $padding, $gap: $gap) {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: @padding;
-  gap: @gap;
+  padding: $padding;
+  gap: $gap;
 }
 
-.horizontal-box(@padding: @padding, @gap: @gap) {
+@mixin horizontal-box($padding: $padding, $gap: $gap) {
   display: flex;
   flex-direction: row;
   align-items: center;
   box-sizing: border-box;
   flex-wrap: wrap;
-  padding: @padding;
-  gap: @gap;
+  padding: $padding;
+  gap: $gap;
 }
 
 .spin {
@@ -118,11 +105,11 @@
 }
 
 // 加载动画
-.loading-spinner(@size: 16px, @border-width: 2px) {
-  width: @size;
-  height: @size;
-  border: @border-width solid currentColor;
+@mixin loading-spinner($size: 16px, $border-width: 2px) {
+  width: $size;
+  height: $size;
+  border: $border-width solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;
-  .spin;
+  @extend .spin;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, Input } from '@tarojs/components'
 
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 import { useTheme } from '@/contexts/ThemeContext'
 

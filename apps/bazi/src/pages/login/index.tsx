@@ -4,7 +4,7 @@ import classNames from 'classnames'
 
 import AuthToggle from './components/AuthToggle'
 import { useLogin } from './useLogin'
-import styles from './index.module.less'
+import styles from './index.module.scss'
 
 import { PageWrapper, InputField, ThemedButton } from '@/components'
 import { useTheme } from '@/contexts/ThemeContext'

@@ -1,10 +1,9 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
-
 import dotenv from 'dotenv'
+
 import devConfig from './dev'
 import prodConfig from './prod'
-
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig<'webpack5'>(async (merge, { mode }) => {
   const isDev = mode === 'development'
@@ -21,8 +20,8 @@ export default defineConfig<'webpack5'>(async (merge, { mode }) => {
           propList: ['*'],
           selectorBlackList: ['ignore'],
           replace: true,
-          mediaQuery: true,
-          baseFontSize: 20,
+          mediaQuery: false,
+          minPixelValue: 0,
         },
       },
       cssModules: {
@@ -59,9 +58,9 @@ export default defineConfig<'webpack5'>(async (merge, { mode }) => {
   }
 
   const baseConfig: UserConfigExport<'webpack5'> = {
-    projectName: 'mobile',
-    date: '2025-3-28',
-    designWidth: 375,
+    projectName: 'bazi',
+    designWidth: 750,
+    baseFontSize: 24,
     deviceRatio: {
       640: 2.34 / 2,
       750: 1,

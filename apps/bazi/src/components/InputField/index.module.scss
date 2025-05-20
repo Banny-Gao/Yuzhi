@@ -1,22 +1,22 @@
-@import '@/styles/index.module.less';
+@import '@/styles/index.module.scss';
 
 .field {
-  .vertical-box(0, @gap);
-  margin-bottom: @padding-lg;
+  @include vertical-box(0, $gap);
+  margin-bottom: $spacing-v-lg;
 }
 
 .labelRow {
-  .horizontal-box(0, @gap-sm);
+  @include horizontal-box(0, $gap-sm);
 }
 
 .label {
-  font-size: @font-size;
+  font-size: $font-size-base;
   color: var(--text-primary);
-  .themeTransition;
+  @extend .themeTransition;
 }
 
 .required {
-  font-size: @font-size;
+  font-size: $font-size-base;
   color: var(--error-color);
 }
 
@@ -28,22 +28,22 @@
 .input {
   width: 100%;
   height: 48px;
-  border-radius: @border-radius;
+  border-radius: $border-radius-lg;
   background-color: var(--bg-secondary);
-  .border-light;
-  padding: 0 @padding-lg;
-  font-size: @font-size-md;
+  @extend .border-light;
+  padding: 0 $spacing-h-lg;
+  font-size: $font-size-lg;
   color: var(--text-primary);
-  .themeTransition;
+  @extend .themeTransition;
   box-sizing: border-box;
   display: flex;
   align-items: center;
 }
 
 .errorText {
-  font-size: @font-size-sm;
+  font-size: $font-size-sm;
   color: var(--error-color);
-  .fadeIn;
+  @extend .fadeIn;
 }
 
 // States
@@ -82,7 +82,7 @@
 
   .input {
     background-color: var(--bg-tertiary);
-    .border;
+    @extend .border;
     color: var(--text-primary);
 
     &::placeholder {
