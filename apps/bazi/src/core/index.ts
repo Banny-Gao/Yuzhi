@@ -1,5 +1,4 @@
 export * from './date'
-
-export * from './data/nouns'
+export * from './data'
 
 export type * from './types'

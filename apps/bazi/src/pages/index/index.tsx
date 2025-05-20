@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { useLoad, getLocation } from '@tarojs/taro'
-import { ScrollView, View, Text } from '@tarojs/components'
-import { AtList, AtListItem } from 'taro-ui'
+import { ScrollView } from '@tarojs/components'
 
-import { PageWrapper } from '@/components'
-import { getSolarDate, Nouns } from '@/core'
+import { PageWrapper, FieldCard } from '@/components'
+import { getSolarDate } from '@/core'
 
 import { loadingManager } from '@/components'
 
-import './index.module.scss'
+import styles from './index.module.scss'
 
 export const pageMeta = {
   title: '排盘',
@@ -25,7 +24,6 @@ const Index = () => {
       const res = await getLocation({
         type: 'wgs84',
       })
-      console.log(res)
       const solarDate = await getSolarDate(new Date(), res.longitude)
 
       setSolarDate(solarDate)
@@ -40,26 +38,27 @@ const Index = () => {
 
   const { lunar, ...solar } = solarDate ?? {}
 
-  const renderList = (data: Record<string, any>) => (
-    <AtList hasBorder={false}>
-      {Object.entries(data).map(([key, value]) => (
-        <AtListItem key={key} title={Nouns[key]} extraText={JSON.stringify(value)} />
-      ))}
-    </AtList>
-  )
-
   return (
     <PageWrapper>
       <ScrollView scrollY>
-        <View>
-          <Text>阳历</Text>
-          {renderList(solar)}
-        </View>
+        <FieldCard className={styles.mb} title="阳历" field={solar} keys={['dateString']} />
         {lunar && (
-          <View>
-            <Text>阴历</Text>
-            {renderList(lunar)}
-          </View>
+          <FieldCard
+            title="农历"
+            field={lunar}
+            keys={[
+              'lunarDateString',
+              'seasonName',
+              'currentSolarTerms',
+              'solarTermName',
+              'solarTermDateString',
+              'dateString',
+              'introduction',
+              'xiSu',
+              'youLai',
+              'yangSheng',
+            ]}
+          />
         )}
       </ScrollView>
     </PageWrapper>

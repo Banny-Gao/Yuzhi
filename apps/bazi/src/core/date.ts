@@ -1,77 +1,57 @@
 import dayjs from 'dayjs'
 import Decimal from 'decimal.js'
 
-import { LUNAR_INFO, MIN_LUNAR_YEAR, MAX_LUNAR_YEAR } from './data/lunar-years'
+import {
+  LUNAR_INFO,
+  MIN_LUNAR_YEAR,
+  MAX_LUNAR_YEAR,
+  SEASON_NAME,
+  LUNAR_MONTH,
+  LUNAR_MONTH_WITH_LEAP,
+  LUNAR_DAY,
+} from './data'
 import { toChineseNum } from './utils/number-to-chinese'
 import { solarTermsControllerGetSolarTerms } from '@/utils/request/openapi'
 
-import type { NameConst } from './types'
+import type { SeasonName, LunarMonth, LunarDay } from './data'
 import type { SolarTerm } from '@/utils/request/openapi'
+
+Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP }) // 设置小数精度
 
 type SolarTermWithDate = SolarTerm & {
   date: dayjs.Dayjs
+  solarTermName: string
+  solarTermDateString: string
   introduction: string // 节气简介
   yangSheng: string // 节气养生建议
 }
 
-Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP }) // 设置小数精度
+type BaseDate<T = object> = T & {
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
+  second: number
+}
 
-/** 四季 */
-type SeasonName = NameConst<typeof SEASON_NAME>
-const SEASON_NAME = ['春', '夏', '秋', '冬'] as const
+type SolarDate = BaseDate<{
+  date: Date
+  dateString: string
+  lunar?: LunarDate // 农历日期
+}>
 
-/** 农历月份 */
-type LunarMonth = NameConst<typeof LUNAR_MONTH> | NameConst<typeof LUNAR_MONTH_WITH_LEAP>
-const LUNAR_MONTH = [
-  '正',
-  '二',
-  '三',
-  '四',
-  '五',
-  '六',
-  '七',
-  '八',
-  '九',
-  '十',
-  '冬',
-  '腊',
-] as const
-const LUNAR_MONTH_WITH_LEAP = [...LUNAR_MONTH.map(item => `闰${item}`)] as const
-
-/** 农历日期 */
-type LunarDay = NameConst<typeof LUNAR_DAY>
-const LUNAR_DAY = [
-  '初一',
-  '初二',
-  '初三',
-  '初四',
-  '初五',
-  '初六',
-  '初七',
-  '初八',
-  '初九',
-  '初十',
-  '十一',
-  '十二',
-  '十三',
-  '十四',
-  '十五',
-  '十六',
-  '十七',
-  '十八',
-  '十九',
-  '二十',
-  '廿一',
-  '廿二',
-  '廿三',
-  '廿四',
-  '廿五',
-  '廿六',
-  '廿七',
-  '廿八',
-  '廿九',
-  '三十',
-] as const
+/** 农历日期接口 */
+type LunarDate = BaseDate<{
+  lunarMonth: LunarMonth
+  lunarDay: LunarDay
+  isLeap: boolean // 是否闰月
+  lunarDateString: string // 农历日期文本
+  monthIndex: number // 当月在本年索引
+  dateIndex: number // 当天在本月索引
+  currentSolarTerms: [SolarTermWithDate, SolarTermWithDate] // 当前前后节气
+  seasonName: SeasonName // 季节名称
+}>
 
 /** 获取闰月月份 */
 const getLeapMonth = (lunarInfo: number): number => lunarInfo & 0xf
@@ -95,33 +75,6 @@ const getLunarYearDays = (lunarInfo: number): number => {
 /** 获取农历某月的天数 */
 const getLunarMonthDays = (lunarInfo: number, month: number): number =>
   lunarInfo & (0x10000 >> month) ? 30 : 29
-
-type BaseDate<T = object> = T & {
-  year: number
-  month: number
-  day: number
-  hour: number
-  minute: number
-  second: number
-}
-
-type SolarDate = BaseDate<{
-  date: Date
-  format: (pattern?: string) => string
-  lunar?: LunarDate // 农历日期
-}>
-
-/** 农历日期接口 */
-type LunarDate = BaseDate<{
-  lunarMonth: LunarMonth
-  lunarDay: LunarDay
-  isLeap: boolean // 是否闰月
-  lunarDateString: string // 农历日期文本
-  monthIndex: number // 当月在本年索引
-  dateIndex: number // 当天在本月索引
-  currentSolarTerms: [SolarTermWithDate, SolarTermWithDate] // 当前前后节气
-  seasonName: SeasonName // 季节名称
-}>
 
 /** 计算时差方程修正值（分钟） */
 const getEquationOfTime = (date: Date): number => {
@@ -162,16 +115,21 @@ const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> 
     }
 
     return (
-      res.data?.map(item => ({
-        ...item,
-        introduction: item.des,
-        yangSheng: item.heath,
-        date: dayjs(
+      res.data?.map(item => {
+        const date = dayjs(
           `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
           'YYYY MM DD HH:mm',
           'zh-cn'
-        ),
-      })) ?? []
+        )
+        return {
+          ...item,
+          introduction: item.des,
+          yangSheng: item.heath,
+          date,
+          solarTermName: item.name,
+          solarTermDateString: date.format('YYYY-MM-DD HH:mm'),
+        }
+      }) ?? []
     )
   } catch (error) {
     console.error(error)
@@ -271,7 +229,7 @@ export const getSolarDate = async (date: Date, longitude: number = 120): Promise
   const seconds = Math.round(remainingSeconds % 60) // 使用 round 处理小数
 
   const newDate = new Date(years, months - 1, days, hours, minutes, seconds)
-  const format = (pattern?: string): string => dayjs(newDate).format(pattern || 'YYYY-MM-DD HH:mm')
+
   const solarDate: SolarDate = {
     year: years,
     month: months,
@@ -280,7 +238,7 @@ export const getSolarDate = async (date: Date, longitude: number = 120): Promise
     minute: minutes,
     second: seconds,
     date: newDate,
-    format,
+    dateString: dayjs(newDate).format('YYYY-MM-DD HH:mm'),
   }
 
   solarDate.lunar = await getLunarDate(solarDate)

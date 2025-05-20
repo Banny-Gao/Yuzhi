@@ -1,0 +1,101 @@
+@import '../../styles/themes/index.scss';
+// Import Taro UI variables
+@import '~taro-ui/dist/style/variables/default.scss';
+
+.field-card {
+  margin: $spacing-v-lg 0;
+  border-radius: $border-radius-lg;
+  box-shadow: var(--box-shadow);
+  background-color: var(--bg-primary);
+
+  &__list {
+    background-color: var(--bg-primary);
+  }
+
+  &__item {
+    padding: $spacing-v-xs 0;
+    border-bottom: 1px solid var(--border-color-light);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__key {
+    font-weight: bold;
+    color: var(--text-primary);
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-v-sm;
+    display: block;
+  }
+
+  &__value {
+    color: var(--text-secondary);
+    font-size: $font-size-base;
+    margin-left: $spacing-h-sm;
+  }
+
+  &__list-item {
+    background-color: var(--bg-primary);
+
+    .at-list__item-content {
+      color: var(--text-secondary);
+    }
+
+    .at-list__item-title {
+      color: var(--text-primary);
+    }
+  }
+
+  &__array-item,
+  &__object-item {
+    padding: $spacing-h-xl;
+  }
+
+  &__array-content,
+  &__object-content {
+    padding: $spacing-h-md;
+    border-left: 2px solid var(--border-color);
+  }
+
+  &__array-nested {
+    margin: $spacing-v-sm 0;
+    padding: $spacing-h-md;
+    background-color: var(--bg-secondary);
+    border-radius: $border-radius-md;
+  }
+}
+
+// Ensure the card adapts to the theme style
+.at-card {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+
+  &__header {
+    border-bottom: 1px solid var(--border-color-light);
+
+    &-title {
+      color: var(--text-primary);
+      font-weight: bold;
+    }
+  }
+
+  &__content {
+    color: var(--text-secondary);
+  }
+}
+
+// Override Taro UI list styles to work with themes
+.at-list {
+  background-color: var(--bg-primary);
+
+  &::after {
+    border-color: var(--border-color);
+  }
+}
+
+.at-list__item {
+  &::after {
+    border-color: var(--border-color-light);
+  }
+}

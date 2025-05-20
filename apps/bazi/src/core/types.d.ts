@@ -18,9 +18,6 @@ export type Option = {
   value: number | string
 }
 
-/** 将字符串数组转换为联合类型 */
-export type NameConst<T extends readonly string[]> = T[number]
-
 export type GetRelationParams<T extends TargetField, S extends IndexField> = {
   target: S | S['fieldName']
   fieldNames: S['fieldName'][]

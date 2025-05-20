@@ -32,6 +32,7 @@ declare module 'taro-ui' {
   export const AtIcon: ComponentClass<any>
   export const AtList: ComponentClass<any>
   export const AtListItem: ComponentClass<any>
+  export const AtCard: ComponentClass<any>
 }
 
 declare module 'axios/unsafe/adapters/xhr'
