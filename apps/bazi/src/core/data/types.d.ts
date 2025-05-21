@@ -13,14 +13,17 @@ import {
   WU_SE_NAME,
   WU_WEI_NAME,
   WU_ZHI_NAME,
+  WX_LIUSHEN,
   LIU_SHEN_NAME,
   TIAN_GAN_NAME,
   DI_ZHI_NAME,
+  GAN_TIAN_WEN,
+  TWELVE_PLACE_NAME,
 } from './nouns'
 
 declare global {
   /** 将字符串数组转换为联合类型 */
-  export type NameConst<T extends readonly string[]> = T[number]
+  export type NameConst<T extends readonly any[]> = T[number]
 
   /** 季节名称 */
   export type SeasonName = NameConst<typeof SEASON_NAME>
@@ -51,9 +54,13 @@ declare global {
   // 五志
   export type WuZhiName = NameConst<typeof WU_ZHI_NAME>
   // 六神
-  export type LiuShenName = NameConst<typeof LIU_SHEN_NAME>
+  export type LiuShenName = NameConst<typeof LIU_SHEN_NAME> | NameConst<typeof WX_LIUSHEN>
   // 天干
   export type TianGanName = NameConst<typeof TIAN_GAN_NAME>
   // 地支
   export type DiZhiName = NameConst<typeof DI_ZHI_NAME>
+  // 天文
+  export type TianWenName = NameConst<typeof GAN_TIAN_WEN>
+  // 五行寄生十二宫
+  export type TwelvePlaceName = NameConst<typeof TWELVE_PLACE_NAME>
 }

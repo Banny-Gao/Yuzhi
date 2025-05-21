@@ -10,6 +10,9 @@ import {
   WU_WEI_NAME,
   WU_ZHI_NAME,
   WU_CHANG_NAME,
+  WX_LIUSHEN,
+  WX_TIAN_GAN,
+  WX_DI_ZHI,
 } from './data'
 
 type YinYangValue = -1 | 1
@@ -81,21 +84,9 @@ export const getWuxings = (): WuXing[] =>
           wuWei: WU_WEI_NAME,
           wuSe: WU_SE_NAME,
           wuChang: WU_CHANG_NAME,
-          liuShen: ['青龙', '朱雀', ['勾陈', '腾蛇'], '白虎', '玄武'],
-          tianGan: [
-            ['甲', '乙'],
-            ['丙', '丁'],
-            ['戊', '己'],
-            ['庚', '辛'],
-            ['壬', '癸'],
-          ],
-          diZhi: [
-            ['寅', '卯'],
-            ['巳', '午'],
-            ['辰', '戌', '丑', '未'],
-            ['申', '酉'],
-            ['亥', '子'],
-          ],
+          liuShen: WX_LIUSHEN,
+          tianGan: WX_TIAN_GAN,
+          diZhi: WX_DI_ZHI,
         },
         index
       ),
