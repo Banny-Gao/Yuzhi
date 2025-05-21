@@ -3,7 +3,7 @@ import { useLoad, getLocation } from '@tarojs/taro'
 import { ScrollView } from '@tarojs/components'
 
 import { PageWrapper, FieldCard } from '@/components'
-import { getSolarDate } from '@/core'
+import { getSolarDate, wuxings } from '@/core'
 
 import { loadingManager } from '@/components'
 
@@ -27,6 +27,8 @@ const Index = () => {
       const solarDate = await getSolarDate(new Date(), res.longitude)
 
       setSolarDate(solarDate)
+      console.log('solarDate', solarDate)
+      console.log('wuxings', wuxings)
     } finally {
       loadingManager.hide()
     }
@@ -36,31 +38,9 @@ const Index = () => {
     getDefualtSolarDate()
   })
 
-  const { lunar, ...solar } = solarDate ?? {}
-
   return (
     <PageWrapper>
-      <ScrollView scrollY>
-        <FieldCard className={styles.mb} title="阳历" field={solar} keys={['dateString']} />
-        {lunar && (
-          <FieldCard
-            title="农历"
-            field={lunar}
-            keys={[
-              'lunarDateString',
-              'seasonName',
-              'currentSolarTerms',
-              'solarTermName',
-              'solarTermDateString',
-              'dateString',
-              'introduction',
-              'xiSu',
-              'youLai',
-              'yangSheng',
-            ]}
-          />
-        )}
-      </ScrollView>
+      <ScrollView scrollY></ScrollView>
     </PageWrapper>
   )
 }

@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { View, Text } from '@tarojs/components'
 import { AtCard, AtList, AtListItem } from 'taro-ui'
-import { Nouns } from '../../core/data/nouns'
+import { NOUN } from '../../core/data/nouns'
 import styles from './index.module.scss'
 
 interface FieldCardProps {
@@ -23,8 +23,8 @@ const FieldCard: FC<FieldCardProps> = ({ field, keys, title, isNested = false, c
   const renderKeys = keys || Object.keys(field)
 
   const renderValue = (key: string, value: any) => {
-    // Get the display title from Nouns, or use the key if not found
-    const displayTitle = Nouns[key as keyof typeof Nouns] || key
+    // Get the display title from NOUN, or use the key if not found
+    const displayTitle = NOUN[key as keyof typeof NOUN] || key
 
     if (Array.isArray(value)) {
       return (
@@ -85,11 +85,7 @@ const FieldCard: FC<FieldCardProps> = ({ field, keys, title, isNested = false, c
   }
 
   return (
-    <AtCard
-      title={title || '详细信息'}
-      className={`${styles['field-card']} ${className || ''}`}
-      hasBorder={false}
-    >
+    <AtCard title={title || '详细信息'} className={`${styles['field-card']} ${className || ''}`} hasBorder={false}>
       {content}
     </AtCard>
   )

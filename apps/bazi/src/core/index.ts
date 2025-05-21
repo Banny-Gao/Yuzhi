@@ -1,4 +1,4 @@
-export * from './date'
 export * from './data'
 
-export type * from './types'
+export * from './date'
+export * from './wuxing'

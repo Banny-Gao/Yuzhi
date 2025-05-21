@@ -13,7 +13,6 @@ import {
 import { toChineseNum } from './utils/number-to-chinese'
 import { solarTermsControllerGetSolarTerms } from '@/utils/request/openapi'
 
-import type { SeasonName, LunarMonth, LunarDay } from './data'
 import type { SolarTerm } from '@/utils/request/openapi'
 
 Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP }) // 设置小数精度
@@ -35,30 +34,31 @@ type BaseDate<T = object> = T & {
   second: number
 }
 
-type SolarDate = BaseDate<{
-  date: Date
-  dateString: string
-  lunar?: LunarDate // 农历日期
-}>
+declare global {
+  export type SolarDate = BaseDate<{
+    date: Date
+    dateString: string
+    lunar?: LunarDate // 农历日期
+  }>
 
-/** 农历日期接口 */
-type LunarDate = BaseDate<{
-  lunarMonth: LunarMonth
-  lunarDay: LunarDay
-  isLeap: boolean // 是否闰月
-  lunarDateString: string // 农历日期文本
-  monthIndex: number // 当月在本年索引
-  dateIndex: number // 当天在本月索引
-  currentSolarTerms: [SolarTermWithDate, SolarTermWithDate] // 当前前后节气
-  seasonName: SeasonName // 季节名称
-}>
+  /** 农历日期接口 */
+  export type LunarDate = BaseDate<{
+    lunarMonth: LunarMonth
+    lunarDay: LunarDay
+    isLeap: boolean // 是否闰月
+    lunarDateString: string // 农历日期文本
+    monthIndex: number // 当月在本年索引
+    dateIndex: number // 当天在本月索引
+    currentSolarTerms: [SolarTermWithDate, SolarTermWithDate] // 当前前后节气
+    seasonName: SeasonName // 季节名称
+  }>
+}
 
 /** 获取闰月月份 */
 const getLeapMonth = (lunarInfo: number): number => lunarInfo & 0xf
 
 /** 获取闰月天数 */
-const getLeapDays = (lunarInfo: number): number =>
-  getLeapMonth(lunarInfo) ? (lunarInfo & 0x10000 ? 30 : 29) : 0
+const getLeapDays = (lunarInfo: number): number => (getLeapMonth(lunarInfo) ? (lunarInfo & 0x10000 ? 30 : 29) : 0)
 
 /** 计算农历年天数 */
 const getLunarYearDays = (lunarInfo: number): number => {
@@ -73,15 +73,12 @@ const getLunarYearDays = (lunarInfo: number): number => {
 }
 
 /** 获取农历某月的天数 */
-const getLunarMonthDays = (lunarInfo: number, month: number): number =>
-  lunarInfo & (0x10000 >> month) ? 30 : 29
+const getLunarMonthDays = (lunarInfo: number, month: number): number => (lunarInfo & (0x10000 >> month) ? 30 : 29)
 
 /** 计算时差方程修正值（分钟） */
 const getEquationOfTime = (date: Date): number => {
   // 计算当年的第几天（1月1日为第0天）
-  const dayOfYear = Math.floor(
-    (date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
-  )
+  const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24))
 
   // 计算太阳角度（弧度），81是春分前的天数
   const B = new Decimal(dayOfYear - 81)
@@ -138,9 +135,7 @@ const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> 
 }
 
 /** 获取某月某天前后的节气 */
-const getPrevAndNextSolarTerm = async (
-  date: Date
-): Promise<[SolarTermWithDate, SolarTermWithDate]> => {
+const getPrevAndNextSolarTerm = async (date: Date): Promise<[SolarTermWithDate, SolarTermWithDate]> => {
   const year = date.getFullYear()
   // 获取前年、当年、后年的节气（处理跨年边界情况）
   const [prevYearTerms, currentYearTerms, nextYearTerms] = await Promise.all([
@@ -150,9 +145,7 @@ const getPrevAndNextSolarTerm = async (
   ])
 
   // 合并并排序所有相关节气（保留三年数据确保覆盖所有情况）
-  const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort((a, b) =>
-    a.date.diff(b.date)
-  )
+  const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort((a, b) => a.date.diff(b.date))
 
   const targetTime = date.getTime()
   let prevTerm = allTerms[0]

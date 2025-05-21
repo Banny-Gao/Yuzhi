@@ -1,31 +1,28 @@
-/** 获取目标索引 */
-import type { BasicField, IndexField, TargetField, GetRelationParams } from '../types'
-
 export const getTargetIndex = <T extends string | IndexField>(
   target: T,
-  fieldNames: string[]
-): number | undefined => (typeof target === 'string' ? fieldNames.indexOf(target) : target?.index)
+  names: string[]
+): number | undefined => (typeof target === 'string' ? names.indexOf(target) : target?.index)
 
 /** 相互关系查找 */
 export function getRelation<T extends TargetField, S extends IndexField>(
   this: S,
   params: GetRelationParams<T, S>
 ): T | undefined {
-  const { fieldName, index } = this
-  const { target, fieldNames, relations, transform } = params
+  const { name, index } = this
+  const { target, names, relations, transform } = params
 
-  const targetFieldName = typeof target === 'string' ? target : target?.fieldName
-  const targetIndex = getTargetIndex(target, fieldNames)
+  const targetName = typeof target === 'string' ? target : target?.name
+  const targetIndex = getTargetIndex(target, names)
   // 两相互判断
-  const defaultCondition = (fieldNames?: string[]): boolean =>
-    !!fieldNames?.includes(fieldName) && !!fieldNames?.includes(targetFieldName)
+  const defaultCondition = (names?: string[]): boolean =>
+    !!names?.includes(name) && !!names?.includes(targetName)
   const condition = params.condition ?? defaultCondition
 
   const returnRelation = (item: string[]): T =>
     ({
-      fieldName,
+      name,
       index,
-      targetFieldName,
+      targetName,
       targetIndex,
       ...(transform?.(item) ?? {}),
     }) as T
@@ -43,15 +40,15 @@ export function getRelation<T extends TargetField, S extends IndexField>(
 
 /** 通用函数生成 */
 export const generateRelation = <T extends IndexField, S extends IndexField>(
-  fieldNames: string[],
+  names: string[],
   condition: (this: S, targetIndex: number) => boolean
 ) =>
-  function (this: S, target: T | T['fieldName']): TargetField {
-    const targetIndex = getTargetIndex<T | T['fieldName']>(target, fieldNames) as number
+  function (this: S, target: T | T['name']): TargetField {
+    const targetIndex = getTargetIndex<T | T['name']>(target, names) as number
 
     return getRelation.bind(this)({
-      target: target as unknown as S | S['fieldName'],
-      fieldNames,
+      target: target as unknown as S | S['name'],
+      names,
       condition: () => condition.call(this, targetIndex),
     }) as TargetField
   }
@@ -67,14 +64,14 @@ export const generateNamesProp = <T extends Record<string, readonly unknown[]>>(
   }, {})
 
 /** 判断两个对象的名词是否相同 */
-export const equalNoun = <T extends BasicField>(a: T, b: T | T['noun']): boolean =>
-  a.noun === (typeof b === 'string' ? b : b.noun)
+export const equalName = <T extends BasicField>(a: T, b: T | T['name']): boolean =>
+  a.name === (typeof b === 'string' ? b : b.name)
 
-/** 通过 noun 获取对象 */
-export const getObjectByNoun = <T extends BasicField>(
+/** 通过 name 获取对象 */
+export const getObjectByName = <T extends BasicField>(
   objectArrary: T[],
-  noun: string
-): T | undefined => objectArrary.find(item => equalNoun(item, noun))
+  name: string
+): T | undefined => objectArrary.find(item => equalName(item, name))
 
 /** 异步执行 */
 export const asyncExec = <T>(fn: () => T): Promise<T> => new Promise(resolve => resolve(fn()))
