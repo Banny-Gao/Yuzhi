@@ -51,6 +51,24 @@ export const NOUN = {
   he: '合',
   hua: '化',
   chong: '冲',
+  wuHudun: '五虎遁',
+  wuShuDun: '五鼠遁',
+  desc: '描述',
+  siYu: '四隅',
+  siZheng: '四正',
+  forTarget: '我为',
+  forMe: '为我',
+  shiShen: '十神',
+  bijian: '比肩',
+  jiecai: '劫财',
+  pianYin: '偏印',
+  zhengYin: '正印',
+  shishen: '食神', // 注意区分 shiShen
+  shangguan: '伤官',
+  qisha: '七杀',
+  zhengguan: '正官',
+  piancai: '偏财',
+  zhengcai: '正财',
 }
 
 /** 季节 */
@@ -91,6 +109,32 @@ export const LUNAR_DAY = [
   '廿九',
   '三十',
 ] as const
+export const SOLAR_TERM = [
+  '立春',
+  '雨水',
+  '惊蛰',
+  '春分',
+  '清明',
+  '谷雨',
+  '立夏',
+  '小满',
+  '芒种',
+  '夏至',
+  '小暑',
+  '大暑',
+  '立秋',
+  '处暑',
+  '白露',
+  '秋分',
+  '寒露',
+  '霜降',
+  '立冬',
+  '小雪',
+  '大雪',
+  '冬至',
+  '小寒',
+  '大寒',
+] as const
 
 /** 阴阳 */
 export const YIN_YANG_NAME = ['阴', '阳'] as const
@@ -122,9 +166,9 @@ export const WU_ZHI_NAME = ['怒', '喜', '思', '悲', '恐'] as const
 /** 六神 */
 export const LIU_SHEN_NAME = ['青龙', '朱雀', '勾陈', '腾蛇', '白虎', '玄武'] as const
 /** 天干 */
-export const TIAN_GAN_NAME = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'] as const
+export const GAN_NAME = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'] as const
 /** 地支 */
-export const DI_ZHI_NAME = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'] as const
+export const ZHI_NAME = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'] as const
 /** 五行对应六神 */
 export const WX_LIUSHEN = ['青龙', '朱雀', ['勾陈', '腾蛇'], '白虎', '玄武'] as const
 /** 五行对应天干 */
@@ -184,4 +228,28 @@ export const TWELVE_PLACE_NAME = [
   '绝',
   '胎',
   '养',
+] as const
+
+/** 四正|四旺（子午卯酉）旺：水火木金 */
+export const SI_ZHENG_NAME = [
+  ['子', '水'],
+  ['午', '火/土'],
+  ['卯', '木'],
+  ['酉', '金'],
+] as const
+/** 四隅|四长生（寅申巳亥）长生：火水金木 */
+export const SI_YU_NAME = [
+  ['寅', '火'],
+  ['申', '水'],
+  ['巳', '金'],
+  ['亥', '木'],
+] as const
+
+/** 十神 */
+export const SHI_SHEN_NAME = [
+  ['比肩', '劫财'], // 同我者为比劫
+  ['偏印', '正印'], // 生我者为枭印
+  ['食神', '伤官'], // 我生者为食伤
+  ['七杀', '正官'], // 克我者为官杀
+  ['偏财', '正财'], // 我克者为财
 ] as const

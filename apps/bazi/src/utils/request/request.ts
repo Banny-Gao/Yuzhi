@@ -19,7 +19,7 @@ const CancelToken = axios.CancelToken
 const source = CancelToken.source()
 export const cancelRequest = (message?: string) => source.cancel(message)
 
-const adapterEnhancer = adapter => async config => withRetry(async () => await adapter(config))
+const adapterEnhancer = adapter => async config => await withRetry(async () => await adapter(config))
 
 export function initApiClient(baseURL: string): void {
   client.setConfig({

@@ -1,27 +1,22 @@
-export const getTargetIndex = <T extends string | IndexField>(
-  target: T,
-  names: string[]
-): number | undefined => (typeof target === 'string' ? names.indexOf(target) : target?.index)
+export const getTargetIndex = <T extends string | IndexField>(target: T, names: string[]): number | undefined =>
+  typeof target === 'string' ? names.indexOf(target) : target?.index
 
 /** 相互关系查找 */
 export function getRelation<T extends TargetField, S extends IndexField>(
   this: S,
   params: GetRelationParams<T, S>
 ): T | undefined {
-  const { name, index } = this
+  const { name } = this
   const { target, names, relations, transform } = params
 
   const targetName = typeof target === 'string' ? target : target?.name
   const targetIndex = getTargetIndex(target, names)
   // 两相互判断
-  const defaultCondition = (names?: string[]): boolean =>
-    !!names?.includes(name) && !!names?.includes(targetName)
+  const defaultCondition = (names?: string[]): boolean => !!names?.includes(name) && !!names?.includes(targetName)
   const condition = params.condition ?? defaultCondition
 
   const returnRelation = (item: string[]): T =>
     ({
-      name,
-      index,
       targetName,
       targetIndex,
       ...(transform?.(item) ?? {}),
@@ -68,10 +63,8 @@ export const equalName = <T extends BasicField>(a: T, b: T | T['name']): boolean
   a.name === (typeof b === 'string' ? b : b.name)
 
 /** 通过 name 获取对象 */
-export const getObjectByName = <T extends BasicField>(
-  objectArrary: T[],
-  name: string
-): T | undefined => objectArrary.find(item => equalName(item, name))
+export const getObjectByName = <T extends BasicField>(objectArrary: T[], name: string): T | undefined =>
+  objectArrary.find(item => equalName(item, name))
 
 /** 异步执行 */
 export const asyncExec = <T>(fn: () => T): Promise<T> => new Promise(resolve => resolve(fn()))

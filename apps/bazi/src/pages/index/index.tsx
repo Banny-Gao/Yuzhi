@@ -3,7 +3,7 @@ import { useLoad, getLocation } from '@tarojs/taro'
 import { ScrollView } from '@tarojs/components'
 
 import { PageWrapper, FieldCard } from '@/components'
-import { getSolarDate, wuxings } from '@/core'
+import { getSolarDate, wuXings, tianGans } from '@/core'
 
 import { loadingManager } from '@/components'
 
@@ -27,8 +27,9 @@ const Index = () => {
       const solarDate = await getSolarDate(new Date(), res.longitude)
 
       setSolarDate(solarDate)
-      console.log('solarDate', solarDate)
-      console.log('wuxings', wuxings)
+      console.log('真太阳时', solarDate)
+      console.log('五行', wuXings)
+      console.log('天干', tianGans)
     } finally {
       loadingManager.hide()
     }
@@ -39,7 +40,7 @@ const Index = () => {
   })
 
   return (
-    <PageWrapper>
+    <PageWrapper showNavbar={false} showTabBar={false} showThemeSwitcher={false}>
       <ScrollView scrollY></ScrollView>
     </PageWrapper>
   )

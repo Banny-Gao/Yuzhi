@@ -18,6 +18,9 @@ interface PageWrapperProps {
   contentClassName?: string
   style?: React.CSSProperties
   contentStyle?: React.CSSProperties
+  showNavbar?: boolean
+  showTabBar?: boolean
+  showThemeSwitcher?: boolean
 }
 
 const PageWrapper: React.FC<PageWrapperProps> = ({
@@ -26,6 +29,9 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
   contentClassName = '',
   style,
   contentStyle,
+  showNavbar = true,
+  showTabBar = true,
+  showThemeSwitcher = true,
 }) => {
   const [currentRoute, setCurrentRoute] = useState<Route | null>(null)
 
@@ -51,26 +57,30 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
 
   const { themeType } = useTheme()
 
-  const DynamicTabBar = isH5ShowTabBar(router.path)
-    ? lazy(() => import('@/custom-tab-bar'))
-    : Fragment
+  const DynamicTabBar = isH5ShowTabBar(router.path) ? lazy(() => import('@/custom-tab-bar')) : Fragment
 
   return (
     <View className={classNames(styles.page, className, `theme-${themeType}`)} style={style}>
-      <Navbar
-        title={currentRoute?.meta.title}
-        back={PAGE_STACK.length > 1}
-        home={!isH5ShowTabBar(router.path) && currentRoute?.meta.homeButton}
-      />
+      {showNavbar && (
+        <Navbar
+          title={currentRoute?.meta.title}
+          back={PAGE_STACK.length > 1}
+          home={!isH5ShowTabBar(router.path) && currentRoute?.meta.homeButton}
+        />
+      )}
 
       <View className={`${styles.content} ${contentClassName}`} style={contentStyle}>
         {children}
       </View>
 
-      <ThemeSwitcher />
+      {showThemeSwitcher && <ThemeSwitcher />}
       <Loading />
 
-      <Suspense fallback={null}>{<DynamicTabBar />}</Suspense>
+      {showTabBar && (
+        <Suspense fallback={null}>
+          <DynamicTabBar />
+        </Suspense>
+      )}
     </View>
   )
 }

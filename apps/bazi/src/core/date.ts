@@ -9,6 +9,7 @@ import {
   LUNAR_MONTH,
   LUNAR_MONTH_WITH_LEAP,
   LUNAR_DAY,
+  SOLAR_TERM,
 } from './data'
 import { toChineseNum } from './utils/number-to-chinese'
 import { solarTermsControllerGetSolarTerms } from '@/utils/request/openapi'
@@ -17,12 +18,12 @@ import type { SolarTerm } from '@/utils/request/openapi'
 
 Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP }) // 设置小数精度
 
-type SolarTermWithDate = SolarTerm & {
+type SolarTermWithDate = Partial<SolarTerm> & {
   date: dayjs.Dayjs
   solarTermName: string
   solarTermDateString: string
-  introduction: string // 节气简介
-  yangSheng: string // 节气养生建议
+  introduction?: string // 节气简介
+  yangSheng?: string // 节气养生建议
 }
 
 type BaseDate<T = object> = T & {
@@ -94,11 +95,11 @@ const getEquationOfTime = (date: Date): number => {
 }
 
 const solarTermsCache: Record<number, SolarTermWithDate[]> = {}
+/** 获取节气数据 */
 const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> => {
-  if (solarTermsCache[year]) {
-    return solarTermsCache[year]
-  }
+  if (solarTermsCache[year]) return solarTermsCache[year]
 
+  let solarTerms: SolarTermWithDate[] = []
   try {
     const res = await solarTermsControllerGetSolarTerms({
       query: {
@@ -111,7 +112,7 @@ const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> 
       return `${match?.[1] || ''} ${match?.[2] || ''}`
     }
 
-    return (
+    solarTerms =
       res.data?.map(item => {
         const date = dayjs(
           `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
@@ -127,11 +128,170 @@ const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> 
           solarTermDateString: date.format('YYYY-MM-DD HH:mm'),
         }
       }) ?? []
-    )
   } catch (error) {
     console.error(error)
-    return []
+    solarTerms = await getSolarTermsFromLocal(year)
   }
+
+  return solarTerms
+}
+/* 本地获取节气 */
+/** 将日期转换为儒略日 */
+export const getJulianDay = (date: Date): number => {
+  const y = date.getFullYear()
+  const m = date.getMonth() + 1
+  const d = date.getDate()
+  const h = new Decimal(date.getHours())
+    .plus(new Decimal(date.getMinutes()).div(60))
+    .plus(new Decimal(date.getSeconds()).div(3600))
+
+  let jd = 0
+  let yy = y
+  let mm = m
+
+  if (m <= 2) {
+    yy--
+    mm += 12
+  }
+
+  const a = Math.floor(yy / 100)
+  const b = 2 - a + Math.floor(a / 4)
+
+  jd = Math.floor(365.25 * (yy + 4716)) + Math.floor(30.6001 * (mm + 1)) + d + b - 1524.5 + h.div(24).toNumber()
+  return jd
+}
+/**
+ * 计算指定儒略日的太阳黄经
+ * 使用天文算法计算太阳在黄道上的位置
+ * @param jd 儒略日
+ */
+export function getSolarLongitude(jd: number): number {
+  // 计算T是从J2000.0起的儒略世纪数
+  const T = (jd - 2451545.0) / 36525
+  const T2 = T * T
+  const T3 = T2 * T
+
+  // 太阳平黄经
+  const L0 = 280.46645 + 36000.76983 * T + 0.0003032 * T2
+  // 太阳平近点角
+  const M = 357.5291 + 35999.0503 * T - 0.0001559 * T2 - 0.00000048 * T3
+
+  // 太阳中心差
+  const C =
+    (1.9146 - 0.004817 * T - 0.000014 * T2) * Math.sin((M * Math.PI) / 180) +
+    (0.019993 - 0.000101 * T) * Math.sin((2 * M * Math.PI) / 180) +
+    0.00029 * Math.sin((3 * M * Math.PI) / 180)
+
+  // 真黄经
+  let theta = L0 + C
+
+  // 把角度限制在0-360度之间
+  theta = theta % 360
+  if (theta < 0) {
+    theta += 360
+  }
+
+  return theta
+}
+/** 查找指定黄经度数对应的儒略日 */
+export const findSolarTermJD = (targetLongitude: number, startJD: number, endJD: number): number => {
+  const precision = 0.0001
+  let low = new Decimal(startJD)
+  let high = new Decimal(endJD)
+  let safetyCounter = 0 // 防止无限循环
+
+  while (high.minus(low).gt(precision) && safetyCounter++ < 50) {
+    const mid = low.plus(high).div(2)
+    const longitude = getSolarLongitude(mid.toNumber())
+
+    const currentDiff = new Decimal(longitude).minus(targetLongitude).mod(360)
+    if (currentDiff.abs().lte(precision)) {
+      return mid.toNumber()
+    }
+
+    // 修正方向判断逻辑
+    const adjustedDiff = currentDiff.add(360).mod(360)
+    adjustedDiff.lt(180) ? (high = mid) : (low = mid)
+  }
+
+  return low.plus(high).div(2).toNumber()
+}
+/** 儒略日转公历日期 */
+export const fromJulianDay = (jd: number): Date => {
+  const z = Math.floor(jd + 0.5)
+  const a = Math.floor((z - 1867216.25) / 36524.25)
+  const b = z + 1 + a - Math.floor(a / 4)
+  const c = b + 1524
+  const d = Math.floor((c - 122.1) / 365.25)
+  const e = Math.floor(365.25 * d)
+  const f = Math.floor((c - e) / 30.6001)
+
+  const day = c - e - Math.floor(30.6001 * f)
+  const month = f - 1 - 12 * Math.floor(f / 14)
+  const year = d - 4715 - Math.floor((7 + month) / 10)
+
+  const fraction = jd + 0.5 - z
+  const hours = Math.floor(fraction * 24)
+  const minutes = Math.floor((fraction * 24 - hours) * 60)
+  const seconds = Math.floor(((fraction * 24 - hours) * 60 - minutes) * 60)
+
+  // 创建UTC时间对象
+  const utcDate = new Date(year, month - 1, day, hours, minutes, seconds)
+  // 转换为中国标准时间（UTC+8）
+  return new Date(utcDate.getTime() + 8 * 60 * 60 * 1000)
+}
+const getSolarTermsFromLocal = async (year: number): Promise<SolarTermWithDate[]> => {
+  // 优先从缓存读取
+  try {
+    const cached = solarTermsCache[year]
+    if (cached) return cached
+  } catch (err) {
+    console.error('本地存储读取失败', err)
+  }
+
+  // 缓存未命中则计算
+  const solarTerms: SolarTermWithDate[] = []
+
+  // 节气估算月份表 (立春到大寒对应的公历月份)
+  const ESTIMATE_MONTHS = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 0, 0]
+  // 节气估算日期表 (每个节气的大致公历日期)
+  const ESTIMATE_DAYS = [4, 19, 5, 20, 5, 20, 5, 21, 6, 21, 6, 22, 7, 22, 7, 23, 8, 23, 8, 23, 7, 22, 7, 5]
+
+  for (let i = 0; i < 24; i++) {
+    // 根据节气索引获取估算月份和日期
+    const estimateMonth = ESTIMATE_MONTHS[i]
+    const estimateDay = ESTIMATE_DAYS[i]
+
+    // 处理跨年 (小寒、大寒属于下一年的节气)
+    const actualYear = i >= 22 ? year + 1 : year
+
+    // 创建估算日期
+    const approxDate = new Date(actualYear, estimateMonth, estimateDay)
+    const jd = getJulianDay(approxDate)
+
+    // 计算精确的黄经位置 (立春开始每个节气间隔15度)
+    const targetLongitude = (315 + i * 15) % 360
+
+    // 查找精确的节气时间 (扩大搜索范围到前后30天)
+    const termJD = findSolarTermJD(targetLongitude, jd - 30, jd + 30)
+    const termDate = fromJulianDay(termJD)
+
+    // 确保节气属于目标年份
+    if (termDate.getFullYear() === year || (i >= 22 && termDate.getFullYear() === year + 1)) {
+      const solarTerm: SolarTermWithDate = {
+        solarTermName: SOLAR_TERM[i],
+        date: dayjs(termDate),
+        solarTermDateString: dayjs(termDate).format('YYYY-MM-DD HH:mm'),
+      }
+      solarTerms.push(solarTerm)
+    }
+  }
+
+  // 按时间排序
+  const sortedSolarTerms = solarTerms.sort((a, b) => a.date.diff(b.date))
+  solarTermsCache[year] = sortedSolarTerms
+
+  return sortedSolarTerms
 }
 
 /** 获取某月某天前后的节气 */
@@ -146,6 +306,8 @@ const getPrevAndNextSolarTerm = async (date: Date): Promise<[SolarTermWithDate, 
 
   // 合并并排序所有相关节气（保留三年数据确保覆盖所有情况）
   const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort((a, b) => a.date.diff(b.date))
+
+  console.log('allTerms', allTerms)
 
   const targetTime = date.getTime()
   let prevTerm = allTerms[0]

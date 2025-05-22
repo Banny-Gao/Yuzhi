@@ -2,3 +2,4 @@ export * from './data'
 
 export * from './date'
 export * from './wuxing'
+export * from './gan'

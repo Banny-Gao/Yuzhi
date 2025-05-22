@@ -48,7 +48,7 @@ export const withRetry = async <T>(
 ): Promise<T> => {
   const { maxRetries, retryDelay, statusCodes = DEFAULT_RETRY_CONFIG.statusCodes } = retryConfig
 
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     let attempts = 0
 
     const attemptRequest = async () => {
@@ -84,12 +84,7 @@ export const withRetry = async <T>(
       }
     }
 
-    // 启动第一次请求
-    try {
-      await attemptRequest()
-    } catch (error) {
-      reject(error)
-    }
+    attemptRequest()
   })
 }
 

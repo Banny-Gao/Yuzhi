@@ -10,7 +10,7 @@ declare global {
     index: number // 索引
   }
 
-  export type TargetField<T extends Record<string, any> = Record<string, any>> = IndexField<T> & {
+  export type TargetField<T extends { name: string } = { name: string }> = Omit<T, 'name'> & {
     targetName: T['name'] // 目标字段名称
     targetIndex: number // 目标索引
   }

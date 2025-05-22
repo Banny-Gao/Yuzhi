@@ -15,10 +15,12 @@ import {
   WU_ZHI_NAME,
   WX_LIUSHEN,
   LIU_SHEN_NAME,
-  TIAN_GAN_NAME,
-  DI_ZHI_NAME,
+  GAN_NAME,
+  ZHI_NAME,
   GAN_TIAN_WEN,
   TWELVE_PLACE_NAME,
+  SHI_SHEN_NAME,
+  SOLAR_TERM,
 } from './nouns'
 
 declare global {
@@ -31,6 +33,8 @@ declare global {
   export type LunarMonth = NameConst<typeof LUNAR_MONTH> | NameConst<typeof LUNAR_MONTH_WITH_LEAP>
   /** 农历日 */
   export type LunarDay = NameConst<typeof LUNAR_DAY>
+  /** 节气名称 */
+  export type SolarTermName = NameConst<typeof SOLAR_TERM>
 
   // 阴阳
   export type YinYangName = NameConst<typeof YIN_YANG_NAME>
@@ -56,11 +60,13 @@ declare global {
   // 六神
   export type LiuShenName = NameConst<typeof LIU_SHEN_NAME> | NameConst<typeof WX_LIUSHEN>
   // 天干
-  export type TianGanName = NameConst<typeof TIAN_GAN_NAME>
+  export type GanName = NameConst<typeof GAN_NAME>
   // 地支
-  export type DiZhiName = NameConst<typeof DI_ZHI_NAME>
+  export type ZhiName = NameConst<typeof ZHI_NAME>
   // 天文
   export type TianWenName = NameConst<typeof GAN_TIAN_WEN>
   // 五行寄生十二宫
   export type TwelvePlaceName = NameConst<typeof TWELVE_PLACE_NAME>
+  // 十神
+  export type ShishenName = (typeof SHI_SHEN_NAME)[number][number]
 }

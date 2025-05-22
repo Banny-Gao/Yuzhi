@@ -83,7 +83,8 @@ export const SOLAR_TERM = [
 export const getLeapMonth = (lunarInfo: number): number => lunarInfo & 0xf
 
 /** 获取闰月天数 */
-export const getLeapDays = (lunarInfo: number): number => (getLeapMonth(lunarInfo) ? (lunarInfo & 0x10000 ? 30 : 29) : 0)
+export const getLeapDays = (lunarInfo: number): number =>
+  getLeapMonth(lunarInfo) ? (lunarInfo & 0x10000 ? 30 : 29) : 0
 
 /** 计算农历年天数 */
 export const getLunarYearDays = (lunarInfo: number): number => {
@@ -98,7 +99,8 @@ export const getLunarYearDays = (lunarInfo: number): number => {
 }
 
 /** 获取农历某月的天数 */
-export const getLunarMonthDays = (lunarInfo: number, month: number): number => (lunarInfo & (0x10000 >> month) ? 30 : 29)
+export const getLunarMonthDays = (lunarInfo: number, month: number): number =>
+  lunarInfo & (0x10000 >> month) ? 30 : 29
 
 /** 真太阳时对象接口 */
 type BaseDate<T> = T & {
@@ -134,7 +136,10 @@ export const getEquationOfTime = (date: Date): number => {
 }
 
 /** 计算真太阳时 */
-export const getTrueSolarTime = async (date: Date, longitudeOrAddress?: number | string): Promise<TrueSolarTimeResult> => {
+export const getTrueSolarTime = async (
+  date: Date,
+  longitudeOrAddress?: number | string
+): Promise<TrueSolarTimeResult> => {
   // 1. 获取经度
   const longitude = await (async () => {
     if (!longitudeOrAddress) return (await getCurrentLoc()).lng
@@ -332,7 +337,9 @@ export const getJulianDay = (date: Date): number => {
   const y = date.getFullYear()
   const m = date.getMonth() + 1
   const d = date.getDate()
-  const h = new Decimal(date.getHours()).plus(new Decimal(date.getMinutes()).div(60)).plus(new Decimal(date.getSeconds()).div(3600))
+  const h = new Decimal(date.getHours())
+    .plus(new Decimal(date.getMinutes()).div(60))
+    .plus(new Decimal(date.getSeconds()).div(3600))
 
   let jd = 0
   let yy = y
@@ -489,7 +496,9 @@ export const getPrevAndNextSolarTerm = async (date: Date): Promise<[SolarTerm, S
   ])
 
   // 合并并排序所有相关节气（保留三年数据确保覆盖所有情况）
-  const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort((a, b) => a.lunarDate.solarDate.getTime() - b.lunarDate.solarDate.getTime())
+  const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort(
+    (a, b) => a.lunarDate.solarDate.getTime() - b.lunarDate.solarDate.getTime()
+  )
 
   const targetTime = date.getTime()
   let prevTerm = allTerms[0]

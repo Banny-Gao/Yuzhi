@@ -39,8 +39,8 @@ declare global {
     wuWei: WuWeiName
     wuZhi: WuZhiName
     liuShen: LiuShenName
-    tianGan: TianGanName
-    diZhi: DiZhiName
+    tianGan: GanName
+    diZhi: ZhiName
   }>
 }
 
@@ -49,6 +49,10 @@ export const yinYangs = YIN_YANG_NAME.map<YinYang>((name, index) => ({
   value: index === 0 ? -1 : 1,
   opposite: index === 0 ? '阳' : '阴',
 }))
+/** 根据天干索引获取阴阳 */
+export const getGanYinYang = (ganIndex: number): YinYang => yinYangs[(ganIndex + 1) % 2]
+/** 获取地支的阴阳 */
+export const getZhiYinYang = (zhiIndex: number): YinYang => yinYangs[(zhiIndex + 1) % 2]
 
 /** 我生 */
 export const woSheng = generateRelation<WuXing, WuXing>([...WX_NAME], function (this: WuXing, targetIndex: number) {
@@ -103,7 +107,23 @@ export const getWuxings = (): WuXing[] =>
   })
 
 /** 五行列表 */
-export const wuxings = getWuxings()
+export const wuXings = getWuxings()
 
 /** 根据名称获取五行 */
-export const getWuXingByName = (name: WuXingName): WuXing | undefined => getObjectByName(wuxings, name)
+export const getWuXingByName = (name: WuXingName): WuXing | undefined => getObjectByName(wuXings, name)
+/** 根据天干索引获取五行 */
+export const getGanWuXing = (ganIndex: number): WuXing => wuXings[Math.floor(ganIndex / 2) % 5]
+/** 获取地支的五行 */
+export const getZhiWuXing = (zhiIndex: number): WuXing => {
+  // 子丑为冬寅为春，通过四季定五行
+  const offsetIndex = (-2 + 12 + zhiIndex) % 12
+  // 三个月为一季，季末为土， 寅卯辰 offsetIndex 0,1,2
+  const isTu = offsetIndex % 3 === 2
+  // 一年四季，春夏秋冬, 五行为木火土金水，夏季后为秋金
+  let seasonIndex = Math.floor(offsetIndex / 3) % 4
+  seasonIndex = seasonIndex >= 2 ? seasonIndex + 1 : seasonIndex
+
+  const wuxingIndex = isTu ? 2 : seasonIndex
+
+  return wuXings[wuxingIndex]
+}
