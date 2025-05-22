@@ -106,6 +106,7 @@ const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> 
         year,
       },
     })
+    if (!res.data?.length) throw new Error('节气数据为空')
     // pub_date 为 10月23日形式， 通过正则提取月和日的数字， 返回 10 23
     const getMonthAndDay = (date: string) => {
       const match = date.match(/(\d+)月(\d+)日/)
@@ -129,8 +130,7 @@ const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> 
         }
       }) ?? []
   } catch (error) {
-    console.error(error)
-    solarTerms = await getSolarTermsFromLocal(year)
+    solarTerms = getSolarTermsFromLocal(year)
   }
 
   return solarTerms
@@ -240,7 +240,7 @@ export const fromJulianDay = (jd: number): Date => {
   // 转换为中国标准时间（UTC+8）
   return new Date(utcDate.getTime() + 8 * 60 * 60 * 1000)
 }
-const getSolarTermsFromLocal = async (year: number): Promise<SolarTermWithDate[]> => {
+const getSolarTermsFromLocal = (year: number): SolarTermWithDate[] => {
   // 优先从缓存读取
   try {
     const cached = solarTermsCache[year]

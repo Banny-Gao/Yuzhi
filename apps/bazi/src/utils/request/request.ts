@@ -19,6 +19,7 @@ const CancelToken = axios.CancelToken
 const source = CancelToken.source()
 export const cancelRequest = (message?: string) => source.cancel(message)
 
+// 修改适配器增强器，确保错误正确处理
 const adapterEnhancer = adapter => async config => await withRetry(async () => await adapter(config))
 
 export function initApiClient(baseURL: string): void {
@@ -44,7 +45,7 @@ export function initApiClient(baseURL: string): void {
       // 隐藏加载提示
       loadingManager.hide()
 
-      if (response.data.code !== 200) {
+      if (response.data?.code !== 200) {
         showToast({
           title: response.data.message,
           icon: 'none',
@@ -75,7 +76,7 @@ export function initApiClient(baseURL: string): void {
           break
       }
 
-      return Promise.reject(error)
+      throw new AppError(error)
     }
   )
 }
