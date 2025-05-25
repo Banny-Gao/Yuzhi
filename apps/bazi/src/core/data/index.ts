@@ -1,2 +1,2 @@
 export * from './lunar-years'
-export * from './nouns'
+export * from './constants.ts'

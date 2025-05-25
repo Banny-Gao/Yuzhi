@@ -21,14 +21,20 @@ import {
   TWELVE_PLACE_NAME,
   SHI_SHEN_NAME,
   SOLAR_TERM,
-} from './nouns'
+  SHENG_XIAO_NAME,
+  DI_LI_NAME,
+  SI_KU_NAME,
+  FINGER_POSITION,
+  SI_ZHENG_NAME,
+  SI_YU_NAME,
+} from './constants.ts'
 
 declare global {
   /** 将字符串数组转换为联合类型 */
   export type NameConst<T extends readonly any[]> = T[number]
 
   /** 季节名称 */
-  export type SeasonName = NameConst<typeof SEASON_NAME>
+  export type SeasonName = NameConst<typeof SEASON_NAME> | '四季末'
   /** 农历月份 */
   export type LunarMonth = NameConst<typeof LUNAR_MONTH> | NameConst<typeof LUNAR_MONTH_WITH_LEAP>
   /** 农历日 */
@@ -68,5 +74,17 @@ declare global {
   // 五行寄生十二宫
   export type TwelvePlaceName = NameConst<typeof TWELVE_PLACE_NAME>
   // 十神
-  export type ShishenName = (typeof SHI_SHEN_NAME)[number][number]
+  export type ShiShenName = (typeof SHI_SHEN_NAME)[number][number]
+  // 生肖
+  export type ShengXiaoName = NameConst<typeof SHENG_XIAO_NAME>
+  // 地理
+  export type DiLiName = NameConst<typeof DI_LI_NAME>
+  // 四正
+  export type SiZhengName = (typeof SI_ZHENG_NAME)[number][0]
+  // 四隅
+  export type SiYuName = (typeof SI_YU_NAME)[number][0]
+  // 四库
+  export type SiKuName = (typeof SI_KU_NAME)[number][0]
+  // 掌诀坐标
+  export type FingerPosition = (typeof FINGER_POSITION)[number]
 }

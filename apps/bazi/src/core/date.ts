@@ -307,8 +307,6 @@ const getPrevAndNextSolarTerm = async (date: Date): Promise<[SolarTermWithDate, 
   // 合并并排序所有相关节气（保留三年数据确保覆盖所有情况）
   const allTerms = [...prevYearTerms, ...currentYearTerms, ...nextYearTerms].sort((a, b) => a.date.diff(b.date))
 
-  console.log('allTerms', allTerms)
-
   const targetTime = date.getTime()
   let prevTerm = allTerms[0]
   let nextTerm = allTerms[allTerms.length - 1]

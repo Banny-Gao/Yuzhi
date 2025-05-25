@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { View, Text } from '@tarojs/components'
 import { AtCard, AtList, AtListItem } from 'taro-ui'
-import { NOUN } from '../../core/data/nouns'
+import { NOUN } from '../../core/data/constants.ts'
 import styles from './index.module.scss'
 
 interface FieldCardProps {

@@ -3,7 +3,7 @@ import { useLoad, getLocation } from '@tarojs/taro'
 import { ScrollView } from '@tarojs/components'
 
 import { PageWrapper, FieldCard } from '@/components'
-import { getSolarDate, wuXings, tianGans } from '@/core'
+import { getSolarDate, wuXings, tianGans, diZhis } from '@/core'
 
 import { loadingManager } from '@/components'
 
@@ -30,6 +30,7 @@ const Index = () => {
       console.log('真太阳时', solarDate)
       console.log('五行', wuXings)
       console.log('天干', tianGans)
+      console.log('地支', diZhis)
     } finally {
       loadingManager.hide()
     }

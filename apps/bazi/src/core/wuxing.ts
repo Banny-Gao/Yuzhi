@@ -1,4 +1,4 @@
-import { generateRelation, getObjectByName, generateNamesProp } from './utils'
+import { generateRelation, getObjectByName, generateNamesProp, equalName } from './utils'
 import {
   WX_NAME,
   YIN_YANG_NAME,
@@ -41,6 +41,7 @@ declare global {
     liuShen: LiuShenName
     tianGan: GanName
     diZhi: ZhiName
+    seasonName: SeasonName
   }>
 }
 
@@ -53,6 +54,10 @@ export const yinYangs = YIN_YANG_NAME.map<YinYang>((name, index) => ({
 export const getGanYinYang = (ganIndex: number): YinYang => yinYangs[(ganIndex + 1) % 2]
 /** 获取地支的阴阳 */
 export const getZhiYinYang = (zhiIndex: number): YinYang => yinYangs[(zhiIndex + 1) % 2]
+/* 判断为阴 */
+export const isYin = (yinYang: YinYang): boolean => equalName(yinYang, '阴')
+/* 判断为阳 */
+export const isYang = (yinYang: YinYang): boolean => equalName(yinYang, '阳')
 
 /** 我生 */
 export const woSheng = generateRelation<WuXing, WuXing>([...WX_NAME], function (this: WuXing, targetIndex: number) {
@@ -91,6 +96,7 @@ export const getWuxings = (): WuXing[] =>
           liuShen: WX_LIUSHEN,
           tianGan: WX_TIAN_GAN,
           diZhi: WX_DI_ZHI,
+          seasonName: ['春', '夏', '四季末', '秋', '冬'],
         },
         index
       ),
@@ -127,3 +133,13 @@ export const getZhiWuXing = (zhiIndex: number): WuXing => {
 
   return wuXings[wuxingIndex]
 }
+/* 判断五行是否为木 */
+export const isMu = (wuXing: WuXing | WuXingName): boolean => equalName(wuXing, '木')
+/* 判断五行是否为火 */
+export const isHuo = (wuXing: WuXing | WuXingName): boolean => equalName(wuXing, '火')
+/* 判断五行是否为土 */
+export const isTu = (wuXing: WuXing | WuXingName): boolean => equalName(wuXing, '土')
+/* 判断五行是否为金 */
+export const isJin = (wuXing: WuXing | WuXingName): boolean => equalName(wuXing, '金')
+/* 判断五行是否为水 */
+export const isShui = (wuXing: WuXing | WuXingName): boolean => equalName(wuXing, '水')

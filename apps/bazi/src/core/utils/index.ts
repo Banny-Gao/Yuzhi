@@ -59,8 +59,12 @@ export const generateNamesProp = <T extends Record<string, readonly unknown[]>>(
   }, {})
 
 /** 判断两个对象的名词是否相同 */
-export const equalName = <T extends BasicField>(a: T, b: T | T['name']): boolean =>
-  a.name === (typeof b === 'string' ? b : b.name)
+export const equalName = <T extends BasicField>(a: T | T['name'], b: T | T['name']): boolean => {
+  const nameA = typeof a === 'string' ? a : a.name
+  const nameB = typeof b === 'string' ? b : b.name
+
+  return nameA === nameB
+}
 
 /** 通过 name 获取对象 */
 export const getObjectByName = <T extends BasicField>(objectArrary: T[], name: string): T | undefined =>
