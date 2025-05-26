@@ -231,12 +231,12 @@ export const fromJulianDay = (jd: number): Date => {
   const year = d - 4715 - Math.floor((7 + month) / 10)
 
   const fraction = jd + 0.5 - z
-  const hours = Math.floor(fraction * 24)
-  const minutes = Math.floor((fraction * 24 - hours) * 60)
-  const seconds = Math.floor(((fraction * 24 - hours) * 60 - minutes) * 60)
+  const hour = Math.floor(fraction * 24)
+  const minute = Math.floor((fraction * 24 - hour) * 60)
+  const second = Math.floor(((fraction * 24 - hour) * 60 - minute) * 60)
 
   // 创建UTC时间对象
-  const utcDate = new Date(year, month - 1, day, hours, minutes, seconds)
+  const utcDate = new Date(year, month - 1, day, hour, minute, second)
   // 转换为中国标准时间（UTC+8）
   return new Date(utcDate.getTime() + 8 * 60 * 60 * 1000)
 }
@@ -346,50 +346,50 @@ export const getSolarDate = async (date: Date, longitude: number = 120): Promise
     getEquationOfTime(date) * 60
 
   // 处理日期计算
-  let years = date.getFullYear()
-  let months = date.getMonth() + 1
-  let days = date.getDate()
+  let year = date.getFullYear()
+  let month = date.getMonth() + 1
+  let day = date.getDate()
 
   // 处理跨日
   if (correctedSeconds < 0) {
     correctedSeconds += 86400 // 24 * 3600
-    days--
-    if (days === 0) {
-      months--
-      if (months === 0) {
-        months = 12
-        years--
+    day--
+    if (day === 0) {
+      month--
+      if (month === 0) {
+        month = 12
+        year--
       }
-      days = new Date(years, months, 0).getDate()
+      day = new Date(year, month, 0).getDate()
     }
   } else if (correctedSeconds >= 86400) {
     correctedSeconds -= 86400
-    days++
-    if (days > new Date(years, months, 0).getDate()) {
-      days = 1
-      months++
-      if (months > 12) {
-        months = 1
-        years++
+    day++
+    if (day > new Date(year, month, 0).getDate()) {
+      day = 1
+      month++
+      if (month > 12) {
+        month = 1
+        year++
       }
     }
   }
 
   // 计算时分秒
-  const hours = Math.floor(correctedSeconds / 3600)
+  const hour = Math.floor(correctedSeconds / 3600)
   const remainingSeconds = correctedSeconds % 3600
-  const minutes = Math.floor(remainingSeconds / 60)
-  const seconds = Math.round(remainingSeconds % 60) // 使用 round 处理小数
+  const minute = Math.floor(remainingSeconds / 60)
+  const second = Math.round(remainingSeconds % 60) // 使用 round 处理小数
 
-  const newDate = new Date(years, months - 1, days, hours, minutes, seconds)
+  const newDate = new Date(year, month - 1, day, hour, minute, second)
 
   const solarDate: SolarDate = {
-    year: years,
-    month: months,
-    day: days,
-    hour: hours,
-    minute: minutes,
-    second: seconds,
+    year,
+    month,
+    day,
+    hour,
+    minute,
+    second: second,
     date: newDate,
     dateString: dayjs(newDate).format('YYYY-MM-DD HH:mm'),
   }

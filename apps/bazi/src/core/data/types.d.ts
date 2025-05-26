@@ -27,7 +27,8 @@ import {
   FINGER_POSITION,
   SI_ZHENG_NAME,
   SI_YU_NAME,
-} from './constants.ts'
+  NAYIN_WUXING,
+} from './constants'
 
 declare global {
   /** 将字符串数组转换为联合类型 */
@@ -87,4 +88,8 @@ declare global {
   export type SiKuName = (typeof SI_KU_NAME)[number][0]
   // 掌诀坐标
   export type FingerPosition = (typeof FINGER_POSITION)[number]
+  // 干支名称
+  export type GanZhiName = (typeof NAYIN_WUXING)[number][0 | 1]
+  // 纳音五行
+  export type NaYinName = (typeof NAYIN_WUXING)[number][2]
 }

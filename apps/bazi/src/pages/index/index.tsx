@@ -3,7 +3,7 @@ import { useLoad, getLocation } from '@tarojs/taro'
 import { ScrollView } from '@tarojs/components'
 
 import { PageWrapper, FieldCard } from '@/components'
-import { getSolarDate, wuXings, tianGans, diZhis } from '@/core'
+import { getSolarDate, wuXings, tianGans, diZhis, getBazi } from '@/core'
 
 import { loadingManager } from '@/components'
 
@@ -31,6 +31,8 @@ const Index = () => {
       console.log('五行', wuXings)
       console.log('天干', tianGans)
       console.log('地支', diZhis)
+      const bazi = await getBazi({ date: new Date('1994-09-16 14:30:00'), longitude: res.longitude, gender: 'male' })
+      console.log('八字', bazi)
     } finally {
       loadingManager.hide()
     }
