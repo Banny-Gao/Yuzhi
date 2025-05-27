@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 import { lcm } from './utils/math'
-import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM } from './data'
+import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM, SINING_NAME, SOLAR_TERMS_RANGE } from './data'
 import { tianGans } from './gan'
 import { diZhis } from './zhi'
-import { getSolarDate } from './date'
+import { getSolarDate, getSolarTermsFormApi } from './date'
 
 enum ZhuIndex {
   NianZhu = 0,
@@ -26,6 +26,13 @@ declare global {
     naYin: NaYinName
   }>
 
+  export type SiNing = {
+    name: ZhiName
+    lunarMonth: number
+    yongShi: (typeof SINING_NAME)[number][1 | 2 | 3]
+    nth: number
+  }
+
   export type Bazi = {
     nianZhu: Zhu
     yueZhu: Zhu
@@ -36,6 +43,7 @@ declare global {
     bianXing: Zhu
     mingGong: Zhu
     shenGong: Zhu
+    siNing: SiNing
   }
 }
 
@@ -262,6 +270,52 @@ const getShenGong = (lunarDate: LunarDate, nianZhu: Zhu, shiZhi: Zhi): Zhu => {
   return composeGanZhi(tianGans[ganIndex], diZhis[zhiIndex], ZhuIndex.MingGong)
 }
 
+/** 根据月支获取节令、气令和下一个节气节令 */
+export const getMonthZhiSolarTerm = async (
+  year: number,
+  zhi: Zhi
+): Promise<[SolarTermWithDate, SolarTermWithDate, SolarTermWithDate]> => {
+  const [start, middle, end] = SOLAR_TERMS_RANGE[zhi.index]!
+  const terms = await getSolarTermsFormApi(year)
+
+  // 统一处理跨年节气
+  const nextYear = year + Math.floor(end / 24)
+  const nextTerm = (await getSolarTermsFormApi(nextYear))[end % 24]
+
+  return [terms[start], terms[middle], nextTerm]
+}
+
+export type PureGanZhi = {
+  gan: Gan
+  zhi: Zhi
+}
+
+const getSining = async (lunarDate: LunarDate, yueZhi: Zhi): Promise<SiNing> => {
+  const [start] = await getMonthZhiSolarTerm(lunarDate.year, yueZhi)
+  const now = dayjs(lunarDate.solarDateString).startOf('day')
+  const term = dayjs(start.solarDateString).startOf('day')
+  // 从节气看
+  const diff = now.diff(term, 'day')
+  const [_, ...rest] = SINING_NAME[yueZhi.index]
+
+  let i = 0,
+    sum = 0
+  while (i < rest.length) {
+    sum += rest[i][1]
+    if (sum >= diff) {
+      break
+    }
+    i++
+  }
+
+  return {
+    name: yueZhi.name,
+    lunarMonth: lunarDate.month,
+    yongShi: rest[i],
+    nth: diff,
+  }
+}
+
 export type GetBaziParams = {
   date: Date
   longitude?: number
@@ -312,6 +366,9 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 身宫
   const shenGong = getShenGong(lunar!, nianZhu, shiZhi)
 
+  // 人元司令分野
+  const siNing = await getSining(lunar!, yueZhi)
+
   const bazi: Bazi = {
     nianZhu,
     yueZhu,
@@ -322,6 +379,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     bianXing,
     mingGong,
     shenGong,
+    siNing,
   }
 
   return bazi

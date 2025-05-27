@@ -18,24 +18,24 @@ import type { SolarTerm } from '@/utils/request/openapi'
 
 Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP }) // 设置小数精度
 
-type SolarTermWithDate = Partial<SolarTerm> & {
-  date: dayjs.Dayjs
-  solarTermName: string
-  solarTermDateString: string
-  introduction?: string // 节气简介
-  yangSheng?: string // 节气养生建议
-}
-
-type BaseDate<T = object> = T & {
-  year: number
-  month: number
-  day: number
-  hour: number
-  minute: number
-  second: number
-}
-
 declare global {
+  export type SolarTermWithDate = Partial<SolarTerm> & {
+    date: dayjs.Dayjs
+    solarTermName: string
+    solarDateString: string
+    introduction?: string // 节气简介
+    yangSheng?: string // 节气养生建议
+  }
+
+  export type BaseDate<T = object> = T & {
+    year: number
+    month: number
+    day: number
+    hour: number
+    minute: number
+    second: number
+  }
+
   export type SolarDate = BaseDate<{
     date: Date
     dateString: string
@@ -44,6 +44,7 @@ declare global {
 
   /** 农历日期接口 */
   export type LunarDate = BaseDate<{
+    solarDateString: string
     lunarMonth: LunarMonth
     lunarDay: LunarDay
     isLeap: boolean // 是否闰月
@@ -96,7 +97,7 @@ const getEquationOfTime = (date: Date): number => {
 
 const solarTermsCache: Record<number, SolarTermWithDate[]> = {}
 /** 获取节气数据 */
-const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> => {
+export const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> => {
   if (solarTermsCache[year]) return solarTermsCache[year]
 
   let solarTerms: SolarTermWithDate[] = []
@@ -114,21 +115,23 @@ const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> 
     }
 
     solarTerms =
-      res.data?.map(item => {
-        const date = dayjs(
-          `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
-          'YYYY MM DD HH:mm',
-          'zh-cn'
-        )
-        return {
-          ...item,
-          introduction: item.des,
-          yangSheng: item.heath,
-          date,
-          solarTermName: item.name,
-          solarTermDateString: date.format('YYYY-MM-DD HH:mm'),
-        }
-      }) ?? []
+      res.data
+        ?.map(item => {
+          const date = dayjs(
+            `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
+            'YYYY MM DD HH:mm',
+            'zh-cn'
+          )
+          return {
+            ...item,
+            introduction: item.des,
+            yangSheng: item.heath,
+            date,
+            solarTermName: item.name,
+            solarDateString: date.format('YYYY-MM-DD HH:mm'),
+          }
+        })
+        .sort((a, b) => a.date.diff(b.date)) ?? []
   } catch (error) {
     solarTerms = getSolarTermsFromLocal(year)
   }
@@ -281,7 +284,7 @@ const getSolarTermsFromLocal = (year: number): SolarTermWithDate[] => {
       const solarTerm: SolarTermWithDate = {
         solarTermName: SOLAR_TERM[i],
         date: dayjs(termDate),
-        solarTermDateString: dayjs(termDate).format('YYYY-MM-DD HH:mm'),
+        solarDateString: dayjs(termDate).format('YYYY-MM-DD HH:mm'),
       }
       solarTerms.push(solarTerm)
     }
@@ -463,6 +466,7 @@ export const getLunarDate = async (solarDate: SolarDate): Promise<LunarDate> => 
   const seasonName = SEASON_NAME[Math.floor(lunarMonth / 3)]
 
   return {
+    solarDateString: solarDate.dateString,
     year: lunarYear,
     month: lunarMonth,
     lunarMonth: monthText,
