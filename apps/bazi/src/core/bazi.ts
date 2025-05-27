@@ -232,32 +232,34 @@ const getZhuHe = ({ gan, zhi }: Zhu): Zhu => {
  * 顺排时辰找卯位
  * 年上起月定天干
  */
-const getMingGong = (lunarDate: LunarDate, yueZhu: Zhu, shiZhi: Zhi): Zhu => {
-  const monthOffset = (1 - lunarDate.month + 12) % 12
-  const offset = 3 - monthOffset + shiZhi.index
+const getMingGong = (lunarDate: LunarDate, nianZhu: Zhu, shiZhi: Zhi): Zhu => {
+  const monthOffset = 1 - lunarDate.month
+  const maoOffset = (3 - shiZhi.index + 12) % 12
 
-  const zhiIndex = (offset + 12) % 12
-  const firstMonthGanIndex = yueZhu.gan.wuHudun.targetIndex
+  const zhiIndex = monthOffset + maoOffset
+  const firstMonthGanIndex = nianZhu.gan.wuHudun.targetIndex
 
-  const ganIndex = (firstMonthGanIndex + offset + 10) % 10
+  const ganIndex = (firstMonthGanIndex + zhiIndex + 10) % 10
 
   return composeGanZhi(tianGans[ganIndex], diZhis[zhiIndex], ZhuIndex.MingGong)
 }
 
 /*
 身宫
- 逆排月份定起点, 子起正月
+ 顺排月份定起点, 子起正月
  逆排时辰找酉位
  年上起月定天干
 */
-const getShenGong = (lunarDate: LunarDate, yueZhu: Zhu, shiZhi: Zhi): Zhu => {
-  const monthOffset = (1 - lunarDate.month + 12) % 12
-  const offset = 9 - monthOffset - shiZhi.index
-  const zhiIndex = (offset + 12) % 12
-  const firstMonthGanIndex = yueZhu.gan.wuHudun.targetIndex
-  const ganIndex = (firstMonthGanIndex + offset + 10) % 10
+const getShenGong = (lunarDate: LunarDate, nianZhu: Zhu, shiZhi: Zhi): Zhu => {
+  const monthOffset = lunarDate.month - 1
+  const youOffset = (shiZhi.index - 9 + 12) % 12
 
-  return composeGanZhi(tianGans[ganIndex], diZhis[zhiIndex], ZhuIndex.ShenGong)
+  const zhiIndex = (youOffset - monthOffset + 12) % 12
+  const firstMonthGanIndex = nianZhu.gan.wuHudun.targetIndex
+
+  const ganIndex = (firstMonthGanIndex + zhiIndex + 10) % 10
+
+  return composeGanZhi(tianGans[ganIndex], diZhis[zhiIndex], ZhuIndex.MingGong)
 }
 
 export type GetBaziParams = {
@@ -267,7 +269,7 @@ export type GetBaziParams = {
 }
 export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promise<Bazi> => {
   const solarDate = await getSolarDate(date, longitude)
-  console.log('真太阳时：', solarDate.dateString)
+  console.log('真太阳时：', solarDate.dateString, solarDate)
 
   const { lunar } = solarDate
   console.log('农历日生日：', lunar?.lunarDateString)
@@ -305,10 +307,10 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   const bianXing = getZhuHe(shiZhu)
 
   // 命宫
-  const mingGong = getMingGong(lunar!, yueZhu, shiZhi)
+  const mingGong = getMingGong(lunar!, nianZhu, shiZhi)
 
   // 身宫
-  const shenGong = getShenGong(lunar!, yueZhu, shiZhi)
+  const shenGong = getShenGong(lunar!, nianZhu, shiZhi)
 
   const bazi: Bazi = {
     nianZhu,
