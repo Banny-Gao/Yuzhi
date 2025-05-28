@@ -115,6 +115,15 @@ export const NOUN = {
   siNing: '人元司令分野',
   yongShi: '用事',
   nth: '第',
+  qiYun: '起运',
+  jiaoYun: '交运',
+  daYun: '大运',
+  age: '年龄',
+  bornDateString: '出生日期',
+  shun: '顺',
+  ni: '逆',
+  qian: '前',
+  hou: '后',
 }
 
 /** 季节 */

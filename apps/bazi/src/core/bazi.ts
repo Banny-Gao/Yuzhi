@@ -4,6 +4,7 @@ import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM, SINING_NAME, SOLAR_TERMS_
 import { tianGans } from './gan'
 import { diZhis } from './zhi'
 import { getSolarDate, getSolarTermsFormApi } from './date'
+import { isYang, isYin } from './wuxing'
 
 enum ZhuIndex {
   NianZhu = 0,
@@ -14,6 +15,7 @@ enum ZhuIndex {
   TaiXi = 5,
   MingGong = 6,
   ShenGong = 7,
+  DaYun = 8,
 }
 
 declare global {
@@ -33,6 +35,22 @@ declare global {
     nth: number
   }
 
+  export type DaYun = {
+    qiYun: {
+      age: string
+      dateString: string
+    }
+    jiaoYun: {
+      isShun: boolean
+      term: SolarTermWithDate
+      day: number
+    }
+    yuns: (Zhu & {
+      year: [number, number]
+      age: [number, number]
+    })[]
+  }
+
   export type Bazi = {
     nianZhu: Zhu
     yueZhu: Zhu
@@ -44,6 +62,7 @@ declare global {
     mingGong: Zhu
     shenGong: Zhu
     siNing: SiNing
+    daYun: DaYun
   }
 }
 
@@ -147,9 +166,9 @@ const getMonthGanOffset = async (lunarDate: LunarDate): Promise<number> => {
 }
 
 /** 获取农历某月某天所在的月的天干 */
-const getYueGan = async (lunarDate: LunarDate, yearGan: Gan): Promise<Gan> => {
+const getYueGan = async (lunarDate: LunarDate, nianGan: Gan): Promise<Gan> => {
   // 正月天干的序号
-  const firstMonthGanIndex = yearGan.wuHudun.targetIndex
+  const firstMonthGanIndex = nianGan.wuHudun.targetIndex
   // 月干偏移
   const monthOffset = await getMonthGanOffset(lunarDate)
 
@@ -280,9 +299,9 @@ export const getMonthZhiSolarTerm = async (
 
   // 统一处理跨年节气
   const nextYear = year + Math.floor(end / 24)
-  const nextTerm = (await getSolarTermsFormApi(nextYear))[end % 24]
+  const endTerm = (await getSolarTermsFormApi(nextYear))[end % 24]
 
-  return [terms[start], terms[middle], nextTerm]
+  return [terms[start], terms[middle], endTerm]
 }
 
 export type PureGanZhi = {
@@ -313,6 +332,74 @@ const getSining = async (lunarDate: LunarDate, yueZhi: Zhi): Promise<SiNing> => 
     lunarMonth: lunarDate.month,
     yongShi: rest[i],
     nth: diff,
+  }
+}
+
+export const getDaYun = async ({
+  nianGan,
+  yueZhu,
+  lunarDate,
+  gender,
+}: {
+  nianGan: Gan
+  yueZhu: Zhu
+  lunarDate: LunarDate
+  gender: 'male' | 'female'
+  longitude?: number
+}): Promise<DaYun> => {
+  /* 大运起始，阳男阴女顺排，阴男阳女逆排
+   * 大运起始年龄 = 出生年份的干支纳音五行与月柱天干纳音五行的生克关系决定的
+   * 阳年生男，阴年生女顺排；阴年生男，阳年生女逆排
+   * 大运干支 = 月柱干支
+   * 大运年龄 = 月柱干支纳音五行与大运干支纳音五行的生克关系决定的
+   * 大运干支 = 月柱干支
+   */
+
+  const isShun = (isYang(nianGan.yinYang) && gender === 'male') || (isYin(nianGan.yinYang) && gender === 'female')
+  const [start, _, end] = await getMonthZhiSolarTerm(lunarDate.year, yueZhu.zhi)
+
+  // 小时差
+  const diff = isShun
+    ? dayjs(end.solarDateString).diff(dayjs(lunarDate.solarDateString), 'hour')
+    : dayjs(lunarDate.solarDateString).diff(dayjs(start.solarDateString), 'hour')
+
+  // 三天计一岁，一天计四个月, 6 小时计 1 个月, 一小时计 5 天
+  const age = Math.floor(diff / 72)
+  const month = Math.floor((diff % 72) / 6)
+  const day = Math.floor((diff % 24) / 6) * 5
+
+  // 大运 120 年， 10 年一运
+  const yunStart = dayjs(lunarDate.solarDateString).add(age, 'year').add(month, 'month').add(day, 'day')
+  const yuns: DaYun['yuns'] = []
+  let yunAge = age,
+    yunYear = yunStart.year()
+
+  for (let i = 1; i <= 12; i++) {
+    const index = isShun ? yueZhu.index + i : yueZhu.index - i
+    const zhu = SIXTY_JIAZI[(index + 60) % 60]
+
+    yuns.push({
+      ...zhu,
+      zhuIndex: ZhuIndex.DaYun,
+      year: [yunYear, yunYear + 10],
+      age: [yunAge, yunAge + 10],
+    })
+
+    yunAge += 10
+    yunYear += 10
+  }
+
+  return {
+    qiYun: {
+      age: `${age}岁${month}个月${day}天`,
+      dateString: yunStart.format('YYYY-MM-DD '),
+    },
+    jiaoYun: {
+      isShun,
+      term: isShun ? start : end,
+      day: Math.floor(diff / 24),
+    },
+    yuns,
   }
 }
 
@@ -369,6 +456,9 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 人元司令分野
   const siNing = await getSining(lunar!, yueZhi)
 
+  // 大运
+  const daYun = await getDaYun({ nianGan, yueZhu, lunarDate: lunar!, gender, longitude })
+
   const bazi: Bazi = {
     nianZhu,
     yueZhu,
@@ -380,6 +470,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     mingGong,
     shenGong,
     siNing,
+    daYun,
   }
 
   return bazi
