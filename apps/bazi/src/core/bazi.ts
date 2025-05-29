@@ -16,6 +16,8 @@ enum ZhuIndex {
   MingGong = 6,
   ShenGong = 7,
   DaYun = 8,
+  LiuNian = 9,
+  LiuYue = 10,
 }
 
 declare global {
@@ -40,15 +42,16 @@ declare global {
       age: string
       dateString: string
     }
-    jiaoYun: {
-      isShun: boolean
-      term: SolarTermWithDate
-      day: number
-    }
+    jiaoYun: string
     yuns: (Zhu & {
       year: [number, number]
       age: [number, number]
     })[]
+  }
+
+  export type LiuNian = Zhu & {
+    year: number
+    age: number
   }
 
   export type Bazi = {
@@ -63,6 +66,7 @@ declare global {
     shenGong: Zhu
     siNing: SiNing
     daYun: DaYun
+    liuNian: LiuNian[]
   }
 }
 
@@ -80,6 +84,7 @@ const getNaYinName = (name: GanZhiName): NaYinName => {
 
 /** 获取干支组合 */
 export const getGanZhiByIndex = (index: number): Omit<Zhu, 'zhuIndex'> => {
+  index %= 60
   const gan = tianGans[index % 10]
   const zhi = diZhis[index % 12]
   const name = `${gan.name}${zhi.name}` as GanZhiName
@@ -340,6 +345,7 @@ export const getDaYun = async ({
   yueZhu,
   lunarDate,
   gender,
+  longitude,
 }: {
   nianGan: Gan
   yueZhu: Zhu
@@ -370,6 +376,15 @@ export const getDaYun = async ({
 
   // 大运 120 年， 10 年一运
   const yunStart = dayjs(lunarDate.solarDateString).add(age, 'year').add(month, 'month').add(day, 'day')
+  // 交运年干节气
+  const { lunar: jiaoYunLunar } = await getSolarDate(yunStart.toDate(), longitude)
+  const jiaoYunNianGan = await getNianGan(jiaoYunLunar!)
+  const jiaoYunYueZhi = await getYueZhi(jiaoYunLunar!)
+  const [jiaoYunTerm] = await getMonthZhiSolarTerm(jiaoYunLunar!.year, jiaoYunYueZhi)
+
+  const startTermDiff = yunStart.diff(dayjs(jiaoYunTerm.solarDateString), 'day')
+  const jiaoYun = `逢${jiaoYunNianGan.name}年,${jiaoYunTerm.name}后${Math.floor(startTermDiff)}天交大运`
+
   const yuns: DaYun['yuns'] = []
   let yunAge = age,
     yunYear = yunStart.year()
@@ -394,13 +409,40 @@ export const getDaYun = async ({
       age: `${age}岁${month}个月${day}天`,
       dateString: yunStart.format('YYYY-MM-DD '),
     },
-    jiaoYun: {
-      isShun,
-      term: isShun ? start : end,
-      day: Math.floor(diff / 24),
-    },
     yuns,
+    jiaoYun,
   }
+}
+
+const getLiuNian = async (year: number, nianZhu: Zhu): Promise<LiuNian[]> => {
+  // 0 - 120 岁
+  const liuNian: LiuNian[] = []
+  for (let i = 0; i < 120; i++) {
+    const index = (nianZhu.index + i) % 60
+    liuNian.push({
+      ...SIXTY_JIAZI[index],
+      zhuIndex: ZhuIndex.LiuNian,
+      year: year + i,
+      age: i,
+    })
+  }
+
+  return liuNian
+}
+
+export const getLiuYue = async (year: number): Promise<Zhu[]> => {
+  const liuYue: Zhu[] = []
+
+  for (const zhi of diZhis) {
+    const [start] = await getMonthZhiSolarTerm(year, zhi)
+    const { lunar } = await getSolarDate(new Date(start.solarDateString), 120)
+    const nianGan = await getNianGan(lunar!)
+    const yueGan = await getYueGan(lunar!, nianGan)
+    const yueZhi = await getYueZhi(lunar!)
+    liuYue.push(composeGanZhi(yueGan, yueZhi, ZhuIndex.LiuYue))
+  }
+
+  return liuYue
 }
 
 export type GetBaziParams = {
@@ -459,6 +501,9 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 大运
   const daYun = await getDaYun({ nianGan, yueZhu, lunarDate: lunar!, gender, longitude })
 
+  // 流年
+  const liuNian = await getLiuNian(solarDate.year, nianZhu)
+
   const bazi: Bazi = {
     nianZhu,
     yueZhu,
@@ -471,6 +516,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     shenGong,
     siNing,
     daYun,
+    liuNian,
   }
 
   return bazi

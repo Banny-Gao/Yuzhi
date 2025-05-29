@@ -136,6 +136,8 @@ export const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithD
     solarTerms = getSolarTermsFromLocal(year)
   }
 
+  solarTermsCache[year] = solarTerms
+
   return solarTerms
 }
 /* 本地获取节气 */
@@ -292,7 +294,6 @@ const getSolarTermsFromLocal = (year: number): SolarTermWithDate[] => {
 
   // 按时间排序
   const sortedSolarTerms = solarTerms.sort((a, b) => a.date.diff(b.date))
-  solarTermsCache[year] = sortedSolarTerms
 
   return sortedSolarTerms
 }
