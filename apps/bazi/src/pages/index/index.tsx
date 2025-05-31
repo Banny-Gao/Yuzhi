@@ -3,7 +3,7 @@ import { useLoad, getLocation } from '@tarojs/taro'
 import { ScrollView } from '@tarojs/components'
 
 import { PageWrapper, FieldCard } from '@/components'
-import { getSolarDate, wuXings, tianGans, diZhis, getBazi } from '@/core'
+import { getSolarDate, wuXings, tianGans, diZhis, getBazi, getLiuYue } from '@/core'
 
 import { loadingManager } from '@/components'
 
@@ -24,15 +24,17 @@ const Index = () => {
       const res = await getLocation({
         type: 'wgs84',
       })
-      const solarDate = await getSolarDate(new Date(), res.longitude)
+      const solarDate = await getSolarDate(new Date('1994-09-16 14:30:00'), res.longitude)
 
       setSolarDate(solarDate)
       console.log('真太阳时', solarDate)
       console.log('五行', wuXings)
       console.log('天干', tianGans)
       console.log('地支', diZhis)
-      const bazi = await getBazi({ date: new Date('1994-09-16 14:30:00'), longitude: res.longitude, gender: 'male' })
+      const bazi = await getBazi({ date: solarDate.date, longitude: res.longitude, gender: 'male' })
       console.log('八字', bazi)
+      const liuYue = await getLiuYue(new Date().getFullYear())
+      console.log('本年流月', liuYue)
     } finally {
       loadingManager.hide()
     }

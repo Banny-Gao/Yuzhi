@@ -22,9 +22,10 @@ declare global {
   export type SolarTermWithDate = Partial<SolarTerm> & {
     date: dayjs.Dayjs
     solarTermName: string
-    solarDateString: string
+    dateString: string
     introduction?: string // 节气简介
     yangSheng?: string // 节气养生建议
+    solarDateString: string
   }
 
   export type BaseDate<T = object> = T & {
@@ -39,11 +40,13 @@ declare global {
   export type SolarDate = BaseDate<{
     date: Date
     dateString: string
+    solarDateString: string
     lunar?: LunarDate // 农历日期
   }>
 
   /** 农历日期接口 */
   export type LunarDate = BaseDate<{
+    dateString: string
     solarDateString: string
     lunarMonth: LunarMonth
     lunarDay: LunarDay
@@ -115,25 +118,29 @@ export const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithD
     }
 
     solarTerms =
-      res.data
-        ?.map(item => {
-          const date = dayjs(
-            `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
-            'YYYY MM DD HH:mm',
-            'zh-cn'
-          )
-          return {
-            ...item,
-            introduction: item.des,
-            yangSheng: item.heath,
-            date,
-            solarTermName: item.name,
-            solarDateString: date.format('YYYY-MM-DD HH:mm'),
-          }
-        })
-        .sort((a, b) => a.date.diff(b.date)) ?? []
+      (
+        await Promise.all(
+          res.data?.map(async item => {
+            const date = dayjs(
+              `${item.pub_year} ${getMonthAndDay(item.pub_date)} ${item.pub_time}`,
+              'YYYY MM DD HH:mm:ss',
+              'zh-cn'
+            )
+            const solarDate = await getSolarDate(date.toDate(), 120, false)
+            return {
+              ...item,
+              introduction: item.des,
+              yangSheng: item.heath,
+              date,
+              solarTermName: item.name,
+              dateString: date.format('YYYY-MM-DD HH:mm:ss'),
+              solarDateString: solarDate.solarDateString,
+            }
+          })
+        )
+      ).sort((a, b) => a.date.diff(b.date)) ?? []
   } catch (error) {
-    solarTerms = getSolarTermsFromLocal(year)
+    solarTerms = await getSolarTermsFromLocal(year)
   }
 
   solarTermsCache[year] = solarTerms
@@ -245,7 +252,7 @@ export const fromJulianDay = (jd: number): Date => {
   // 转换为中国标准时间（UTC+8）
   return new Date(utcDate.getTime() + 8 * 60 * 60 * 1000)
 }
-const getSolarTermsFromLocal = (year: number): SolarTermWithDate[] => {
+const getSolarTermsFromLocal = async (year: number): Promise<SolarTermWithDate[]> => {
   // 优先从缓存读取
   try {
     const cached = solarTermsCache[year]
@@ -283,10 +290,12 @@ const getSolarTermsFromLocal = (year: number): SolarTermWithDate[] => {
 
     // 确保节气属于目标年份
     if (termDate.getFullYear() === year || (i >= 22 && termDate.getFullYear() === year + 1)) {
+      const solarDate = await getSolarDate(termDate, 120, false)
       const solarTerm: SolarTermWithDate = {
         solarTermName: SOLAR_TERM[i],
         date: dayjs(termDate),
-        solarDateString: dayjs(termDate).format('YYYY-MM-DD HH:mm'),
+        dateString: dayjs(termDate).format('YYYY-MM-DD HH:mm'),
+        solarDateString: solarDate.solarDateString,
       }
       solarTerms.push(solarTerm)
     }
@@ -340,7 +349,11 @@ const getPrevAndNextSolarTerm = async (date: Date): Promise<[SolarTermWithDate, 
 }
 
 /** 计算真太阳时 */
-export const getSolarDate = async (date: Date, longitude: number = 120): Promise<SolarDate> => {
+export const getSolarDate = async (
+  date: Date,
+  longitude: number = 120,
+  initLunar: boolean = true
+): Promise<SolarDate> => {
   // 计算修正秒数
   const standardMeridian = 120
   const totalSeconds = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()
@@ -395,10 +408,13 @@ export const getSolarDate = async (date: Date, longitude: number = 120): Promise
     minute,
     second: second,
     date: newDate,
-    dateString: dayjs(newDate).format('YYYY-MM-DD HH:mm'),
+    dateString: dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
+    solarDateString: dayjs(newDate).format('YYYY-MM-DD HH:mm:ss'),
   }
 
-  solarDate.lunar = await getLunarDate(solarDate)
+  if (initLunar) {
+    solarDate.lunar = await getLunarDate(solarDate)
+  }
 
   return solarDate
 }
@@ -467,7 +483,8 @@ export const getLunarDate = async (solarDate: SolarDate): Promise<LunarDate> => 
   const seasonName = SEASON_NAME[Math.floor(lunarMonth / 3)]
 
   return {
-    solarDateString: solarDate.dateString,
+    dateString: solarDate.dateString,
+    solarDateString: solarDate.solarDateString,
     year: lunarYear,
     month: lunarMonth,
     lunarMonth: monthText,
