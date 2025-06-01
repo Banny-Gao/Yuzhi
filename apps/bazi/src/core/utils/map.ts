@@ -1,5 +1,4 @@
 import { load } from '@amap/amap-jsapi-loader'
-import { getWindow } from './browser'
 
 declare global {
   interface Window {
@@ -9,7 +8,7 @@ declare global {
   }
 }
 
-;(getWindow() as Window)._AMapSecurityConfig = {
+;(window as Window)._AMapSecurityConfig = {
   securityJsCode: 'da44670b52fc3896d170116c609c0e6e',
 }
 
@@ -34,7 +33,10 @@ interface GeolocationOptions {
 }
 
 interface Geocoder {
-  getLocation: (address: string, callback: (status: 'complete' | 'error' | 'no_data', result: GeocodeResult) => void) => void
+  getLocation: (
+    address: string,
+    callback: (status: 'complete' | 'error' | 'no_data', result: GeocodeResult) => void
+  ) => void
 }
 
 interface Geolocation {

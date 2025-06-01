@@ -3,7 +3,7 @@ import { lcm } from './utils/math'
 import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM, SINING_NAME, SOLAR_TERMS_RANGE } from './data'
 import { tianGans } from './gan'
 import { diZhis } from './zhi'
-import { getSolarDate, getSolarTermsFormApi } from './date'
+import { getSolarDate, getSolarTermsFormApi, getDaysInMonth, dateFormat, DAY_FORMAT } from './date'
 import { isYang, isYin } from './wuxing'
 
 enum ZhuIndex {
@@ -57,7 +57,10 @@ declare global {
   export type LiuYue = Zhu & {
     solarTermName: string
     dateString: string
+    month: number
   }
+
+  export type LiuRi = Zhu & SolarDate
 
   export type Bazi = {
     nianZhu: Zhu
@@ -72,6 +75,7 @@ declare global {
     siNing: SiNing
     daYun: DaYun
     liuNian: LiuNian[]
+    getLiuYue: (year: number) => Promise<LiuYue[]>
   }
 }
 
@@ -134,7 +138,7 @@ const composeGanZhi = (gan: Gan, zhi: Zhi, zhuIndex: ZhuIndex): Zhu => {
 // 立春后算新的一年，修正年月数值取值
 const getFixedYear = async (lunarDate: LunarDate): Promise<number> => {
   let fixedYear = lunarDate.year
-  const [currentSolarTerm, nextSolarTerm] = await lunarDate.currentSolarTerms
+  const [currentSolarTerm, nextSolarTerm] = lunarDate.currentSolarTerms!
   /** 立春在年前，年加一 */
   if (currentSolarTerm.name === '立春' && lunarDate.year < currentSolarTerm.date.year()) {
     fixedYear += 1
@@ -170,7 +174,7 @@ const SOLAR_TERM_OFFSET: Record<string, number> = Object.fromEntries(
 
 /** 获取某年某月某日节气的月干偏移 */
 const getMonthGanOffset = async (lunarDate: LunarDate): Promise<number> => {
-  const [currentSolarTerm, nextSolarTerm] = await lunarDate.currentSolarTerms
+  const [currentSolarTerm, nextSolarTerm] = lunarDate.currentSolarTerms!
 
   const termName = lunarDate.dateString === nextSolarTerm.dateString ? nextSolarTerm.name : currentSolarTerm.name
 
@@ -412,7 +416,7 @@ export const getDaYun = async ({
   return {
     qiYun: {
       age: `${age}岁${month}个月${day}天`,
-      dateString: yunStart.format('YYYY-MM-DD '),
+      dateString: dateFormat(yunStart, DAY_FORMAT),
     },
     yuns,
     jiaoYun,
@@ -435,6 +439,7 @@ const getLiuNian = async (year: number, nianZhu: Zhu): Promise<LiuNian[]> => {
   return liuNian
 }
 
+/** 根据年获取流月 */
 export const getLiuYue = async (year: number): Promise<LiuYue[]> => {
   const liuYue: LiuYue[] = []
 
@@ -452,11 +457,30 @@ export const getLiuYue = async (year: number): Promise<LiuYue[]> => {
       ...yueZhu,
       solarTermName: start.solarTermName,
       dateString: start.dateString,
+      month: lunar!.month,
     })
   }
 
   return liuYue.sort((a, b) => a.dateString.localeCompare(b.dateString))
 }
+/** 根据年月获取流日 */
+export const getLiuRi = async (year: number, month: number | LiuYue): Promise<LiuRi[]> => {
+  const liuRi: LiuRi[] = []
+
+  const days = await getDaysInMonth(year, typeof month === 'number' ? month : month.month)
+
+  for (const day of days) {
+    const riZhu = getRiGanZhi(day)
+    liuRi.push({
+      ...day,
+      ...riZhu,
+    })
+  }
+
+  return liuRi
+}
+/** 根据年月日时获取流时 */
+// export const getLiuShi = async (year: number, month: number, day: number, hour: number): Promise<LiuShi[]> => {}
 
 export type GetBaziParams = {
   date: Date
@@ -527,6 +551,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     siNing,
     daYun,
     liuNian,
+    getLiuYue,
   }
 
   return bazi

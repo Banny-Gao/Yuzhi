@@ -124,6 +124,9 @@ export const NOUN = {
   ni: '逆',
   qian: '前',
   hou: '后',
+  liuYue: '流月',
+  liuRi: '流日',
+  liuShi: '流时',
 }
 
 /** 季节 */

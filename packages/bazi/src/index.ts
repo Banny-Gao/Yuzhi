@@ -1,5 +1,0 @@
-export * from './core'
-export * from './wuxing'
-export * from './date'
-export * from './global'
-export * from './utils'

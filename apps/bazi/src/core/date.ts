@@ -17,6 +17,15 @@ import { solarTermsControllerGetSolarTerms } from '@/utils/request/openapi'
 import type { SolarTerm } from '@/utils/request/openapi'
 
 Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP }) // 设置小数精度
+const DEFAULT_LONGITUDE = 120
+
+export const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+export const MONTH_FORMAT = 'YYYY-MM'
+export const DAY_FORMAT = 'YYYY-MM-DD'
+export const HOUR_FORMAT = 'YYYY-MM-DD HH'
+export const TIME_FORMAT = 'HH:mm:ss'
+export const dateFormat = (date: dayjs.Dayjs | Date | string, format: string = DATE_FORMAT) =>
+  dayjs(date).format(format)
 
 declare global {
   export type SolarTermWithDate = Partial<SolarTerm> & {
@@ -54,7 +63,7 @@ declare global {
     lunarDateString: string // 农历日期文本
     monthIndex: number // 当月在本年索引
     dateIndex: number // 当天在本月索引
-    currentSolarTerms: [SolarTermWithDate, SolarTermWithDate] // 当前前后节气
+    currentSolarTerms?: [SolarTermWithDate, SolarTermWithDate] // 当前前后节气
     seasonName: SeasonName // 季节名称
   }>
 }
@@ -82,8 +91,9 @@ const getLunarMonthDays = (lunarInfo: number, month: number): number => (lunarIn
 
 /** 计算时差方程修正值（分钟） */
 const getEquationOfTime = (date: Date): number => {
-  // 计算当年的第几天（1月1日为第0天）
-  const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24))
+  // 计算当年的第几天（1月1日为第1天）
+  const dayOfYear =
+    Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 1).getTime()) / (1000 * 60 * 60 * 24)) + 1
 
   // 计算太阳角度（弧度），81是春分前的天数
   const B = new Decimal(dayOfYear - 81)
@@ -126,14 +136,14 @@ export const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithD
               'YYYY MM DD HH:mm:ss',
               'zh-cn'
             )
-            const solarDate = await getSolarDate(date.toDate(), 120, false)
+            const solarDate = await getSolarDate(date.toDate(), DEFAULT_LONGITUDE, false)
             return {
               ...item,
               introduction: item.des,
               yangSheng: item.heath,
               date,
               solarTermName: item.name,
-              dateString: date.format('YYYY-MM-DD HH:mm:ss'),
+              dateString: date.format(DATE_FORMAT),
               solarDateString: solarDate.solarDateString,
             }
           })
@@ -290,11 +300,12 @@ const getSolarTermsFromLocal = async (year: number): Promise<SolarTermWithDate[]
 
     // 确保节气属于目标年份
     if (termDate.getFullYear() === year || (i >= 22 && termDate.getFullYear() === year + 1)) {
-      const solarDate = await getSolarDate(termDate, 120, false)
+      const solarDate = await getSolarDate(termDate, DEFAULT_LONGITUDE, false)
+      const dTermDate = dayjs(termDate)
       const solarTerm: SolarTermWithDate = {
         solarTermName: SOLAR_TERM[i],
-        date: dayjs(termDate),
-        dateString: dayjs(termDate).format('YYYY-MM-DD HH:mm'),
+        date: dTermDate,
+        dateString: dTermDate.format(DATE_FORMAT),
         solarDateString: solarDate.solarDateString,
       }
       solarTerms.push(solarTerm)
@@ -351,11 +362,12 @@ const getPrevAndNextSolarTerm = async (date: Date): Promise<[SolarTermWithDate, 
 /** 计算真太阳时 */
 export const getSolarDate = async (
   date: Date,
-  longitude: number = 120,
-  initLunar: boolean = true
+  longitude: number = DEFAULT_LONGITUDE,
+  initLunar: boolean = true,
+  initSolarTerms: boolean = true
 ): Promise<SolarDate> => {
   // 计算修正秒数
-  const standardMeridian = 120
+  const standardMeridian = DEFAULT_LONGITUDE
   const totalSeconds = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()
   let correctedSeconds =
     totalSeconds +
@@ -408,21 +420,33 @@ export const getSolarDate = async (
     minute,
     second: second,
     date: newDate,
-    dateString: dayjs(date).format('YYYY-MM-DD HH:mm:ss'),
-    solarDateString: dayjs(newDate).format('YYYY-MM-DD HH:mm:ss'),
+    dateString: dateFormat(date),
+    solarDateString: dateFormat(newDate),
   }
 
   if (initLunar) {
-    solarDate.lunar = await getLunarDate(solarDate)
+    solarDate.lunar = await getLunarDate(solarDate, initSolarTerms)
   }
 
   return solarDate
 }
 
 /** 将真太阳时转换为农历日期 */
-export const getLunarDate = async (solarDate: SolarDate): Promise<LunarDate> => {
-  const baseDate = new Date(MIN_LUNAR_YEAR, 0, 31)
-  const offsetDays = Math.floor((solarDate.date.getTime() - baseDate.getTime()) / 86400000)
+export const getLunarDate = async (solarDate: SolarDate, initSolarTerms: boolean = true): Promise<LunarDate> => {
+  // 使用UTC时间避免时区问题，基准日期设为1900年1月31日UTC
+  const baseDate = new Date(Date.UTC(MIN_LUNAR_YEAR, 0, 31))
+  const solarDateUTC = new Date(
+    Date.UTC(
+      solarDate.date.getFullYear(),
+      solarDate.date.getMonth(),
+      solarDate.date.getDate(),
+      solarDate.date.getHours(),
+      solarDate.date.getMinutes(),
+      solarDate.date.getSeconds()
+    )
+  )
+
+  const offsetDays = Math.floor((solarDateUTC.getTime() - baseDate.getTime()) / 86400000)
 
   let lunarYear = MIN_LUNAR_YEAR
   let daysRemaining = offsetDays
@@ -479,7 +503,10 @@ export const getLunarDate = async (solarDate: SolarDate): Promise<LunarDate> => 
   }
   const lunarYearText = toChineseNum(lunarYear)
 
-  const currentSolarTerms = await getPrevAndNextSolarTerm(solarDate.date)
+  let currentSolarTerms
+  if (initSolarTerms) {
+    currentSolarTerms = await getPrevAndNextSolarTerm(solarDate.date)
+  }
   const seasonName = SEASON_NAME[Math.floor(lunarMonth / 3)]
 
   return {
@@ -500,4 +527,136 @@ export const getLunarDate = async (solarDate: SolarDate): Promise<LunarDate> => 
     currentSolarTerms,
     seasonName,
   }
+}
+
+/** 农历日期转公历日期 */
+export const lunarToDate = (lunarDate: LunarDate): Date => {
+  let daysOffset = 0
+
+  // 累加从MIN_LUNAR_YEAR到目标农历年的所有天数
+  for (let y = MIN_LUNAR_YEAR; y < lunarDate.year; y++) {
+    const yearInfo = LUNAR_INFO[y - MIN_LUNAR_YEAR]
+    daysOffset += getLunarYearDays(yearInfo)
+  }
+
+  const targetYearInfo = LUNAR_INFO[lunarDate.year - MIN_LUNAR_YEAR]
+  const leapMonth = getLeapMonth(targetYearInfo)
+
+  // 累加目标农历年中已过完整月份的天数
+  let leapProcessed = false
+
+  for (let m = 1; m < lunarDate.month; m++) {
+    // 先处理正常月份
+    daysOffset += getLunarMonthDays(targetYearInfo, m)
+
+    // 处理闰月（在正常月份之后）
+    if (leapMonth === m && !leapProcessed) {
+      daysOffset += getLeapDays(targetYearInfo)
+      leapProcessed = true
+    }
+  }
+
+  // 如果目标月份本身是闰月，需要先添加对应正常月份的天数
+  if (lunarDate.isLeap && leapMonth === lunarDate.month) {
+    daysOffset += getLunarMonthDays(targetYearInfo, lunarDate.month)
+  }
+
+  // 添加目标月份内的天数（从0开始计算偏移）
+  daysOffset += lunarDate.day - 1
+
+  // 基准日期必须与getLunarDate中保持完全一致，使用UTC时间
+  const baseDate = new Date(Date.UTC(MIN_LUNAR_YEAR, 0, 31))
+
+  // 重建真太阳时日期
+  const solarTimeStamp = baseDate.getTime() + daysOffset * 86400000
+  const solarBaseDateUTC = new Date(solarTimeStamp)
+
+  // 创建真太阳时日期，从UTC转换为本地时间
+  const solarTimeDate = new Date(
+    solarBaseDateUTC.getUTCFullYear(),
+    solarBaseDateUTC.getUTCMonth(),
+    solarBaseDateUTC.getUTCDate(),
+    lunarDate.hour,
+    lunarDate.minute,
+    lunarDate.second
+  )
+
+  // 直接返回真太阳时，不进行逆向修正
+  // 因为农历数据本身就是基于真太阳时计算的
+  return solarTimeDate
+}
+
+/** 农历日期转换为原始标准时间（如果需要逆向转换为输入时间） */
+export const lunarToStandardTime = (lunarDate: LunarDate, longitude: number = DEFAULT_LONGITUDE): Date => {
+  // 先获取真太阳时
+  const solarTimeDate = lunarToDate(lunarDate)
+
+  // 进行逆向真太阳时修正，从真太阳时转回原始标准时间
+  const standardMeridian = DEFAULT_LONGITUDE
+  const solarTimeSeconds = lunarDate.hour * 3600 + lunarDate.minute * 60 + lunarDate.second
+
+  // 计算当时的真太阳时修正量
+  const longitudeCorrection = (longitude - standardMeridian) * 240
+  const timeEquationCorrection = getEquationOfTime(solarTimeDate) * 60
+
+  // 逆向修正：真太阳时 - 修正量 = 原始标准时间
+  let originalSeconds = solarTimeSeconds - longitudeCorrection - timeEquationCorrection
+
+  // 处理跨日情况，从真太阳时的日期开始
+  let year = solarTimeDate.getFullYear()
+  let month = solarTimeDate.getMonth() + 1
+  let day = solarTimeDate.getDate()
+
+  if (originalSeconds < 0) {
+    originalSeconds += 86400
+    day--
+    if (day === 0) {
+      month--
+      if (month === 0) {
+        month = 12
+        year--
+      }
+      day = new Date(year, month, 0).getDate()
+    }
+  } else if (originalSeconds >= 86400) {
+    originalSeconds -= 86400
+    day++
+    if (day > new Date(year, month, 0).getDate()) {
+      day = 1
+      month++
+      if (month > 12) {
+        month = 1
+        year++
+      }
+    }
+  }
+
+  // 计算原始时分秒
+  const hour = Math.floor(originalSeconds / 3600)
+  const minute = Math.floor((originalSeconds % 3600) / 60)
+  const second = Math.round(originalSeconds % 60)
+
+  return new Date(year, month - 1, day, hour, minute, second)
+}
+
+/** 获取某年某月所有的日期，默认取东经120度中午12点 */
+export const getDaysInMonth = async (year: number, month: number): Promise<SolarDate[]> => {
+  // 获取该月的天数
+  const daysInMonth = new Date(year, month, 0).getDate()
+
+  // 创建所有日期的Promise数组
+  const datePromises: Promise<SolarDate>[] = []
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    // 创建该天的日期对象（使用中午12点避免时区问题）
+    const date = new Date(year, month - 1, day, 12, 0, 0)
+
+    // 添加转换Promise到数组
+    datePromises.push(getSolarDate(date, DEFAULT_LONGITUDE, true, false))
+  }
+
+  // 并行处理所有日期转换
+  const solarDates = await Promise.all(datePromises)
+
+  return solarDates
 }
