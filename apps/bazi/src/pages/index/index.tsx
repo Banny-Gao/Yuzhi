@@ -34,14 +34,12 @@ const Index = () => {
   const getDefualtSolarDate = async () => {
     try {
       const now = new Date()
-      const { longitude } = await getLocation({ type: 'wgs84' })
-
       const owner = {
         gender: 'male' as const,
         birthday: new Date('1994-09-16 14:30:00'),
-        longitude,
+        longitude: 104.195,
       }
-      const solarDate = await getSolarDate(owner.birthday, 104.195)
+      const solarDate = await getSolarDate(owner.birthday)
       console.log('真太阳时', solarDate)
       console.log('五行', wuXings)
       console.log('天干', tianGans)

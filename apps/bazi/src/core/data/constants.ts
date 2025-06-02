@@ -127,6 +127,10 @@ export const NOUN = {
   liuYue: '流月',
   liuRi: '流日',
   liuShi: '流时',
+  riYuan: '日元',
+  yuanNan: '元男',
+  yuanNv: '元女',
+  mingZhu: '命主',
 }
 
 /** 季节 */

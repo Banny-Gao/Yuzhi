@@ -1,4 +1,4 @@
-import { generateNamesProp, getRelation, equalName } from './utils'
+import { generateNamesProp, getRelation, equalName, getObjectByName } from './utils'
 import {
   ZHI_NAME,
   DI_LI_NAME,
@@ -257,8 +257,10 @@ const getZhongQi = (zhi: Zhi): QiName => {
   return null
 }
 
-function getZhiCangGan(this: Zhi): ZhiCangGan {
-  return [getBenQi(this), getZhongQi(this), getYuQi(this)]
+function getZhiCangGan(this: Zhi): (Gan | null)[] {
+  return [getBenQi(this), getZhongQi(this), getYuQi(this)].map(name =>
+    name ? (getObjectByName(tianGans, name) as Gan) : null
+  )
 }
 
 /** 掌诀获取索引， 横合 */
