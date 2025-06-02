@@ -14,6 +14,7 @@ import {
   getLiuRi,
   lunarToDate,
   lunarToStandardTime,
+  getLiuShi,
 } from '@/core'
 
 import { loadingManager } from '@/components'
@@ -40,7 +41,7 @@ const Index = () => {
         birthday: new Date('1994-09-16 14:30:00'),
         longitude,
       }
-      const solarDate = await getSolarDate(owner.birthday, longitude)
+      const solarDate = await getSolarDate(owner.birthday, 104.195)
       console.log('真太阳时', solarDate)
       console.log('五行', wuXings)
       console.log('天干', tianGans)
@@ -50,7 +51,9 @@ const Index = () => {
       const liuYue = await getLiuYue(now.getFullYear())
       console.log('本年流月', liuYue)
       const liuRi = await getLiuRi(now.getFullYear(), now.getMonth() + 1)
-      console.log('本月：', now.getMonth() + 1, '本月流日：', liuRi)
+      console.log('本月流日：', liuRi)
+      const liuShi = await getLiuShi(now.getFullYear(), now.getMonth() + 1, now.getDate())
+      console.log('本日流时：', liuShi)
     } finally {
       loadingManager.hide()
     }

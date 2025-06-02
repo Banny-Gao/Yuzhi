@@ -3,7 +3,7 @@ import { lcm } from './utils/math'
 import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM, SINING_NAME, SOLAR_TERMS_RANGE } from './data'
 import { tianGans } from './gan'
 import { diZhis } from './zhi'
-import { getSolarDate, getSolarTermsFormApi, getDaysInMonth, dateFormat, DAY_FORMAT } from './date'
+import { getSolarDate, getSolarTermsFormApi, getDaysInMonth, dateFormat, DAY_FORMAT, getLunarDate } from './date'
 import { isYang, isYin } from './wuxing'
 
 enum ZhuIndex {
@@ -61,6 +61,10 @@ declare global {
   }
 
   export type LiuRi = Zhu & SolarDate
+  export type LiuShi = SolarDate & {
+    riZhu: Zhu
+    shiZhu: Zhu
+  }
 
   export type Bazi = {
     nianZhu: Zhu
@@ -238,7 +242,17 @@ const getRiGanZhi = (solarDate: SolarDate): Zhu => {
 }
 
 /** 获取时辰索引：23:00-00:59 为子时(0)，01:00-02:59 为丑时(1)，以此类推 */
-export const getShiZhiIndex = (hour: number): number => Math.floor(((hour + 1) % 24) / 2)
+const getShiZhiIndex = (hour: number): number => Math.floor(((hour + 1) % 24) / 2)
+/** 根据地支反推时间，23:00-00:59 为子时(0)，01:00-02:59 为丑时(1)，以此类推 */
+const getShiTimeByZhi = (zhi: Zhi): number => {
+  // 子时特殊处理：子时(index=0)对应23:00-00:59，起始时间是23点
+  if (zhi.index === 0) {
+    return 23
+  }
+  // 其他时辰：丑时(1)->1点，寅时(2)->3点，卯时(3)->5点...
+  // 公式：(index * 2 - 1) 对于index >= 1
+  return zhi.index * 2 - 1
+}
 
 /** 获取农历某月某天某时的天干：日上起时，五鼠遁 */
 const getShiGan = (solarDate: SolarDate, dayGan: Gan): Gan => {
@@ -439,7 +453,7 @@ const getLiuNian = async (year: number, nianZhu: Zhu): Promise<LiuNian[]> => {
   return liuNian
 }
 
-/** 根据年获取流月 */
+/** 根据年获取十二流月 */
 export const getLiuYue = async (year: number): Promise<LiuYue[]> => {
   const liuYue: LiuYue[] = []
 
@@ -479,8 +493,44 @@ export const getLiuRi = async (year: number, month: number | LiuYue): Promise<Li
 
   return liuRi
 }
-/** 根据年月日时获取流时 */
-// export const getLiuShi = async (year: number, month: number, day: number, hour: number): Promise<LiuShi[]> => {}
+/** 根据年月日获取十二流时 */
+export const getLiuShi = async (year: number, month: number, day: number): Promise<LiuShi[]> =>
+  Promise.all(
+    diZhis.map(async zhi => {
+      const time = getShiTimeByZhi(zhi)
+      // 若是子时，则需要减去 1 天
+      const d = new Date(year, month - 1, day, time, 0, 0)
+      if (zhi.index === 0) {
+        d.setDate(d.getDate() - 1)
+      }
+
+      const solarDate: SolarDate = {
+        year: d.getFullYear(),
+        month: d.getMonth() + 1,
+        day: d.getDate(),
+        hour: d.getHours(),
+        minute: d.getMinutes(),
+        second: d.getSeconds(),
+        date: d,
+        dateString: dateFormat(d),
+        solarDateString: dateFormat(d),
+      }
+
+      solarDate.lunar = await getLunarDate(solarDate)
+
+      const riZhu = getRiGanZhi(solarDate)
+
+      const shiGan = await getShiGan(solarDate, riZhu.gan)
+      const shiZhi = await getShiZhi(solarDate)
+      const shiZhu = composeGanZhi(shiGan, shiZhi, ZhuIndex.ShiZhu)
+
+      return {
+        ...solarDate,
+        riZhu,
+        shiZhu,
+      }
+    })
+  )
 
 export type GetBaziParams = {
   date: Date
