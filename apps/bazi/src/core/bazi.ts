@@ -35,6 +35,11 @@ declare global {
     gan: Gan
     zhi: Zhi
     naYin: NaYinName
+    xingYun?: TwelvePlaceName
+    ziZuo?: {
+      xingYun: TwelvePlaceName
+      shiShen: TargetShiShen
+    }
   }>
 
   export type SiNing = {
@@ -546,6 +551,27 @@ const initShiShen = (riYuan: Gan, targetZhu: Zhu) => {
   targetZhu.zhi.cangGan = targetZhu.zhi.cangGan.map(cangGan => cangGan && getShiShen.call(cangGan, riYuan))
 }
 
+/** 处理各柱星运 十二长生状态 */
+const initXingYun = (riYuan: Gan, targetZhu: Zhu, key = 'xingYun') => {
+  const { name } = riYuan.twelvePlace.find(item => item.dizhiName === targetZhu.zhi.name)!
+  targetZhu[key] = name
+}
+
+/** 处理各柱自坐十神 */
+const initZiZuo = (targetZhu: Zhu) => {
+  const { name } = targetZhu.gan.twelvePlace.find(item => item.dizhiName === targetZhu.zhi.name)!
+  targetZhu.ziZuo = {
+    xingYun: name,
+    shiShen: getShiShen.call(targetZhu.gan, targetZhu.zhi.name),
+  }
+}
+
+const initExtra = (riYuan: Gan, targetZhu: Zhu) => {
+  initXingYun(riYuan, targetZhu)
+  initShiShen(riYuan, targetZhu)
+  initZiZuo(targetZhu)
+}
+
 export type GetBaziParams = {
   date: Date
   longitude?: number
@@ -573,7 +599,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   const shiZhi = await getShiZhi(solarDate)
   const shiZhu = composeGanZhi(shiGan, shiZhi, ZhuIndex.ShiZhu)
   // 四柱十神
-  ;[nianZhu, yueZhu, riZhu, shiZhu].forEach(zhu => initShiShen(riZhu.gan, zhu))
+  ;[nianZhu, yueZhu, riZhu, shiZhu].forEach(zhu => initExtra(riZhu.gan, zhu))
 
   /**
    * 日主胎息
@@ -581,7 +607,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
    */
   const taiXi = getZhuHe(riZhu)
   // 胎息十神
-  initShiShen(riZhu.gan, taiXi)
+  initExtra(riZhu.gan, taiXi)
   // 胎元
   const taiYuan = getTaiYuan(yueZhu)
   // 命宫
@@ -589,26 +615,26 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 身宫
   const shenGong = getShenGong(lunar!, nianZhu, shiZhi)
   // 三垣十神
-  ;[taiYuan, mingGong, shenGong].forEach(zhu => initShiShen(riZhu.gan, zhu))
+  ;[taiYuan, mingGong, shenGong].forEach(zhu => initExtra(riZhu.gan, zhu))
 
   /** 起变法：时变, 变星
    * 取时柱干支所合
    */
   const bianXing = getZhuHe(shiZhu)
   // 变星十神
-  initShiShen(riZhu.gan, bianXing)
+  initExtra(riZhu.gan, bianXing)
   // 人元司令分野
   const siNing = await getSining(lunar!, yueZhi)
 
   // 大运
   const daYun = await getDaYun({ nianGan, yueZhu, lunarDate: lunar!, gender, longitude })
   // 大运十神
-  daYun.yuns.forEach(yun => initShiShen(riZhu.gan, yun))
+  daYun.yuns.forEach(yun => initExtra(riZhu.gan, yun))
 
   // 流年
   const liuNian = await getLiuNian(solarDate.year, nianZhu)
   // 流年十神
-  liuNian.forEach(nian => initShiShen(riZhu.gan, nian))
+  liuNian.forEach(nian => initExtra(riZhu.gan, nian))
 
   const bazi: Bazi = {
     nianZhu,

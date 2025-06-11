@@ -224,3 +224,11 @@ export const YANG: Summary = {
   时柱养：子女性格温和，晚年生活安康。若时支养且逢天德，子女孝顺，可享天伦之乐。
   `,
 }
+
+export const LIU_JIA_XUN_KONG: Summary = {
+  title: '六甲旬空',
+  desc: '每旬（10 天）对应两个空亡地支',
+  content: `
+    六甲旬空：甲子旬空戌亥，甲戌旬空申酉，甲申旬空午未，甲午旬空辰巳，甲辰旬空寅卯，甲寅旬空子丑。
+  `,
+}

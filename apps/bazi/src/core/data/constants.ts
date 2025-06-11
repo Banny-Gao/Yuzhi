@@ -131,6 +131,27 @@ export const NOUN = {
   yuanNan: '元男',
   yuanNv: '元女',
   mingZhu: '命主',
+  qi: '气',
+  xingYun: '星运',
+  ziZuo: '自坐',
+  kongWang: '空亡',
+  liuJiaXunKong: '六甲旬空',
+  siDaKong: '四大空亡',
+  wuGuiKong: '五鬼空亡',
+  jieLuKong: '截路空亡',
+  shiShenKong: '十神空亡',
+  wuXingKong: '五行空亡',
+  mingKong: '命空',
+  shenKong: '神空',
+  luKong: '禄空',
+  zhenKong: '真空',
+  hunKong: '魂空',
+  lianKong: '连空',
+  suiKong: '随空',
+  zhenJiaKong: '真假空亡',
+  sanKong: '三空相会',
+  jiKong: '吉空',
+  xiongKong: '凶空',
 }
 
 /** 季节 */
@@ -530,3 +551,12 @@ export const SOLAR_TERMS_RANGE = {
   0: [22, 23, 24], // 大雪、冬至、小寒
   1: [24, 25, 26], // 小寒、大寒, 下一年立春
 }
+
+export const LIU_JIA_XUN_KONG = [
+  ['甲子', '戌', '亥'],
+  ['甲戌', '申', '酉'],
+  ['甲申', '午', '未'],
+  ['甲午', '辰', '巳'],
+  ['甲辰', '寅', '卯'],
+  ['甲寅', '子', '丑'],
+] as const
