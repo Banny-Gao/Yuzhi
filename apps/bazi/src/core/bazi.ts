@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { cloneDeep } from 'lodash-es'
 import { lcm } from './utils/math'
-import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM, SINING_NAME, SOLAR_TERMS_RANGE } from './data'
+import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM, SINING_NAME, SOLAR_TERMS_RANGE, LIU_JIA_XUN_KONG } from './data'
 import { tianGans } from './gan'
 import { diZhis } from './zhi'
 import { getSolarDate, getSolarTermsFormApi, getDaysInMonth, dateFormat, DAY_FORMAT, getLunarDate } from './date'
@@ -40,6 +40,7 @@ declare global {
       xingYun: TwelvePlaceName
       shiShen: TargetShiShen
     }
+    kongWang?: KongWang
   }>
 
   export type SiNing = {
@@ -79,6 +80,11 @@ declare global {
   }
 
   export type RiZhu = Zhu & { mingZhu: MingZhu }
+
+  export type KongWang = {
+    liuJiaXunKong: (typeof LIU_JIA_XUN_KONG)[number]
+  }
+
   export type Bazi = {
     nianZhu: Zhu
     yueZhu: Zhu
@@ -545,6 +551,14 @@ export const getLiuShi = async (year: number, month: number, day: number): Promi
     })
   )
 
+/** 六甲旬空 */
+const getLiuJiaXunKong = (zhu: Zhu) => {
+  const liuJia = SIXTY_JIAZI[Math.floor(zhu.index / 10) * 10]
+
+  if (!zhu.kongWang) zhu.kongWang = {} as KongWang
+  zhu.kongWang.liuJiaXunKong = LIU_JIA_XUN_KONG.find(([lj]) => lj === liuJia.name)!
+}
+
 /**处理各柱十神 */
 const initShiShen = (riYuan: Gan, targetZhu: Zhu) => {
   if (targetZhu.zhuIndex !== ZhuIndex.RiZhu) targetZhu.gan.shiShen = getShiShen.call(targetZhu.gan, riYuan)
@@ -570,6 +584,7 @@ const initExtra = (riYuan: Gan, targetZhu: Zhu) => {
   initXingYun(riYuan, targetZhu)
   initShiShen(riYuan, targetZhu)
   initZiZuo(targetZhu)
+  getLiuJiaXunKong(targetZhu)
 }
 
 export type GetBaziParams = {
