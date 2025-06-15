@@ -1,7 +1,20 @@
 import dayjs from 'dayjs'
 import { cloneDeep } from 'lodash-es'
 import { lcm } from './utils/math'
-import { GAN_NAME, NAYIN_WUXING, ZHI_NAME, SOLAR_TERM, SINING_NAME, SOLAR_TERMS_RANGE, LIU_JIA_XUN_KONG } from './data'
+import {
+  GAN_NAME,
+  NAYIN_WUXING,
+  ZHI_NAME,
+  SOLAR_TERM,
+  SINING_NAME,
+  SOLAR_TERMS_RANGE,
+  LIU_JIA_XUN_KONG,
+  JIE_LU_KONG,
+  SI_DA_KONG,
+  WU_GUI_KONG,
+  KE_HAI_KONG,
+  PO_ZU_KONG,
+} from './data'
 import { tianGans } from './gan'
 import { diZhis } from './zhi'
 import { getSolarDate, getSolarTermsFormApi, getDaysInMonth, dateFormat, DAY_FORMAT, getLunarDate } from './date'
@@ -83,6 +96,11 @@ declare global {
 
   export type KongWang = {
     liuJiaXunKong: (typeof LIU_JIA_XUN_KONG)[number]
+    jieluKong: (typeof JIE_LU_KONG)[number]
+    siDaKong?: [(typeof SI_DA_KONG)[number][0] | (typeof SI_DA_KONG)[number][1], (typeof SI_DA_KONG)[number][2]]
+    wuGuiKong: (typeof WU_GUI_KONG)[number]
+    keHaiKong: (typeof KE_HAI_KONG)[number]
+    poZuKong: (typeof PO_ZU_KONG)[number]
   }
 
   export type Bazi = {
@@ -551,14 +569,6 @@ export const getLiuShi = async (year: number, month: number, day: number): Promi
     })
   )
 
-/** 六甲旬空 */
-const getLiuJiaXunKong = (zhu: Zhu) => {
-  const liuJia = SIXTY_JIAZI[Math.floor(zhu.index / 10) * 10]
-
-  if (!zhu.kongWang) zhu.kongWang = {} as KongWang
-  zhu.kongWang.liuJiaXunKong = LIU_JIA_XUN_KONG.find(([lj]) => lj === liuJia.name)!
-}
-
 /**处理各柱十神 */
 const initShiShen = (riYuan: Gan, targetZhu: Zhu) => {
   if (targetZhu.zhuIndex !== ZhuIndex.RiZhu) targetZhu.gan.shiShen = getShiShen.call(targetZhu.gan, riYuan)
@@ -584,6 +594,7 @@ const initExtra = (riYuan: Gan, targetZhu: Zhu) => {
   initXingYun(riYuan, targetZhu)
   initShiShen(riYuan, targetZhu)
   initZiZuo(targetZhu)
+  // 初始化各柱六甲旬空关系
   getLiuJiaXunKong(targetZhu)
 }
 
@@ -600,15 +611,18 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   const nianGan = await getNianGan(lunar!)
   const nianZhi = await getNianZhi(lunar!)
   const nianZhu = composeGanZhi(nianGan, nianZhi, ZhuIndex.NianZhu)
+
   // 月柱
   const yueGan = await getYueGan(lunar!, nianGan)
   const yueZhi = await getYueZhi(lunar!)
   const yueZhu = composeGanZhi(yueGan, yueZhi, ZhuIndex.YueZhu)
+
   // 日柱
   const riZhu: RiZhu = {
     ...getRiGanZhi(solarDate),
     mingZhu: gender === 'male' ? MingZhu.male : MingZhu.female,
   }
+
   // 时柱
   const shiGan = await getShiGan(solarDate, riZhu.gan)
   const shiZhi = await getShiZhi(solarDate)
@@ -651,6 +665,25 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 流年十神
   liuNian.forEach(nian => initExtra(riZhu.gan, nian))
 
+  /** 初始化日柱空亡关系 */
+  // 截路空亡
+  getJieLuKongWang(riZhu)
+  // 四大空亡
+  getSiDaKongWang(riZhu)
+  // 五鬼空亡
+  getWuGuiKongWang(riZhu)
+  // 克害空亡
+  getKeHaiKongWang(riZhu)
+  // 破祖空亡
+  getPoZuKongWang(riZhu)
+  /**
+   * todo
+   * 1. 判断各柱是否犯空亡（六甲旬空），所犯空亡十神、是否真空亡、空亡互换
+   * 2. 判断各柱是否犯截路空亡、四大空亡、五鬼空亡、克害空亡、破祖空亡
+   * 3. 判断各柱是否犯五行空亡
+   * 4. 盲派空亡判断，是否命空、神空、禄空、魂空、真空、三空相会
+   */
+
   const bazi: Bazi = {
     nianZhu,
     yueZhu,
@@ -668,4 +701,61 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   }
 
   return bazi
+}
+
+/** 六甲旬空 */
+const getLiuJiaXunKong = (zhu: Zhu) => {
+  const liuJia = SIXTY_JIAZI[Math.floor(zhu.index / 10) * 10]
+
+  if (!zhu.kongWang) zhu.kongWang = {} as KongWang
+  zhu.kongWang.liuJiaXunKong = LIU_JIA_XUN_KONG.find(([lj]) => lj === liuJia.name)!
+}
+
+/**
+ * 甲子、甲午旬：五行缺水。
+ * 甲寅、甲申旬：五行缺金。
+ * 其他柱含缺即犯空
+ */
+const getSiDaKongWang = (riZhu: Zhu) => {
+  const liuJia = SIXTY_JIAZI[Math.floor(riZhu.index / 10) * 10]
+
+  if (!riZhu.kongWang) riZhu.kongWang = {} as KongWang
+  riZhu.kongWang.siDaKong = SI_DA_KONG.find(k => k.includes(liuJia.name as never))?.map(k => [liuJia.name, k[2]]) as any
+}
+
+/**
+ * 截路空亡
+ * 日柱天干所克之物（财星）被时柱地支所 “截”
+ * 若胎元中亦见此煞，凶势叠加，困苦更甚
+ */
+const getJieLuKongWang = (riZhu: Zhu) => {
+  if (!riZhu.kongWang) riZhu.kongWang = {} as KongWang
+  riZhu.kongWang.jieluKong = JIE_LU_KONG.find(([jl]) => jl.includes(riZhu.gan.name))!
+}
+
+/**
+ * 五鬼空亡
+ * 甲己日见巳午，乙庚日见寅卯，丙辛日见子丑，丁壬日见戌亥，戊癸日见申酉
+ */
+const getWuGuiKongWang = (riZhu: Zhu) => {
+  if (!riZhu.kongWang) riZhu.kongWang = {} as KongWang
+  riZhu.kongWang.wuGuiKong = WU_GUI_KONG.find(([wg]) => wg.includes(riZhu.gan.name))!
+}
+
+/**
+ * 克害空亡
+ * 甲乙日见午，丙丁日见申，戊己日见巳，庚辛日见寅，壬癸日见酉丑
+ */
+const getKeHaiKongWang = (riZhu: Zhu) => {
+  if (!riZhu.kongWang) riZhu.kongWang = {} as KongWang
+  riZhu.kongWang.keHaiKong = KE_HAI_KONG.find(([kh]) => kh.includes(riZhu.gan.name))!
+}
+
+/**
+ * 破祖空亡
+ * 甲乙丙丁日见午，戊己日见戌，庚辛日见子，壬癸日见寅
+ */
+const getPoZuKongWang = (riZhu: Zhu) => {
+  if (!riZhu.kongWang) riZhu.kongWang = {} as KongWang
+  riZhu.kongWang.poZuKong = PO_ZU_KONG.find(([pz]) => pz.includes(riZhu.gan.name))!
 }
