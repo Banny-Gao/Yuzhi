@@ -35,6 +35,10 @@ declare global {
     introduction?: string // 节气简介
     yangSheng?: string // 节气养生建议
     solarDateString: string
+    longitude: string // 黄经
+    climate: string // 气候特点
+    phenomenon: string // 物候现象
+    activity: string // 农事活动
   }
 
   export type BaseDate<T = object> = T & {
@@ -109,6 +113,10 @@ const getEquationOfTime = (date: Date): number => {
 }
 
 const solarTermsCache: Record<number, SolarTermWithDate[]> = {}
+const getExtraPropsByName = (name: SolarTermName) => {
+  const [_, longitude, climate, phenomenon, activity] = SOLAR_TERM.find(term => term[0] === name)!
+  return { longitude, climate, phenomenon, activity }
+}
 /** 获取节气数据 */
 export const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithDate[]> => {
   if (solarTermsCache[year]) return solarTermsCache[year]
@@ -145,6 +153,7 @@ export const getSolarTermsFormApi = async (year: number): Promise<SolarTermWithD
               solarTermName: item.name,
               dateString: date.format(DATE_FORMAT),
               solarDateString: solarDate.solarDateString,
+              ...getExtraPropsByName(item.name as SolarTermName),
             }
           })
         )
@@ -302,11 +311,14 @@ const getSolarTermsFromLocal = async (year: number): Promise<SolarTermWithDate[]
     if (termDate.getFullYear() === year || (i >= 22 && termDate.getFullYear() === year + 1)) {
       const solarDate = await getSolarDate(termDate, DEFAULT_LONGITUDE, false)
       const dTermDate = dayjs(termDate)
+      console.log(i)
+      const name = SOLAR_TERM[i][0]
       const solarTerm: SolarTermWithDate = {
-        solarTermName: SOLAR_TERM[i],
+        solarTermName: name,
         date: dTermDate,
         dateString: dTermDate.format(DATE_FORMAT),
         solarDateString: solarDate.solarDateString,
+        ...getExtraPropsByName(name),
       }
       solarTerms.push(solarTerm)
     }

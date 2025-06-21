@@ -8,28 +8,36 @@ import {
   TWELVE_PLACE_NAME,
   ZHI_NAME,
   SI_YU_NAME,
+  GAN_OTHERS,
 } from './data'
 import { getGanWuXing, getGanYinYang } from './wuxing'
 import { getShiShen } from './shishen'
 declare global {
   export type Gan = IndexField<{
-    name: GanName
-    tianWen: TianWenName
-    liuShen: LiuShenName
-    yinYang: YinYang
-    wuXing: WuXing
-    wuHudun: TargetField<{ name: GanName }>
-    wuShuDun: TargetField<{ name: GanName }>
-    he: ReturnType<typeof ganHe>
-    chong: ReturnType<typeof ganChong>
-    twelvePlace: ReturnType<typeof getGanPlace>
-    shiShen: ReturnType<typeof getShiShen>
+    name: GanName // 天干名称
+    tianWen: TianWenName // 对应天文
+    liuShen: LiuShenName // 对应六神
+    yinYang: YinYang // 阴阳
+    wuXing: WuXing // 五行
+    wuHudun: TargetField<{ name: GanName }> // 五虎遁
+    wuShuDun: TargetField<{ name: GanName }> // 五鼠遁
+    /** 天干其他表象 */
+    position: (typeof GAN_OTHERS)[number][1] // 方位
+    detailSeason: (typeof GAN_OTHERS)[number][2] // 季节细化
+    character: (typeof GAN_OTHERS)[number][3] // 性格特征
+    nature: (typeof GAN_OTHERS)[number][4] // 自然现象
+    organ: (typeof GAN_OTHERS)[number][5] // 器官脏腑
+    he: ReturnType<typeof ganHe> // 天干合化
+    chong: ReturnType<typeof ganChong> // 天干相冲
+    twelvePlace: ReturnType<typeof getGanPlace> // 十二宫
+    shiShen: ReturnType<typeof getShiShen> // 十神
   }>
 
   export type GanHe = TargetField<{
     name: GanName
     desc: (typeof GAN_HE)[number][3]
     hua?: WuXingName
+    feature: (typeof GAN_HE)[number][4]
   }>
 
   export type GanChong = TargetField<{
@@ -45,9 +53,10 @@ declare global {
 /* 获取天干的合化 */
 function ganHe(this: Gan, target?: Gan | GanName): GanHe | undefined {
   target ??= GAN_NAME[(this.index + 5) % 10]
-  const transform = ([_, _name2, hua, desc]: string[]): Required<Omit<GanHe, keyof TargetField>> =>
+  const transform = ([_, _name2, hua, desc, feature]: string[]): Required<Omit<GanHe, keyof TargetField>> =>
     ({
       desc,
+      feature,
       hua,
     }) as Required<Omit<GanHe, keyof TargetField>>
 
@@ -111,6 +120,11 @@ export const tianGans = GAN_NAME.map((name, index) => {
       targetName: GAN_NAME[(index % 5) * 2],
       targetIndex: (index % 5) * 2,
     },
+    position: GAN_OTHERS.find(([ganName]) => ganName === name)?.[1],
+    detailSeason: GAN_OTHERS.find(([ganName]) => ganName === name)?.[2],
+    character: GAN_OTHERS.find(([ganName]) => ganName === name)?.[3],
+    nature: GAN_OTHERS.find(([ganName]) => ganName === name)?.[4],
+    organ: GAN_OTHERS.find(([ganName]) => ganName === name)?.[5],
   } as Gan
 
   tianGan.he = ganHe.call(tianGan)

@@ -210,7 +210,9 @@ const getNianZhi = async (lunarDate: LunarDate): Promise<Zhi> => {
 
 /** 节气对应的月干偏移 */
 const SOLAR_TERM_OFFSET: Record<string, number> = Object.fromEntries(
-  SOLAR_TERM.map((term, index) => [term, Math.floor(index / 2)])
+  SOLAR_TERM.map(term => term[0])
+    .flat()
+    .map((term, index) => [term, Math.floor(index / 2)])
 )
 
 /** 获取某年某月某日节气的月干偏移 */

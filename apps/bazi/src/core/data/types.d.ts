@@ -41,7 +41,7 @@ declare global {
   /** 农历日 */
   export type LunarDay = NameConst<typeof LUNAR_DAY>
   /** 节气名称 */
-  export type SolarTermName = NameConst<typeof SOLAR_TERM>
+  export type SolarTermName = (typeof SOLAR_TERM)[number][0]
 
   // 阴阳
   export type YinYangName = NameConst<typeof YIN_YANG_NAME>

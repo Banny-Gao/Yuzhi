@@ -46,7 +46,7 @@ export const WU_SHU_DUN: Summary = {
 export const TIAN_GAN_HE: Summary = {
   title: '天干五合',
   desc: ['隔五位而合', '异性相合，土水合、金木合、火金合'],
-  content: `甲己合土，乙庚合金，丙辛合水，丁壬合木，戊癸合火。`,
+  content: `甲己合化土，乙庚合金，丙辛合化水，丁壬合化木，戊癸合化火。`,
 }
 
 /** 天干相冲 */

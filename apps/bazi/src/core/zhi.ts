@@ -19,6 +19,7 @@ import {
   SI_ZHENG_NAME,
   SI_YU_NAME,
   SI_KU_NAME,
+  ZHI_OTHERS,
 } from './data'
 import { getShiShen } from './shishen'
 import { getZhiYinYang, getZhiWuXing, getWuXingByName, yinYangs, isYin, isYang, isTu, isShui } from './wuxing'
@@ -26,26 +27,32 @@ import { tianGans } from './gan'
 
 declare global {
   export type Zhi = IndexField<{
-    name: ZhiName
-    yinYang: YinYang
-    wuXing: WuXing
-    seasonName: SeasonName
-    shengXiao: ShengXiaoName
-    fingerPosition: FingerPosition
-    sanHui: ReturnType<typeof sanHui>
-    sanHe: ReturnType<typeof sanHe>
-    banHe: ReturnType<typeof zhiBanHe>
-    benQi: ReturnType<typeof getBenQi>
-    yuQi: ReturnType<typeof getYuQi>
-    zhongQi: ReturnType<typeof getZhongQi>
-    cangGan: ReturnType<typeof getZhiCangGan>
-    he: ReturnType<typeof zhiHe>
-    hai: ReturnType<typeof zhiHai>
-    chong: ReturnType<typeof zhiChong>
-    po: ReturnType<typeof zhiPo>
-    xing: ReturnType<typeof zhiXing>
-    anHe: ReturnType<typeof zhiAnHe>
-    shiShen: ReturnType<typeof getShiShen>
+    name: ZhiName // 地支名称
+    yinYang: YinYang // 阴阳
+    wuXing: WuXing // 五行
+    seasonName: SeasonName // 季节名称
+    shengXiao: ShengXiaoName // 生肖名称
+    fingerPosition: FingerPosition // 手指位置
+    sanHui: ReturnType<typeof sanHui> // 三会
+    sanHe: ReturnType<typeof sanHe> // 三合
+    banHe: ReturnType<typeof zhiBanHe> // 半合
+    benQi: ReturnType<typeof getBenQi> // 本气
+    yuQi: ReturnType<typeof getYuQi> // 余气
+    zhongQi: ReturnType<typeof getZhongQi> // 中气
+    cangGan: ReturnType<typeof getZhiCangGan> // 藏干
+    he: ReturnType<typeof zhiHe> // 横合
+    hai: ReturnType<typeof zhiHai> // 竖害
+    chong: ReturnType<typeof zhiChong> // 冲
+    po: ReturnType<typeof zhiPo> // 破
+    xing: ReturnType<typeof zhiXing> // 刑
+    anHe: ReturnType<typeof zhiAnHe> // 暗合
+    shiShen: ReturnType<typeof getShiShen> // 十神
+    organ: (typeof ZHI_OTHERS)[number][1] // 器官
+    hours: (typeof ZHI_OTHERS)[number][2] // 时辰
+    detailSeason: (typeof ZHI_OTHERS)[number][3] // 季节细化
+    position: (typeof ZHI_OTHERS)[number][4] // 方位
+    jingLuo: (typeof ZHI_OTHERS)[number][5] // 经络
+    shenTiFa: (typeof ZHI_OTHERS)[number][6] // 身体当令
   }>
 
   export type ZhiBanHeType = 'shengWang' | 'muWang' | 'shengMu'
@@ -473,6 +480,12 @@ export const diZhis = ZHI_NAME.map((name, index) => {
     seasonName: SEASON_NAME[Math.floor(((index - 2 + 12) % 12) / 3)],
     yinYang: getZhiYinYang(index),
     wuXing: getZhiWuXing(index),
+    organ: ZHI_OTHERS.find(([zhiName]) => zhiName === name)?.[1],
+    hours: ZHI_OTHERS.find(([zhiName]) => zhiName === name)?.[2],
+    detailSeason: ZHI_OTHERS.find(([zhiName]) => zhiName === name)?.[3],
+    position: ZHI_OTHERS.find(([zhiName]) => zhiName === name)?.[4],
+    jingLuo: ZHI_OTHERS.find(([zhiName]) => zhiName === name)?.[5],
+    shenTiFa: ZHI_OTHERS.find(([zhiName]) => zhiName === name)?.[6],
   } as Zhi
 
   diZhi.sanHui = sanHui.call(diZhi)
