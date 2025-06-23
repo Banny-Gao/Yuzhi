@@ -23,16 +23,19 @@ import { getShiShen } from './shishen'
 
 enum ZhuIndex {
   NianZhu = 0,
-  YueZhu = 1,
-  RiZhu = 2,
-  ShiZhu = 3,
-  TaiYuan = 4,
-  TaiXi = 5,
-  MingGong = 6,
-  ShenGong = 7,
-  DaYun = 8,
-  LiuNian = 9,
-  LiuYue = 10,
+  YueZhu,
+  RiZhu,
+  ShiZhu,
+  TaiYuan,
+  MingGong,
+  ShenGong,
+  TaiXi,
+  BianXing,
+  DaYun,
+  LiuNian,
+  LiuYue,
+  LiuRi,
+  LiuShi,
 }
 
 export enum MingZhu {
@@ -88,10 +91,10 @@ declare global {
   }
 
   export type LiuRi = Zhu & SolarDate
-  export type LiuShi = SolarDate & {
-    riZhu: Zhu
-    shiZhu: Zhu
-  }
+  export type LiuShi = SolarDate &
+    Zhu & {
+      riZhu: Zhu
+    }
 
   export type RiZhu = Zhu & { mingZhu: MingZhu }
 
@@ -140,12 +143,14 @@ declare global {
     siNing: SiNing
     daYun: DaYun
     liuNian: LiuNian[]
-    curDaYun: Yun // 当前大运
-    curLiuNian: LiuNian // 当前流年
-    curLiuYue: LiuYue // 当前流月
-    curLiuRi: LiuRi // 当前流日
-    curLiuShi: LiuShi // 当前流时
-    getLiuYue: (year: number) => Promise<LiuYue[]>
+    liuYue?: LiuYue[]
+    liuRi?: LiuRi[]
+    liuShi?: LiuShi[]
+    curDaYun?: Yun // 当前大运
+    curLiuNian?: LiuNian // 当前流年
+    curLiuYue?: LiuYue // 当前流月
+    curLiuRi?: LiuRi // 当前流日
+    curLiuShi?: LiuShi // 当前流时
     relations: ZhuRelation[] // 各柱干支关系
   }
 }
@@ -347,11 +352,11 @@ const getTaiYuan = ({ gan, zhi }: Zhu): Zhu => {
 }
 
 /* 干支合柱 */
-const getSelfZhu = ({ gan, zhi }: Zhu): Zhu => {
+const getSelfZhu = ({ gan, zhi }: Zhu, zhuIndex: ZhuIndex): Zhu => {
   const gans = tianGans[gan.he!.targetIndex]
   const zhis = diZhis[zhi.he!.targetIndex]
 
-  return composeGanZhi(gans, zhis, ZhuIndex.TaiXi)
+  return composeGanZhi(gans, zhis, zhuIndex)
 }
 
 /** 命宫:起通
@@ -386,7 +391,7 @@ const getShenGong = (lunarDate: LunarDate, nianZhu: Zhu, shiZhi: Zhi): Zhu => {
 
   const ganIndex = (firstMonthGanIndex + zhiIndex + 10) % 10
 
-  return composeGanZhi(tianGans[ganIndex], diZhis[zhiIndex], ZhuIndex.MingGong)
+  return composeGanZhi(tianGans[ganIndex], diZhis[zhiIndex], ZhuIndex.ShenGong)
 }
 
 /** 根据月支获取节令、气令和下一个节气节令 */
@@ -505,6 +510,11 @@ export const getDaYun = async ({
     jiaoYun,
   }
 }
+const setCurrentYun = (bazi: Bazi, year: number) => {
+  const yun = bazi.daYun.yuns.find(yun => year >= yun.year[0] && year < yun.year[1])
+
+  bazi.curDaYun = yun
+}
 
 const getLiuNian = async (year: number, nianZhu: Zhu): Promise<LiuNian[]> => {
   // 0 - 120 岁
@@ -520,6 +530,11 @@ const getLiuNian = async (year: number, nianZhu: Zhu): Promise<LiuNian[]> => {
   }
 
   return liuNian
+}
+const setCurrentLiuNian = (bazi: Bazi, year: number) => {
+  const liuNian = bazi.liuNian.find(liuNian => year === liuNian.year)!
+
+  bazi.curLiuNian = liuNian
 }
 
 /** 根据年获取十二流月 */
@@ -538,14 +553,23 @@ export const getLiuYue = async (year: number): Promise<LiuYue[]> => {
 
     liuYue.push({
       ...yueZhu,
+      zhuIndex: ZhuIndex.LiuYue,
       solarTermName: start.solarTermName,
       dateString: start.dateString,
-      month: lunar!.month,
+      month: lunar!.month, // 农历月
     })
   }
 
   return liuYue.sort((a, b) => a.dateString.localeCompare(b.dateString))
 }
+const setCurrentLiuYue = async (bazi: Bazi, year: number, lunarMonth: number) => {
+  if (!bazi.liuYue) {
+    bazi.liuYue = await getLiuYue(year)
+  }
+
+  bazi.curLiuYue = bazi.liuYue.find(liuYue => lunarMonth === liuYue.month)!
+}
+
 /** 根据年月获取流日 */
 export const getLiuRi = async (year: number, month: number | LiuYue): Promise<LiuRi[]> => {
   const liuRi: LiuRi[] = []
@@ -557,10 +581,18 @@ export const getLiuRi = async (year: number, month: number | LiuYue): Promise<Li
     liuRi.push({
       ...day,
       ...riZhu,
+      zhuIndex: ZhuIndex.LiuRi,
     })
   }
 
   return liuRi
+}
+const setCurrentLiuRi = async (bazi: Bazi, year: number, month: number, day: number, hour: number) => {
+  if (!bazi.liuRi) {
+    bazi.liuRi = await getLiuRi(year, month)
+  }
+
+  bazi.curLiuRi = bazi.liuRi.find(liuRi => (hour >= 23 ? day + 1 : day) === liuRi.day)!
 }
 /** 根据年月日获取十二流时 */
 export const getLiuShi = async (year: number, month: number, day: number): Promise<LiuShi[]> =>
@@ -595,11 +627,19 @@ export const getLiuShi = async (year: number, month: number, day: number): Promi
 
       return {
         ...solarDate,
+        ...shiZhu,
         riZhu,
-        shiZhu,
+        zhuIndex: ZhuIndex.LiuShi,
       }
     })
   )
+const setCurrentLiuShi = async (bazi: Bazi, year: number, month: number, day: number, hour: number) => {
+  if (!bazi.liuShi) {
+    bazi.liuShi = await getLiuShi(year, month, hour >= 23 ? day + 1 : day)
+  }
+
+  bazi.curLiuShi = bazi.liuShi.find(liuShi => hour === liuShi.hour)!
+}
 
 /**处理各柱十神 */
 const initShiShen = (riYuan: Gan, targetZhu: Zhu) => {
@@ -661,7 +701,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   const shiZhu = composeGanZhi(shiGan, shiZhi, ZhuIndex.ShiZhu)
 
   /** 日主胎息 取日柱干支所合 */
-  const taiXi = getSelfZhu(riZhu)
+  const taiXi = getSelfZhu(riZhu, ZhuIndex.TaiXi)
   // 胎元
   const taiYuan = getTaiYuan(yueZhu)
   // 命宫
@@ -672,7 +712,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   /** 起变法：时变, 变星
    * 取时柱干支所合
    */
-  const bianXing = getSelfZhu(shiZhu)
+  const bianXing = getSelfZhu(shiZhu, ZhuIndex.BianXing)
 
   // 人元司令分野
   const siNing = await getSining(lunar!, yueZhi)
@@ -681,8 +721,6 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   const daYun = await getDaYun({ nianGan, yueZhu, lunarDate: lunar!, gender, longitude })
   // 流年
   const liuNian = await getLiuNian(solarDate.year, nianZhu)
-
-  // 当前大运
 
   // 各柱十神、星运、自坐、六甲旬空
   ;[
@@ -723,7 +761,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
    * 4. 盲派空亡判断，是否命空、神空、禄空、魂空、真空、三空相会
    */
 
-  const bazi: Bazi = {
+  const bazi = {
     nianZhu,
     yueZhu,
     riZhu,
@@ -736,9 +774,28 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     siNing,
     daYun,
     liuNian,
-    getLiuYue,
     relations: [],
-  }
+  } as Bazi
+
+  // 当前大运
+  const currentSolarDate = await getSolarDate(new Date(), longitude)
+  setCurrentYun(bazi, currentSolarDate.year)
+  setCurrentLiuNian(bazi, currentSolarDate.year)
+  await setCurrentLiuYue(bazi, currentSolarDate.year, currentSolarDate.lunar!.month)
+  await setCurrentLiuRi(
+    bazi,
+    currentSolarDate.year,
+    currentSolarDate.month,
+    currentSolarDate.day,
+    currentSolarDate.hour
+  )
+  await setCurrentLiuShi(
+    bazi,
+    currentSolarDate.year,
+    currentSolarDate.month,
+    currentSolarDate.day,
+    currentSolarDate.hour
+  )
 
   initZhuRelation(bazi)
 
@@ -803,7 +860,22 @@ const getPoZuKongWang = (riZhu: Zhu) => {
 }
 
 export const initZhuRelation = (bazi: Bazi) => {
-  const { nianZhu, yueZhu, riZhu, shiZhu, taiXi, taiYuan, mingGong, shenGong, bianXing } = bazi
+  const {
+    nianZhu,
+    yueZhu,
+    riZhu,
+    shiZhu,
+    taiYuan,
+    mingGong,
+    shenGong,
+    taiXi,
+    bianXing,
+    curDaYun,
+    curLiuNian,
+    curLiuYue,
+    curLiuRi,
+    curLiuShi,
+  } = bazi
 
   const relations: ZhuRelation[] = []
 

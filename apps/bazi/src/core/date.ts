@@ -311,7 +311,6 @@ const getSolarTermsFromLocal = async (year: number): Promise<SolarTermWithDate[]
     if (termDate.getFullYear() === year || (i >= 22 && termDate.getFullYear() === year + 1)) {
       const solarDate = await getSolarDate(termDate, DEFAULT_LONGITUDE, false)
       const dTermDate = dayjs(termDate)
-      console.log(i)
       const name = SOLAR_TERM[i][0]
       const solarTerm: SolarTermWithDate = {
         solarTermName: name,
