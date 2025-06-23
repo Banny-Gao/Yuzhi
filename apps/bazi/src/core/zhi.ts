@@ -450,7 +450,8 @@ function zhiAnHe(this: Zhi, target?: Zhi | ZhiName): ZhiAnHe | ZhiAnHe[] | undef
       .flat() as ZhiName[]
     target = targetNames[0]
     if (!target) return void 0
-    if (targetNames.length > 1) return targetNames.map(name => zhiAnHe.call(this, name)) as ZhiAnHe[]
+
+    return targetNames.map(name => zhiAnHe.call(this, name)) as ZhiAnHe[]
   }
 
   const transform = ([_, _name2, desc]: (typeof ZHI_AN_HE)[number]) => ({

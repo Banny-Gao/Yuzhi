@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, uniqWith } from 'lodash-es'
 import { lcm } from './utils/math'
 import {
+  NOUN,
   GAN_NAME,
   NAYIN_WUXING,
   ZHI_NAME,
@@ -37,10 +38,40 @@ enum ZhuIndex {
   LiuRi,
   LiuShi,
 }
+const ZhuIndexMap = {
+  [ZhuIndex.NianZhu]: '年柱',
+  [ZhuIndex.YueZhu]: '月柱',
+  [ZhuIndex.RiZhu]: '日柱',
+  [ZhuIndex.ShiZhu]: '时柱',
+  [ZhuIndex.TaiYuan]: '胎元',
+  [ZhuIndex.MingGong]: '命宫',
+  [ZhuIndex.ShenGong]: '身宫',
+  [ZhuIndex.TaiXi]: '胎息',
+  [ZhuIndex.BianXing]: '变星',
+  [ZhuIndex.DaYun]: '大运',
+  [ZhuIndex.LiuNian]: '流年',
+  [ZhuIndex.LiuYue]: '流月',
+  [ZhuIndex.LiuRi]: '流日',
+  [ZhuIndex.LiuShi]: '流时',
+}
 
 export enum MingZhu {
   male = '元男',
   female = '元女',
+}
+
+export enum ZhuRelationType {
+  ganHe,
+  ganChong,
+  zhiSanhui,
+  zhiSanHe,
+  zhiBanHe,
+  zhiHe,
+  zhiHai,
+  zhiChong,
+  zhiPo,
+  zhiXing,
+  zhiAnHe,
 }
 
 declare global {
@@ -107,24 +138,12 @@ declare global {
     poZuKong: (typeof PO_ZU_KONG)[number]
   }
 
-  export enum ZhuRelationType {
-    ganHe,
-    ganChong,
-    zhiSanhui,
-    zhiSanHe,
-    zhiBanHe,
-    zhiHe,
-    zhiHai,
-    zhiChong,
-    zhiPo,
-    zhiXing,
-    zhiAnHe,
-  }
   export type ZhuRelation = {
     type: ZhuRelationType
-    names: GanName[] | ZhiName[]
+    desc: string
+    names: (GanName | ZhiName)[]
     zhuIndex: ZhuIndex
-    relationsZhuIndex: ZhuIndex[]
+    relationZhuIndex: ZhuIndex[]
     relationShiShen: ShiShenName[]
     hua?: WuXingName
     hui?: WuXingName
@@ -859,6 +878,85 @@ const getPoZuKongWang = (riZhu: Zhu) => {
   riZhu.kongWang.poZuKong = PO_ZU_KONG.find(([pz]) => pz.includes(riZhu.gan.name))!
 }
 
+const sortGanZhiNames = (names: (GanName | ZhiName)[]): (GanName | ZhiName)[] =>
+  names.sort((a, b) => {
+    const aIndex = [...GAN_NAME, ...ZHI_NAME].indexOf(a)
+    const bIndex = [...GAN_NAME, ...ZHI_NAME].indexOf(b)
+
+    return aIndex - bIndex
+  })
+
+const initDoubleRelation =
+  (
+    zhuIndex: ZhuIndex,
+    otherZhuIndex: ZhuIndex,
+    zhiShiShen: TargetShiShen,
+    ganShiShen: TargetShiShen,
+    prefixDesc: string
+  ) =>
+  (type: ZhuRelationType, names: (GanName | ZhiName)[], descField: string, from: string): ZhuRelation => ({
+    type,
+    names: sortGanZhiNames(names),
+    desc: [prefixDesc, from, ...names, descField].join(''),
+    zhuIndex,
+    relationZhuIndex: [otherZhuIndex],
+    relationShiShen: [zhiShiShen.forMe?.name!, ganShiShen.forMe?.name!].filter(Boolean) as ShiShenName[],
+  })
+
+const getZhuDoubleRelation = (zhu: Zhu, other: Zhu): ZhuRelation[] => {
+  if (!zhu || !other) return []
+  const { gan, zhi, zhuIndex } = zhu
+  const { gan: otherGan, zhi: otherZhi, zhuIndex: otherZhuIndex } = other
+  const relations: ZhuRelation[] = []
+  const initRelation = initDoubleRelation(
+    zhuIndex,
+    otherZhuIndex,
+    zhi.shiShen as TargetShiShen,
+    gan.shiShen as TargetShiShen,
+    [ZhuIndexMap[zhuIndex], ZhuIndexMap[otherZhuIndex]].join('与')
+  )
+
+  // 天干合
+  if (gan.he?.targetName === otherGan.name) {
+    relations.push(initRelation(ZhuRelationType.ganHe, [gan.name, otherGan.name], NOUN.he, '天干：'))
+  }
+  // 天干冲
+  if (gan.chong?.targetName === otherGan.name) {
+    relations.push(initRelation(ZhuRelationType.ganChong, [gan.name, otherGan.name], NOUN.chong, '天干：'))
+  }
+  // 地支半合
+  const banHe = (zhi.banHe as ZhiBanHe[])?.find(bh => bh.targetName === otherZhi.name)
+  if (banHe) {
+    relations.push(initRelation(ZhuRelationType.zhiBanHe, [zhi.name, otherZhi.name], NOUN[banHe.type], '地支：'))
+  }
+  // 地支六合
+  if (zhi.he?.targetName === otherZhi.name) {
+    relations.push(initRelation(ZhuRelationType.zhiHe, [zhi.name, otherZhi.name], NOUN.he, '地支：'))
+  }
+  // 地支六冲
+  if (zhi.chong?.targetName === otherZhi.name) {
+    relations.push(initRelation(ZhuRelationType.zhiChong, [zhi.name, otherZhi.name], NOUN.chong, '地支：'))
+  }
+  // 地支六害
+  if (zhi.hai?.targetName === otherZhi.name) {
+    relations.push(initRelation(ZhuRelationType.zhiHai, [zhi.name, otherZhi.name], NOUN.hai, '地支：'))
+  }
+  // 地支六破
+  if (zhi.po?.targetName === otherZhi.name) {
+    relations.push(initRelation(ZhuRelationType.zhiPo, [zhi.name, otherZhi.name], NOUN.po, '地支：'))
+  }
+  // 地支相刑
+  if (zhi.xing?.targetName === otherZhi.name) {
+    relations.push(initRelation(ZhuRelationType.zhiXing, [zhi.name, otherZhi.name], NOUN.xing, '地支：'))
+  }
+  // 地支暗合
+  if ((zhi.anHe as ZhiAnHe[])?.some(ah => ah.targetName === otherZhi.name)) {
+    relations.push(initRelation(ZhuRelationType.zhiAnHe, [zhi.name, otherZhi.name], NOUN.anHe, '地支：'))
+  }
+
+  return relations
+}
+
 export const initZhuRelation = (bazi: Bazi) => {
   const {
     nianZhu,
@@ -878,6 +976,37 @@ export const initZhuRelation = (bazi: Bazi) => {
   } = bazi
 
   const relations: ZhuRelation[] = []
+  // 处理两两关系， 天干地支、合害刑冲克
+  const compareZhuList = [
+    nianZhu,
+    yueZhu,
+    riZhu,
+    shiZhu,
+    taiYuan,
+    mingGong,
+    shenGong,
+    taiXi,
+    bianXing,
+    curDaYun,
+    curLiuNian,
+    curLiuYue,
+    curLiuRi,
+    curLiuShi,
+  ]
+  const zhuList = [nianZhu, yueZhu, riZhu, shiZhu]
 
-  bazi.relations = relations
+  for (const zhu of zhuList) {
+    for (const other of compareZhuList) {
+      if (zhu?.zhuIndex === other?.zhuIndex) continue
+      relations.push(...getZhuDoubleRelation(zhu!, other!))
+    }
+  }
+
+  bazi.relations = uniqWith(
+    relations,
+    (a, b) =>
+      a.zhuIndex === b.zhuIndex &&
+      a.relationZhuIndex.toString() === b.relationZhuIndex.toString() &&
+      a.names.toString() === b.names.toString()
+  )
 }
