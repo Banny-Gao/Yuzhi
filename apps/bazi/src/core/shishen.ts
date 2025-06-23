@@ -2,60 +2,9 @@ import { SHI_SHEN_NAME, GAN_NAME, ZHI_NAME } from './data'
 import { getGanWuXing, getZhiWuXing, getGanYinYang, getZhiYinYang } from './wuxing'
 
 declare global {
-  type GetShiShenType<M extends number, N extends number> = (typeof SHI_SHEN_NAME)[M][N]
-
-  /* 比肩 */
-  export type Bijian = BasicField<{
-    name: GetShiShenType<0, 0>
+  export type GanZhiShiShen = BasicField<{
+    name: (typeof SHI_SHEN_NAME)[number][number]
   }>
-  /* 劫财 */
-  export type Jiecai = BasicField<{
-    name: GetShiShenType<0, 1>
-  }>
-  /* 偏印 */
-  export type PianYin = BasicField<{
-    name: GetShiShenType<1, 0>
-  }>
-  /* 正印 */
-  export type ZhengYin = BasicField<{
-    name: GetShiShenType<1, 1>
-  }>
-  /* 食神 */
-  export type Shishen = BasicField<{
-    name: GetShiShenType<2, 0>
-  }>
-  /* 伤官 */
-  export type Shangguan = BasicField<{
-    name: GetShiShenType<2, 1>
-  }>
-  /* 七杀 */
-  export type Qisha = BasicField<{
-    name: GetShiShenType<3, 0>
-  }>
-  /* 正官 */
-  export type Zhengguan = BasicField<{
-    name: GetShiShenType<3, 1>
-  }>
-  /* 偏财 */
-  export type Piancai = BasicField<{
-    name: GetShiShenType<4, 0>
-  }>
-  /* 正财 */
-  export type Zhengcai = BasicField<{
-    name: GetShiShenType<4, 1>
-  }>
-
-  export type GanZhiShiShen =
-    | Bijian
-    | Jiecai
-    | PianYin
-    | ZhengYin
-    | Shishen
-    | Shangguan
-    | Qisha
-    | Zhengguan
-    | Piancai
-    | Zhengcai
 
   export type TargetShiShen = TargetField<{
     name: GanName | ZhiName

@@ -12,6 +12,8 @@ export type FortuneAssert = {
   relationship?: string[] // 人际关系
   life?: string[] // 生活
   comprehensive?: string[] // 综合影响
+  hua?: string | string[] // 合化五行
+  effect?: string[] // 影响
 }
 
 export const FORTUNE_ASSERTS: FortuneAssert[] = [
@@ -19,6 +21,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 甲己合化土
   {
     name: '甲己',
+    hua: '土',
     description: '甲己合化土 --- 中正之合',
     principle: [
       '甲为阳木，己为阴土，木克土本为相克关系，然甲己居十天干首尾（甲为1，己为6），阴阳相济形成合局；五行中中央属土，甲己合时若得月令土气助（如辰、未、戌月），则化土之力强盛，象征天地之气交融成土',
@@ -40,6 +43,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 乙庚合化金
   {
     name: '乙庚',
+    hua: '金',
     description: '乙庚合化金 --- 仁义之合',
     principle: [
       '乙为阴木，庚为阳金，金克木本为敌对，然阴阳异性相吸形成合局；庚金为阳金之刃，乙木为阴木之柔韧，刚柔相济可化金气，若得月令金气助（如申、酉月），则化金之力锐利迅猛',
@@ -57,6 +61,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 丙辛合化水
   {
     name: '丙辛',
+    hua: '水',
     description: '丙辛合化水 --- 威制之合',
     principle: [
       '丙为阳火，辛为阴金，火克金本为相克，然丙火之阳热与辛金之阴寒相济成合局；火炼金而生水（金生水），若得月令水气助（如亥、子月），则化水之势沛然，象征水火既济转化为滋养之力',
@@ -78,6 +83,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 丁壬合化木
   {
     name: '丁壬',
+    hua: '木',
     description: '丁壬合化木 --- 淫慝之合',
     principle: [
       '丁为阴火，壬为阳水，水火本相克，然丁火之柔与壬水之润相济成合局；水滋润而火温暖，可生木气（水生木），若得月令木气助（如寅、卯月），则化木之势生机勃勃，象征水火调和以生养万物',
@@ -99,6 +105,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 戊癸合化火
   {
     name: '戊癸',
+    hua: '火',
     description: '戊癸合化火 --- 无情之合',
     principle: [
       '戊为阳土，癸为阴水，土克水本为相克，然戊土之阳燥与癸水之阴湿相济成合局；土蓄水而火生焉（火生土，土中水可化火），若得月令火气助（如巳、午月），则化火之势炽热旺盛，象征阴阳和合以生阳气',
@@ -456,6 +463,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 申子辰合化水局
   {
     name: '申子辰',
+    hua: '水',
     description: '申为水长生，子为水帝旺，辰为水墓库，三者汇聚形成水能量闭环',
     principle: [
       '能量闭环：申（水长生）→子（水帝旺）→辰（水墓库）构成完整的五行生长收藏循环',
@@ -469,6 +477,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 亥卯未合化木局
   {
     name: '亥卯未',
+    hua: '木',
     description: '亥为木长生，卯为木帝旺，未为木墓库，三者聚合形成木能量场',
     principle: [
       '生长循环：亥（木长生）→卯（木帝旺）→未（木墓库）象征生命力的蓬勃与收敛',
@@ -482,6 +491,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 寅午戌合化火局
   {
     name: '寅午戌',
+    hua: '火',
     description: '寅为火长生，午为火帝旺，戌为火墓库，三者共振形成火能量爆发',
     principle: [
       '能量共振：寅（火长生）→午（火帝旺）→戌（火墓库）象征热力的释放与沉淀',
@@ -495,6 +505,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 巳酉丑合化金局
   {
     name: '巳酉丑',
+    hua: '金',
     description: '巳为金长生，酉为金帝旺，丑为金墓库，三者汇聚形成金能量聚合',
     principle: [
       '肃杀循环：巳（金长生）→酉（金帝旺）→丑（金墓库）象征金属性的淬炼与终结',
@@ -509,6 +520,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 子丑合化土局 (水局)
   {
     name: '子丑',
+    hua: '土',
     description: '子丑合化土局 (水局) --- 泥合',
     principle: [
       '土克水成合：子水（阳）与丑土（阴）本为相克，然阴阳相济化土',
@@ -522,6 +534,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 寅亥合化木局
   {
     name: '寅亥',
+    hua: '木',
     description: '寅亥合化木局  --- 义合',
     principle: [
       '水生木成合：亥水（阴）生寅木（阳），阴阳相生形成木能量',
@@ -535,6 +548,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 卯戌合化火局
   {
     name: '卯戌',
+    hua: '火',
     description: '卯戌合化火局 --- 淫合',
     principle: [
       '木生火成合：卯木（阴）克戌土（阳），然木焚为火，阴阳交感成化',
@@ -548,6 +562,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 辰酉合化金局
   {
     name: '辰酉',
+    hua: '金',
     description: '辰酉合化金局 --- 融合',
     principle: [
       '土生金成合：辰土（阳）生酉金（阴），阴阳相生形成金能量',
@@ -561,6 +576,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 巳申合化水局
   {
     name: '巳申',
+    hua: '水',
     description: '巳申合化水局 --- 刑合',
     principle: [
       '火炼金生水：巳火（阳）克申金（阴），然金被火炼而生水，阴阳交感成化',
@@ -574,6 +590,7 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
   // 午未合化土局（或火局）
   {
     name: '午未',
+    hua: ['土', '火'],
     description: '午未合化土局 (火局) --- 和合',
     principle: [
       '火生土成合：午火（阳）生未土（阴），然未中藏丁火，可反化火',
@@ -588,4 +605,30 @@ export const FORTUNE_ASSERTS: FortuneAssert[] = [
     finance: ['化土时财运稳定，适合不动产投资；化火时财运爆发，适合热门产业投机；合而不化时需注意财务纠纷'],
     health: ['化土时需注意脾胃湿气，化火时需防范心火过旺；合而不化者需警惕火土相煎引发的代谢问题'],
   },
+  // 合化十神影响
+  {
+    name: '枭印',
+    effect: ['生扶'],
+    comprehensive: [`增强日主，易身旺`]
+  },
+  {
+    name: '比劫',
+    effect: ['帮扶'],
+    comprehensive: [`增强日主，易身旺`]
+  },
+  {
+    name: '官杀',
+    effect: ['克身'],
+    comprehensive: [`削弱日主，易身旺`]
+  },
+  {
+    name: '财星',
+    effect: ['耗身'],
+    comprehensive: [`削弱日主，易身弱`]
+  },
+  {
+    name: '食伤',
+    effect: ['泄秀'],
+    comprehensive: [`中性, 泄身但可能生财`]
+  }
 ]
