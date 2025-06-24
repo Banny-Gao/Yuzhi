@@ -162,6 +162,12 @@ export const NOUN = {
   sanKong: '三空相会',
   jiKong: '吉空',
   xiongKong: '凶空',
+  wuXingWangShuai: '五行旺衰',
+  wangShuai: '旺衰',
+  wang: '旺',
+  xiang: '相',
+  xiu: '休',
+  qiu: '囚',
 }
 
 /** 季节 */
@@ -941,4 +947,12 @@ export const PO_ZU_KONG = [
   ['戊己', '戌'],
   ['庚辛', '子'],
   ['壬癸', '寅'],
+] as const
+
+export const WU_XING_WANG_SHUAI = [
+  ['旺', 1],
+  ['相', 0.8],
+  ['休', 0.6],
+  ['囚', 0.4],
+  ['死', 0.2],
 ] as const

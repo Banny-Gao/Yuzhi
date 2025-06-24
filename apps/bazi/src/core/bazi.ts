@@ -15,6 +15,7 @@ import {
   WU_GUI_KONG,
   KE_HAI_KONG,
   PO_ZU_KONG,
+  WU_XING_WANG_SHUAI,
 } from './data'
 import { tianGans } from './gan'
 import { diZhis } from './zhi'
@@ -149,6 +150,12 @@ declare global {
     hui?: WuXingName
   }
 
+  export type WxWangShuai = {
+    name: WuXingName
+    wangShuai: (typeof WU_XING_WANG_SHUAI)[number][0]
+    value: (typeof WU_XING_WANG_SHUAI)[number][1]
+  }
+
   export type Bazi = {
     nianZhu: Zhu
     yueZhu: Zhu
@@ -171,6 +178,7 @@ declare global {
     curLiuRi?: LiuRi // 当前流日
     curLiuShi?: LiuShi // 当前流时
     relations: ZhuRelation[] // 各柱干支关系
+    wuXingWangShuai: WxWangShuai[]
   }
 }
 
