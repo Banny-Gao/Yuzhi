@@ -152,8 +152,8 @@ declare global {
 
   export type WxWangShuai = {
     name: WuXingName
-    wangShuai: (typeof WU_XING_WANG_SHUAI)[number][0]
-    value: (typeof WU_XING_WANG_SHUAI)[number][1]
+    wangShuai: '旺' | '相' | '休' | '囚' | '死'
+    value: number
   }
 
   export type Bazi = {
@@ -749,6 +749,16 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 流年
   const liuNian = await getLiuNian(solarDate.year, nianZhu)
 
+  // 五行旺衰
+  const getWxWangShuai = (yueZhi: Zhi): WxWangShuai[] =>
+    WU_XING_WANG_SHUAI.find(item => item[0] === yueZhi.name)!
+      .slice(1)
+      .map(([name, wangShuai, value]) => ({
+        name,
+        wangShuai,
+        value,
+      }))
+
   // 各柱十神、星运、自坐、六甲旬空
   ;[
     // 四柱十神
@@ -788,6 +798,8 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
    * 4. 盲派空亡判断，是否命空、神空、禄空、魂空、真空、三空相会
    */
 
+  const wuXingWangShuai = getWxWangShuai(yueZhi)
+
   const bazi = {
     nianZhu,
     yueZhu,
@@ -802,6 +814,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     daYun,
     liuNian,
     relations: [],
+    wuXingWangShuai,
   } as Bazi
 
   // 当前大运

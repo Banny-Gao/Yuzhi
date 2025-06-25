@@ -258,3 +258,15 @@ export const WX_KONG: Summary = {
   content: ``,
   qoutes: ['金空则响，火空则明，水空则清，木空则折，土空则崩。 --- 《三命通会》'],
 }
+
+export const WX_WANG_SHUAI: Summary = {
+  title: '五行旺衰',
+  desc: '根据地支五行断旺衰，受藏干余气影响。',
+  content: `
+  当令者旺，
+  令生者相，
+  生令者休，
+  克令者囚，
+  令克者死
+  `,
+}
