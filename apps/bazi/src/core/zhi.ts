@@ -20,10 +20,22 @@ import {
   SI_YU_NAME,
   SI_KU_NAME,
   ZHI_OTHERS,
+  ZHI_CANG_GAN,
 } from './data'
 import { getShiShen } from './shishen'
 import { getZhiYinYang, getZhiWuXing, getWuXingByName, yinYangs, isYin, isYang, isTu, isShui } from './wuxing'
 import { tianGans } from './gan'
+
+export enum QiEnum {
+  benQi,
+  zhongQi,
+  yuQi,
+}
+export const qiOptions = [
+  { name: '本气', type: QiEnum.benQi },
+  { name: '中气', type: QiEnum.zhongQi },
+  { name: '余气', type: QiEnum.yuQi },
+]
 
 declare global {
   export type Zhi = IndexField<{
@@ -36,9 +48,9 @@ declare global {
     sanHui: ReturnType<typeof sanHui> // 三会
     sanHe: ReturnType<typeof sanHe> // 三合
     banHe: ReturnType<typeof zhiBanHe> // 半合
-    benQi: ReturnType<typeof getBenQi> // 本气
-    yuQi: ReturnType<typeof getYuQi> // 余气
-    zhongQi: ReturnType<typeof getZhongQi> // 中气
+    // benQi: ReturnType<typeof getBenQi> // 本气
+    // yuQi: ReturnType<typeof getYuQi> // 余气
+    // zhongQi: ReturnType<typeof getZhongQi> // 中气
     cangGan: ReturnType<typeof getZhiCangGan> // 藏干
     he: ReturnType<typeof zhiHe> // 横合
     hai: ReturnType<typeof zhiHai> // 竖害
@@ -195,7 +207,7 @@ const getBaZhaiWuXing = (name: Zhi['name']): WuXing[] | undefined => {
  * 2. 四旺为阴，四长生为阳，四墓阴阳与自身相同
  * */
 
-const getBenQi = (zhi: Zhi): QiName => {
+export const getBenQi = (zhi: Zhi): QiName => {
   const { wuXing, yinYang } = zhi
   const isSiWang = isSiZheng(zhi.name)
   const isSiChangSheng = isSiYu(zhi.name)
@@ -211,7 +223,7 @@ const getBenQi = (zhi: Zhi): QiName => {
  * 1. 四旺与水无余气
  * 2. 上支为四旺，余气为上支本气
  */
-const getYuQi = (zhi: Zhi): QiName => {
+export const getYuQi = (zhi: Zhi): QiName => {
   const { wuXing, index } = zhi
   const isSiWang = isSiZheng(zhi.name)
 
@@ -242,7 +254,7 @@ const getYuQi = (zhi: Zhi): QiName => {
  * 1. 本支为四墓, 五行为墓库，取阴
  * 2. 本支四长生，中气五行为我生，取阳
  */
-const getZhongQi = (zhi: Zhi): QiName => {
+export const getZhongQi = (zhi: Zhi): QiName => {
   const { wuXing } = zhi
   // 本支为四墓, 五行为墓库，取阴
   if (isSiku(zhi.name)) {
@@ -264,10 +276,13 @@ const getZhongQi = (zhi: Zhi): QiName => {
   return null
 }
 
-function getZhiCangGan(this: Zhi): (Gan | null)[] {
-  return [getBenQi(this), getZhongQi(this), getYuQi(this)].map(name =>
-    name ? (getObjectByName(tianGans, name) as Gan) : null
-  )
+function getZhiCangGan(this: Zhi): ((Gan & any) | null)[] {
+  return ZHI_CANG_GAN.find(item => item[0] === this.name)!
+    .slice(1)
+    .map(name => (name ? (getObjectByName(tianGans, name) as Gan) : null))
+  // return [getBenQi(this), getZhongQi(this), getYuQi(this)].map(name =>
+  //   name ? (getObjectByName(tianGans, name) as Gan) : null
+  // )
 }
 
 /** 掌诀获取索引， 横合 */
@@ -492,9 +507,9 @@ export const diZhis = ZHI_NAME.map((name, index) => {
   diZhi.sanHui = sanHui.call(diZhi)
   diZhi.sanHe = sanHe.call(diZhi)
   diZhi.banHe = zhiBanHe.call(diZhi)
-  diZhi.benQi = getBenQi(diZhi)
-  diZhi.yuQi = getYuQi(diZhi)
-  diZhi.zhongQi = getZhongQi(diZhi)
+  // diZhi.benQi = getBenQi(diZhi)
+  // diZhi.yuQi = getYuQi(diZhi)
+  // diZhi.zhongQi = getZhongQi(diZhi)
   diZhi.cangGan = getZhiCangGan.call(diZhi)
   diZhi.he = zhiHe.call(diZhi)
   diZhi.hai = zhiHai.call(diZhi)

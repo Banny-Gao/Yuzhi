@@ -18,7 +18,7 @@ import {
   WU_XING_WANG_SHUAI,
 } from './data'
 import { tianGans } from './gan'
-import { diZhis } from './zhi'
+import { diZhis, QiEnum, qiOptions } from './zhi'
 import { getSolarDate, getSolarTermsFormApi, getDaysInMonth, dateFormat, DAY_FORMAT, getLunarDate } from './date'
 import { isYang, isYin } from './wuxing'
 import { getShiShen } from './shishen'
@@ -156,6 +156,14 @@ declare global {
     value: number
   }
 
+  export type TouGan = {
+    name: GanName
+    qiType: QiEnum
+    zhuIndex: ZhuIndex
+    targetZhuIndex: ZhuIndex
+    desc: string
+  }
+
   export type Bazi = {
     nianZhu: Zhu
     yueZhu: Zhu
@@ -179,6 +187,7 @@ declare global {
     curLiuShi?: LiuShi // 当前流时
     relations: ZhuRelation[] // 各柱干支关系
     wuXingWangShuai: WxWangShuai[]
+    touGans?: TouGan[]
   }
 }
 
@@ -665,13 +674,20 @@ const setCurrentLiuShi = async (bazi: Bazi, year: number, month: number, day: nu
     bazi.liuShi = await getLiuShi(year, month, hour >= 23 ? day + 1 : day)
   }
 
-  bazi.curLiuShi = bazi.liuShi.find(liuShi => hour === liuShi.hour)!
+  const curLiuShi = bazi.liuShi.find(liuShi => Math.ceil(hour / 2) === Math.ceil(liuShi.hour / 2) % 12)!
+  bazi.curLiuShi = curLiuShi
 }
 
 /**处理各柱十神 */
 const initShiShen = (riYuan: Gan, targetZhu: Zhu) => {
   if (targetZhu.zhuIndex !== ZhuIndex.RiZhu) targetZhu.gan.shiShen = getShiShen.call(targetZhu.gan, riYuan)
-  targetZhu.zhi.cangGan = targetZhu.zhi.cangGan.map(cangGan => cangGan && getShiShen.call(cangGan, riYuan))
+  targetZhu.zhi.cangGan = targetZhu.zhi.cangGan.map(
+    cangGan =>
+      cangGan && {
+        ...cangGan,
+        shiShen: getShiShen.call(cangGan, riYuan),
+      }
+  )
 }
 
 /** 处理各柱星运 十二长生状态 */
@@ -695,6 +711,97 @@ const initExtra = (riYuan: Gan, targetZhu: Zhu) => {
   initZiZuo(targetZhu)
   // 初始化各柱六甲旬空关系
   getLiuJiaXunKong(targetZhu)
+}
+
+// 五行旺衰
+const getWxWangShuai = (yueZhi: Zhi): WxWangShuai[] =>
+  WU_XING_WANG_SHUAI.find(item => item[0] === yueZhi.name)!
+    .slice(1)
+    .map(([name, wangShuai, value]) => ({
+      name,
+      wangShuai,
+      value,
+    }))
+
+const getComparations = (bazi: Bazi) => {
+  const {
+    nianZhu,
+    yueZhu,
+    riZhu,
+    shiZhu,
+    taiYuan,
+    mingGong,
+    shenGong,
+    taiXi,
+    bianXing,
+    curDaYun,
+    curLiuNian,
+    curLiuYue,
+    curLiuRi,
+    curLiuShi,
+  } = bazi
+
+  const compareZhuList = [
+    nianZhu,
+    yueZhu,
+    riZhu,
+    shiZhu,
+    taiYuan,
+    mingGong,
+    shenGong,
+    taiXi,
+    bianXing,
+    curDaYun,
+    curLiuNian,
+    curLiuYue,
+    curLiuRi,
+    curLiuShi,
+  ]
+  const zhuList = [nianZhu, yueZhu, riZhu, shiZhu]
+
+  return {
+    compareZhuList,
+    zhuList,
+  }
+}
+
+// 藏干透干
+const initTouGans = (bazi: Bazi) => {
+  const { compareZhuList, zhuList } = getComparations(bazi)
+
+  const touGans: TouGan[] = []
+
+  for (const zhu of zhuList) {
+    for (const target of compareZhuList) {
+      if (zhu.zhuIndex === target!.zhuIndex) continue
+
+      const {
+        zhi: { cangGan },
+        zhuIndex,
+      } = zhu
+      const { gan: targetGan, zhuIndex: targetZhuIndex } = target!
+      const index = cangGan.findIndex(item => item?.name === targetGan.name)
+
+      if (index !== -1) {
+        const { type: qiType, name: qiName } = qiOptions[index]
+        const desc = `${ZhuIndexMap[zhuIndex]}地支${qiName}透干${ZhuIndexMap[targetZhuIndex]}天干${targetGan.name}`
+        const touGan = {
+          name: targetGan.name,
+          qiType,
+          zhuIndex,
+          targetZhuIndex,
+          desc,
+        }
+
+        if (!cangGan[index].touGan) cangGan[index].touGan = []
+        cangGan[index].touGan.push(targetZhuIndex)
+
+        touGans.push(touGan)
+      }
+    }
+  }
+
+  bazi.touGans = touGans
 }
 
 export type GetBaziParams = {
@@ -749,55 +856,6 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 流年
   const liuNian = await getLiuNian(solarDate.year, nianZhu)
 
-  // 五行旺衰
-  const getWxWangShuai = (yueZhi: Zhi): WxWangShuai[] =>
-    WU_XING_WANG_SHUAI.find(item => item[0] === yueZhi.name)!
-      .slice(1)
-      .map(([name, wangShuai, value]) => ({
-        name,
-        wangShuai,
-        value,
-      }))
-
-  // 各柱十神、星运、自坐、六甲旬空
-  ;[
-    // 四柱十神
-    nianZhu,
-    yueZhu,
-    riZhu,
-    shiZhu,
-    taiXi,
-    // 三垣十神
-    taiYuan,
-    mingGong,
-    shenGong,
-    // 变星十神
-    bianXing,
-  ].forEach(zhu => initExtra(riZhu.gan, zhu))
-  // 大运十神
-  daYun.yuns.forEach(yun => initExtra(riZhu.gan, yun))
-  // 流年十神
-  liuNian.forEach(nian => initExtra(riZhu.gan, nian))
-
-  /** 初始化日柱空亡关系 */
-  // 截路空亡
-  getJieLuKongWang(riZhu)
-  // 四大空亡
-  getSiDaKongWang(riZhu)
-  // 五鬼空亡
-  getWuGuiKongWang(riZhu)
-  // 克害空亡
-  getKeHaiKongWang(riZhu)
-  // 破祖空亡
-  getPoZuKongWang(riZhu)
-  /**
-   * todo
-   * 1. 判断各柱是否犯空亡（六甲旬空），所犯空亡十神、是否真空亡、空亡互换
-   * 2. 判断各柱是否犯截路空亡、四大空亡、五鬼空亡、克害空亡、破祖空亡
-   * 3. 判断各柱是否犯五行空亡
-   * 4. 盲派空亡判断，是否命空、神空、禄空、魂空、真空、三空相会
-   */
-
   const wuXingWangShuai = getWxWangShuai(yueZhi)
 
   const bazi = {
@@ -820,8 +878,11 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
   // 当前大运
   const currentSolarDate = await getSolarDate(new Date(), longitude)
   setCurrentYun(bazi, currentSolarDate.year)
+  // 当前流年
   setCurrentLiuNian(bazi, currentSolarDate.year)
+  // 当前流月
   await setCurrentLiuYue(bazi, currentSolarDate.year, currentSolarDate.lunar!.month)
+  // 当前流日
   await setCurrentLiuRi(
     bazi,
     currentSolarDate.year,
@@ -829,6 +890,7 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     currentSolarDate.day,
     currentSolarDate.hour
   )
+  // 当前流时
   await setCurrentLiuShi(
     bazi,
     currentSolarDate.year,
@@ -837,6 +899,56 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     currentSolarDate.hour
   )
 
+  // 各柱十神、星运、自坐、六甲旬空
+  ;[
+    // 四柱十神
+    nianZhu,
+    yueZhu,
+    riZhu,
+    shiZhu,
+    taiXi,
+    // 三垣十神
+    taiYuan,
+    mingGong,
+    shenGong,
+    // 变星十神
+    bianXing,
+    // 大运十神
+    ...daYun.yuns,
+    // 流年十神
+    ...liuNian,
+    // 流月十神
+    bazi.curLiuYue,
+    // 流日十神
+    bazi.curLiuRi,
+    // 流时十神
+    bazi.curLiuShi,
+  ]
+    .filter(Boolean)
+    .forEach(zhu => initExtra(riZhu.gan, zhu!))
+
+  /** 初始化日柱空亡关系 */
+  // 截路空亡
+  getJieLuKongWang(riZhu)
+  // 四大空亡
+  getSiDaKongWang(riZhu)
+  // 五鬼空亡
+  getWuGuiKongWang(riZhu)
+  // 克害空亡
+  getKeHaiKongWang(riZhu)
+  // 破祖空亡
+  getPoZuKongWang(riZhu)
+  /**
+   * todo
+   * 1. 判断各柱是否犯空亡（六甲旬空），所犯空亡十神、是否真空亡、空亡互换
+   * 2. 判断各柱是否犯截路空亡、四大空亡、五鬼空亡、克害空亡、破祖空亡
+   * 3. 判断各柱是否犯五行空亡
+   * 4. 盲派空亡判断，是否命空、神空、禄空、魂空、真空、三空相会
+   */
+
+  // 初始化透干
+  initTouGans(bazi)
+  // 初始化各柱关系
   initZhuRelation(bazi)
 
   return bazi
@@ -978,48 +1090,18 @@ const getZhuDoubleRelation = (zhu: Zhu, other: Zhu): ZhuRelation[] => {
   return relations
 }
 
+/** 初始化各柱关系 */
 export const initZhuRelation = (bazi: Bazi) => {
-  const {
-    nianZhu,
-    yueZhu,
-    riZhu,
-    shiZhu,
-    taiYuan,
-    mingGong,
-    shenGong,
-    taiXi,
-    bianXing,
-    curDaYun,
-    curLiuNian,
-    curLiuYue,
-    curLiuRi,
-    curLiuShi,
-  } = bazi
+  const { compareZhuList, zhuList } = getComparations(bazi)
 
-  const relations: ZhuRelation[] = []
   // 处理两两关系， 天干地支、合害刑冲克
-  const compareZhuList = [
-    nianZhu,
-    yueZhu,
-    riZhu,
-    shiZhu,
-    taiYuan,
-    mingGong,
-    shenGong,
-    taiXi,
-    bianXing,
-    curDaYun,
-    curLiuNian,
-    curLiuYue,
-    curLiuRi,
-    curLiuShi,
-  ]
-  const zhuList = [nianZhu, yueZhu, riZhu, shiZhu]
+  const relations: ZhuRelation[] = []
 
   for (const zhu of zhuList) {
     for (const other of compareZhuList) {
+      // 排除自身
       if (zhu?.zhuIndex === other?.zhuIndex) continue
-      relations.push(...getZhuDoubleRelation(zhu!, other!))
+      relations.push(...getZhuDoubleRelation(zhu!, other!)) // 天干地支、合害刑冲克
     }
   }
 
