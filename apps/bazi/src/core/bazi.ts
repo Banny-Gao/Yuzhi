@@ -782,22 +782,22 @@ const initTouGans = (bazi: Bazi) => {
       const { gan: targetGan, zhuIndex: targetZhuIndex } = target!
       const index = cangGan.findIndex(item => item?.name === targetGan.name)
 
-      if (index !== -1) {
-        const { type: qiType, name: qiName } = qiOptions[index]
-        const desc = `${ZhuIndexMap[zhuIndex]}地支${qiName}透干${ZhuIndexMap[targetZhuIndex]}天干${targetGan.name}`
-        const touGan = {
-          name: targetGan.name,
-          qiType,
-          zhuIndex,
-          targetZhuIndex,
-          desc,
-        }
+      if (!~index) continue
 
-        if (!cangGan[index].touGan) cangGan[index].touGan = []
-        cangGan[index].touGan.push(targetZhuIndex)
-
-        touGans.push(touGan)
+      const { type: qiType, name: qiName } = qiOptions[index]
+      const desc = `${ZhuIndexMap[zhuIndex]}地支${qiName}透干${ZhuIndexMap[targetZhuIndex]}天干${targetGan.name}`
+      const touGan = {
+        name: targetGan.name,
+        qiType,
+        zhuIndex,
+        targetZhuIndex,
+        desc,
       }
+
+      if (!cangGan[index].touGan) cangGan[index].touGan = []
+      cangGan[index].touGan.push(targetZhuIndex)
+
+      touGans.push(touGan)
     }
   }
 
