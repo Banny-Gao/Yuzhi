@@ -8,6 +8,7 @@ import {
   ZHI_HE,
   ZHI_SAN_HUI,
   ZHI_SAN_HE,
+  ZHI_SAN_XING,
   SHENG_WANG,
   MU_WANG,
   SHENG_MU,
@@ -57,6 +58,7 @@ declare global {
     chong: ReturnType<typeof zhiChong> // 冲
     po: ReturnType<typeof zhiPo> // 破
     xing: ReturnType<typeof zhiXing> // 刑
+    sanXing: ReturnType<typeof zhiSanXing> // 三刑
     anHe: ReturnType<typeof zhiAnHe> // 暗合
     shiShen: ReturnType<typeof getShiShen> // 十神
     organ: (typeof ZHI_OTHERS)[number][1] // 器官
@@ -117,14 +119,14 @@ declare global {
 const reflectionOfThree = <T extends readonly (readonly string[])[]>(
   zhi: Zhi,
   names: T,
-  transformDesc: (desc: string) => Record<string, string>
+  transformDesc?: (desc: string) => Record<string, string>
 ) => {
   for (const item of names) {
     const [desc, ...targetNames] = [...item].reverse()
     if (targetNames.includes(zhi.name)) {
       return {
         targetNames: targetNames.filter(name => name !== zhi.name) as ZhiName[],
-        ...transformDesc(desc),
+        ...transformDesc?.(desc),
       }
     }
   }
@@ -276,7 +278,7 @@ export const getZhongQi = (zhi: Zhi): QiName => {
   return null
 }
 
-function getZhiCangGan(this: Zhi): ((Gan & any) | null)[] {
+function getZhiCangGan(this: Zhi): ((Gan & { touGan?: any }) | null)[] {
   return ZHI_CANG_GAN.find(item => item[0] === this.name)!
     .slice(1)
     .map(name => (name ? (getObjectByName(tianGans, name) as Gan) : null))
@@ -455,6 +457,13 @@ function zhiXing(this: Zhi, target?: Zhi | ZhiName): ZhiXing | undefined {
   })
 }
 
+/* 地支三合 */
+function zhiSanXing(this: Zhi) {
+  return reflectionOfThree(this, [...ZHI_SAN_XING], desc => ({
+    desc,
+  }))
+}
+
 function zhiAnHe(this: Zhi, target?: Zhi | ZhiName): ZhiAnHe | ZhiAnHe[] | undefined {
   if (!target) {
     const groups = getGroups([...ZHI_AN_HE])
@@ -516,6 +525,7 @@ export const diZhis = ZHI_NAME.map((name, index) => {
   diZhi.chong = zhiChong.call(diZhi)
   diZhi.po = zhiPo.call(diZhi)
   diZhi.xing = zhiXing.call(diZhi)
+  diZhi.sanXing = zhiSanXing.call(diZhi)
   diZhi.anHe = zhiAnHe.call(diZhi)
   diZhi.shiShen = getShiShen.call(diZhi)
 

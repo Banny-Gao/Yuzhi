@@ -169,6 +169,8 @@ export const NOUN = {
   xiu: '休',
   qiu: '囚',
   touGan: '透干',
+  deLing: '得令',
+  deSheng: '得生',
 }
 
 /** 季节 */
@@ -729,7 +731,7 @@ export const ZHI_PO = [
   ['辰', '丑'],
   ['戌', '未'],
 ] as const
-/** 地支三刑 */
+/** 地支相刑 */
 export const ZHI_XING = [
   ['寅', '巳', '无恩之刑'],
   ['巳', '申', '无恩之刑'],
@@ -743,6 +745,12 @@ export const ZHI_XING = [
   ['酉', '酉', '自刑之刑'],
   ['亥', '亥', '自刑之刑'],
 ] as const
+/** 地支三刑 */
+export const ZHI_SAN_XING = [
+  ['寅', '巳', '申', '无恩之刑'],
+  ['丑', '戌', '未', '恃势之刑'],
+] as const
+
 /** 地支暗合 */
 export const ZHI_AN_HE = [
   ['寅', '丑', '通合'],
