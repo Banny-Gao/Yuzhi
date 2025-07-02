@@ -100,7 +100,7 @@ function getGanPlace(this: Gan): TwelvePlace[] {
 }
 /** 获取十天干 */
 export const tianGans = GAN_NAME.map((name, index) => {
-  const tianGan = {
+  const gan = {
     ...generateNamesProp(
       {
         tianWen: GAN_TIAN_WEN,
@@ -127,10 +127,10 @@ export const tianGans = GAN_NAME.map((name, index) => {
     organ: GAN_OTHERS.find(([ganName]) => ganName === name)?.[5],
   } as Gan
 
-  tianGan.he = ganHe.call(tianGan)
-  tianGan.chong = ganChong.call(tianGan)
-  tianGan.shiShen = getShiShen.call(tianGan)
-  tianGan.twelvePlace = getGanPlace.call(tianGan)
+  gan.he = ganHe.call(gan)
+  gan.chong = ganChong.call(gan)
+  gan.shiShen = getShiShen.call(gan)
+  gan.twelvePlace = getGanPlace.call(gan)
 
-  return tianGan
+  return gan
 })

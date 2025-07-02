@@ -46,8 +46,8 @@ export const NOUN = {
   ke: '我克者',
   sheng: '我生者',
   liuShen: '六神',
-  tianGan: '天干',
-  diZhi: '地支',
+  gan: '天干',
+  zhi: '地支',
   tianWen: '天文',
   position: '方位',
   character: '性格特征',
@@ -171,6 +171,12 @@ export const NOUN = {
   touGan: '透干',
   deLing: '得令',
   deSheng: '得生',
+  deZhu: '得助',
+  tongGen: '通根',
+  qiangGen: '强根',
+  zhongGen: '中根',
+  ruoGen: '弱根',
+  deDi: '得地',
 }
 
 /** 季节 */

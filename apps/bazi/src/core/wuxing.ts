@@ -39,8 +39,8 @@ declare global {
     wuWei: WuWeiName
     wuZhi: WuZhiName
     liuShen: LiuShenName
-    tianGan: GanName
-    diZhi: ZhiName
+    gan: GanName
+    zhi: ZhiName
     seasonName: SeasonName
   }>
 }
@@ -94,8 +94,8 @@ export const getWuxings = (): WuXing[] =>
           wuSe: WU_SE_NAME,
           wuChang: WU_CHANG_NAME,
           liuShen: WX_LIUSHEN,
-          tianGan: WX_TIAN_GAN,
-          diZhi: WX_DI_ZHI,
+          gan: WX_TIAN_GAN,
+          zhi: WX_DI_ZHI,
           seasonName: ['春', '夏', '四季末', '秋', '冬'],
         },
         index

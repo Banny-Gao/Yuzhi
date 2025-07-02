@@ -491,7 +491,7 @@ function zhiAnHe(this: Zhi, target?: Zhi | ZhiName): ZhiAnHe | ZhiAnHe[] | undef
 }
 
 export const diZhis = ZHI_NAME.map((name, index) => {
-  const diZhi = {
+  const zhi = {
     ...generateNamesProp(
       {
         dili: DI_LI_NAME,
@@ -513,21 +513,21 @@ export const diZhis = ZHI_NAME.map((name, index) => {
     shenTiFa: ZHI_OTHERS.find(([zhiName]) => zhiName === name)?.[6],
   } as Zhi
 
-  diZhi.sanHui = sanHui.call(diZhi)
-  diZhi.sanHe = sanHe.call(diZhi)
-  diZhi.banHe = zhiBanHe.call(diZhi)
-  // diZhi.benQi = getBenQi(diZhi)
-  // diZhi.yuQi = getYuQi(diZhi)
-  // diZhi.zhongQi = getZhongQi(diZhi)
-  diZhi.cangGan = getZhiCangGan.call(diZhi)
-  diZhi.he = zhiHe.call(diZhi)
-  diZhi.hai = zhiHai.call(diZhi)
-  diZhi.chong = zhiChong.call(diZhi)
-  diZhi.po = zhiPo.call(diZhi)
-  diZhi.xing = zhiXing.call(diZhi)
-  diZhi.sanXing = zhiSanXing.call(diZhi)
-  diZhi.anHe = zhiAnHe.call(diZhi)
-  diZhi.shiShen = getShiShen.call(diZhi)
+  zhi.sanHui = sanHui.call(zhi)
+  zhi.sanHe = sanHe.call(zhi)
+  zhi.banHe = zhiBanHe.call(zhi)
+  // zhi.benQi = getBenQi(zhi)
+  // zhi.yuQi = getYuQi(zhi)
+  // zhi.zhongQi = getZhongQi(zhi)
+  zhi.cangGan = getZhiCangGan.call(zhi)
+  zhi.he = zhiHe.call(zhi)
+  zhi.hai = zhiHai.call(zhi)
+  zhi.chong = zhiChong.call(zhi)
+  zhi.po = zhiPo.call(zhi)
+  zhi.xing = zhiXing.call(zhi)
+  zhi.sanXing = zhiSanXing.call(zhi)
+  zhi.anHe = zhiAnHe.call(zhi)
+  zhi.shiShen = getShiShen.call(zhi)
 
-  return diZhi
+  return zhi
 })

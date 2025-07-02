@@ -76,20 +76,35 @@ export enum ZhuRelationType {
 }
 
 declare global {
-  type DeSheng = {
+  type De = {
     zhuIndex: ZhuIndex
     type: 'gan' | 'zhi'
     targetType: 'gan' | 'zhi'
+    desc: string
   }
+  type DeSheng = De
+  type DeZhu = De
+  type TongGen = {
+    zhuIndex: ZhuIndex
+    genType: 'qiangGen' | 'zhongGen' | 'ruoGen'
+    desc: string
+  }
+
   export type BaziZhi = Zhi & {
-    deLing?: boolean
-    deSheng?: DeSheng[]
-    sourceDeSheng?: DeSheng[]
+    deLing?: boolean // 得令
+    deSheng?: DeSheng[] // 得生助
+    sourceDeSheng?: DeSheng[] // 原局得生助
+    deZhu?: DeZhu[] // 得同助
+    sourceDeZhu?: DeZhu[] // 原局得同助
   }
   export type BaziGan = Gan & {
     deLing?: boolean
     deSheng?: DeSheng[]
     sourceDeSheng?: DeSheng[]
+    deZhu?: DeZhu[]
+    sourceDeZhu?: DeZhu[]
+    tongGen?: TongGen[]
+    sourceTongGen?: TongGen[]
   }
   export type Zhu = IndexField<{
     index: number // 六十甲子索引
@@ -202,6 +217,7 @@ declare global {
     sourceRelations: ZhuRelation[] // 原局干支关系
     wuXingWangShuai: WxWangShuai[]
     touGans?: TouGan[]
+    sourceTouGans?: TouGan[]
   }
 }
 
@@ -743,11 +759,11 @@ const getComparations = (bazi: Bazi) => {
     yueZhu,
     riZhu,
     shiZhu,
-    // taiYuan,
-    // mingGong,
-    // shenGong,
-    // taiXi,
-    // bianXing,
+    taiYuan,
+    mingGong,
+    shenGong,
+    taiXi,
+    bianXing,
     curDaYun,
     curLiuNian,
     curLiuYue,
@@ -755,67 +771,153 @@ const getComparations = (bazi: Bazi) => {
     curLiuShi,
   } = bazi
 
-  const compareZhuList = [
-    nianZhu,
-    yueZhu,
-    riZhu,
-    shiZhu,
-    // taiYuan,
-    // mingGong,
-    // shenGong,
-    // taiXi,
-    // bianXing,
-    curDaYun,
-    curLiuNian,
-    curLiuYue,
-    curLiuRi,
-    curLiuShi,
-  ]
+  const yunZhuList = [curDaYun, curLiuNian, curLiuYue, curLiuRi, curLiuShi]
   const zhuList = [nianZhu, yueZhu, riZhu, shiZhu]
+  const mingZhuList = [taiYuan, mingGong, shenGong, taiXi, bianXing]
 
   return {
-    compareZhuList,
-    zhuList,
+    yunZhuList, // 运柱
+    zhuList, // 原局柱
+    mingZhuList, // 命宫柱
+  }
+}
+
+const getTouGan = (zhu: Zhu, target: Zhu) => {
+  const {
+    zhi: { cangGan },
+    zhuIndex,
+  } = zhu
+  const { gan: targetGan, zhuIndex: targetZhuIndex } = target!
+  const index = cangGan.findIndex(item => item?.name === targetGan.name)
+
+  if (!~index) return null
+
+  const { type: qiType, name: qiName } = qiOptions[index]
+  const desc = `${ZhuIndexMap[zhuIndex]}地支${qiName}透干${ZhuIndexMap[targetZhuIndex]}天干${targetGan.name}`
+  const tou = {
+    name: targetGan.name,
+    qiType,
+    zhuIndex,
+    targetZhuIndex,
+    desc,
+  }
+
+  if (!cangGan[index]?.touGan) cangGan[index]!.touGan = []
+  cangGan[index]!.touGan.push(tou) // 记录透干
+
+  return tou
+}
+
+/** 判断是否通根，本气透出为强根，中气透出为中根，余气透出为弱根 */
+const tongGenTypeMap = {
+  [QiEnum.benQi]: 'qiangGen',
+  [QiEnum.zhongQi]: 'zhongGen',
+  [QiEnum.yuQi]: 'ruoGen',
+} as const
+
+const getTongGen = (zhu: Zhu, target: Zhu, touGan: TouGan): TongGen => {
+  const { qiType } = touGan
+  const genType = tongGenTypeMap[qiType]
+  const qiName = qiOptions.find(item => item.type === qiType)!.name
+
+  return {
+    zhuIndex: target.zhuIndex,
+    genType,
+    desc: `${ZhuIndexMap[zhu.zhuIndex]}天干${zhu.gan.name}通根${ZhuIndexMap[target.zhuIndex]}地支${target.zhi.name}${qiName}, 得${NOUN[genType]}`,
   }
 }
 
 // 藏干透干
 const initTouGans = (bazi: Bazi) => {
-  const { compareZhuList, zhuList } = getComparations(bazi)
+  const { yunZhuList, zhuList } = getComparations(bazi)
 
   const touGans: TouGan[] = []
+  const sourceTouGans: TouGan[] = []
 
   for (const zhu of zhuList) {
-    for (const target of compareZhuList) {
-      if (zhu.zhuIndex === target!.zhuIndex) continue
+    for (const target of zhuList) {
+      const tou = getTouGan(zhu, target!)
 
-      const {
-        zhi: { cangGan },
-        zhuIndex,
-      } = zhu
-      const { gan: targetGan, zhuIndex: targetZhuIndex } = target!
-      const index = cangGan.findIndex(item => item?.name === targetGan.name)
+      if (!tou) continue
+      // 原局透干
+      sourceTouGans.push(tou)
+      // 原局通根
+      const tongGen = getTongGen(target!, zhu, tou)
+      if (!target!.gan.sourceTongGen) target!.gan.sourceTongGen = []
+      target!.gan.sourceTongGen.push(tongGen)
+    }
 
-      if (!~index) continue
+    for (const target of yunZhuList) {
+      const tou = getTouGan(zhu, target!)
 
-      const { type: qiType, name: qiName } = qiOptions[index]
-      const desc = `${ZhuIndexMap[zhuIndex]}地支${qiName}透干${ZhuIndexMap[targetZhuIndex]}天干${targetGan.name}`
-      const touGan = {
-        name: targetGan.name,
-        qiType,
-        zhuIndex,
-        targetZhuIndex,
-        desc,
-      }
+      if (!tou) continue
 
-      if (!cangGan[index]?.touGan) cangGan[index]!.touGan = []
-      cangGan[index]!.touGan.push(targetZhuIndex) // 记录透干
-
-      touGans.push(touGan)
+      // 运柱透干
+      touGans.push(tou)
+      // 运柱通根
+      const tongGen = getTongGen(target!, zhu, tou)
+      if (!target!.gan.tongGen) target!.gan.tongGen = []
+      target!.gan.tongGen.push(tongGen)
     }
   }
 
   bazi.touGans = touGans
+  bazi.sourceTouGans = sourceTouGans
+}
+
+/** 判断是否得生助, 本版本不考虑地支藏干生助 */
+const getDeSheng = (zhu: Zhu, target: Zhu) => {
+  const isGanDeZhiSheng = zhu.gan.wuXing.shengWo.targetName === target.zhi.wuXing.name
+  const isZhiDeGanSheng = zhu.zhi.wuXing.shengWo.targetName === target.gan.wuXing.name
+  let isGanDeGanSheng = false
+  let isZhiDeZhiSheng = false
+
+  if (zhu.zhuIndex !== target.zhuIndex) {
+    isGanDeGanSheng = zhu.gan.wuXing.shengWo.targetName === target.gan.wuXing.name
+    isZhiDeZhiSheng = zhu.zhi.wuXing.shengWo.targetName === target.zhi.wuXing.name
+  }
+
+  const type =
+    ((isGanDeZhiSheng || isGanDeGanSheng) && 'gan') || ((isZhiDeZhiSheng || isZhiDeGanSheng) && 'zhi') || null
+  let targetType
+  switch (type) {
+    case 'gan':
+      targetType = isGanDeZhiSheng ? 'zhi' : isGanDeGanSheng ? 'gan' : null
+      break
+    case 'zhi':
+      targetType = isZhiDeZhiSheng ? 'zhi' : isZhiDeGanSheng ? 'gan' : null
+  }
+
+  const desc = `${ZhuIndexMap[target.zhuIndex]}${NOUN[targetType]}${target[targetType!]?.name},生助${ZhuIndexMap[zhu.zhuIndex]}${NOUN[type!]}${zhu[type!]?.name}`
+
+  return targetType ? ({ zhuIndex: target.zhuIndex, targetType, type, desc } as DeSheng) : null
+}
+
+/** 判断是否得同助，本版本不考虑地支藏干同助 */
+const getDeZhu = (zhu: Zhu, target: Zhu) => {
+  const isGanDeZhiTong = zhu.gan.wuXing.name === target.zhi.wuXing.name
+  const isZhiDeGanTong = zhu.zhi.wuXing.name === target.gan.wuXing.name
+  let isGanDeGanTong = false
+  let isZhiDeZhiTong = false
+
+  if (zhu.zhuIndex !== target.zhuIndex) {
+    isGanDeGanTong = zhu.gan.wuXing.name === target.gan.wuXing.name
+    isZhiDeZhiTong = zhu.zhi.wuXing.name === target.zhi.wuXing.name
+  }
+
+  const type = ((isGanDeZhiTong || isGanDeGanTong) && 'gan') || ((isZhiDeZhiTong || isZhiDeGanTong) && 'zhi') || null
+  let targetType
+  switch (type) {
+    case 'gan':
+      targetType = isGanDeZhiTong ? 'zhi' : isGanDeGanTong ? 'gan' : null
+      break
+    case 'zhi':
+      targetType = isZhiDeZhiTong ? 'zhi' : isZhiDeGanTong ? 'gan' : null
+  }
+
+  const desc = `${ZhuIndexMap[target.zhuIndex]}${NOUN[targetType]}${target[targetType!]?.name},同助${ZhuIndexMap[zhu.zhuIndex]}${NOUN[type!]}${zhu[type!]?.name}`
+
+  return targetType ? ({ zhuIndex: target.zhuIndex, targetType, type, desc } as DeZhu) : null
 }
 
 // 初始化得令, 得生、得助...
@@ -831,51 +933,42 @@ const initDe = (bazi: Bazi) => {
     zhu.gan.deLing = zhu.gan.wuXing.name === yueZhu.zhi.wuXing.name
   })
 
-  const { compareZhuList, zhuList } = getComparations(bazi)
-  const getDeSheng = (zhu: Zhu, target: Zhu) => {
-    const isGanDeZhiSheng = zhu.gan.wuXing.shengWo.targetName === target.zhi.wuXing.name
-    const isZhiDeGanSheng = zhu.zhi.wuXing.shengWo.targetName === target.gan.wuXing.name
-    let isGanDeGanSheng = false
-    let isZhiDeZhiSheng = false
-
-    if (zhu.zhuIndex !== target.zhuIndex) {
-      isGanDeGanSheng = zhu.gan.wuXing.shengWo.targetName === target.gan.wuXing.name
-      isZhiDeZhiSheng = zhu.zhi.wuXing.shengWo.targetName === target.zhi.wuXing.name
-    }
-
-    const type =
-      ((isGanDeZhiSheng || isGanDeGanSheng) && 'gan') || ((isZhiDeZhiSheng || isZhiDeGanSheng) && 'zhi') || null
-    let targetType
-    switch (type) {
-      case 'gan':
-        targetType = isGanDeZhiSheng ? 'zhi' : isGanDeGanSheng ? 'gan' : null
-        break
-      case 'zhi':
-        targetType = isZhiDeZhiSheng ? 'zhi' : isZhiDeGanSheng ? 'gan' : null
-    }
-
-    return targetType ? ({ zhuIndex: target.zhuIndex, targetType, type } as DeSheng) : null
-  }
+  const { yunZhuList, zhuList } = getComparations(bazi)
 
   for (const zhu of zhuList) {
     // 判断是否得生
     const sourceDeSheng: DeSheng[] = []
     const deSheng: DeSheng[] = []
+    // 判断是否得助
+    const sourceDeZhu: DeZhu[] = []
+    const deZhu: DeZhu[] = []
 
     for (const target of zhuList) {
-      const result = getDeSheng(zhu, target)
-      result && sourceDeSheng.push(result)
+      const shengZhu = getDeSheng(zhu, target)
+      shengZhu && sourceDeSheng.push(shengZhu)
+
+      const tongZhu = getDeZhu(zhu, target)
+      tongZhu && sourceDeZhu.push(tongZhu)
     }
 
-    for (const target of compareZhuList) {
-      const result = getDeSheng(zhu, target!)
-      result && deSheng.push(result)
+    for (const target of yunZhuList) {
+      const shengZhu = getDeSheng(zhu, target!)
+      shengZhu && deSheng.push(shengZhu)
+
+      const tongZhu = getDeZhu(zhu, target!)
+      tongZhu && deZhu.push(tongZhu)
     }
 
+    // 得生助
     zhu.gan.deSheng = deSheng.filter(item => item.type === 'gan')
     zhu.zhi.deSheng = deSheng.filter(item => item.type === 'zhi')
     zhu.gan.sourceDeSheng = sourceDeSheng.filter(item => item.type === 'gan')
     zhu.zhi.sourceDeSheng = sourceDeSheng.filter(item => item.type === 'zhi')
+    // 得同助
+    zhu.gan.deZhu = deZhu.filter(item => item.type === 'gan')
+    zhu.zhi.deZhu = deZhu.filter(item => item.type === 'zhi')
+    zhu.gan.sourceDeZhu = sourceDeZhu.filter(item => item.type === 'gan')
+    zhu.zhi.sourceDeZhu = sourceDeZhu.filter(item => item.type === 'zhi')
   }
 }
 
@@ -1003,6 +1096,13 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
     .filter(Boolean)
     .forEach(zhu => initExtra(riZhu.gan, zhu!))
 
+  // 初始化透干
+  initTouGans(bazi)
+  // 初始化得令, 得生、得助...
+  initDe(bazi)
+  // 初始化各柱关系
+  initZhuRelation(bazi)
+
   /** 初始化日柱空亡关系 */
   // 截路空亡
   getJieLuKongWang(riZhu)
@@ -1021,13 +1121,6 @@ export const getBazi = async ({ date, longitude, gender }: GetBaziParams): Promi
    * 3. 判断各柱是否犯五行空亡
    * 4. 盲派空亡判断，是否命空、神空、禄空、魂空、真空、三空相会
    */
-
-  // 初始化透干
-  initTouGans(bazi)
-  // 初始化得令, 得生、得助...
-  initDe(bazi)
-  // 初始化各柱关系
-  initZhuRelation(bazi)
 
   return bazi
 }
@@ -1171,7 +1264,7 @@ const getZhuDoubleRelation = (zhu: Zhu, other: Zhu): ZhuRelation[] => {
 
 /** 初始化各柱关系 */
 export const initZhuRelation = (bazi: Bazi) => {
-  const { compareZhuList, zhuList } = getComparations(bazi)
+  const { yunZhuList, zhuList } = getComparations(bazi)
 
   // 处理两两关系， 天干地支、合害刑冲克
   const sourceRelations: ZhuRelation[] = []
@@ -1184,7 +1277,7 @@ export const initZhuRelation = (bazi: Bazi) => {
       sourceRelations.push(...getZhuDoubleRelation(zhu!, other!)) // 天干地支、合害刑冲克
     }
 
-    for (const other of compareZhuList) {
+    for (const other of yunZhuList) {
       // 排除自身
       if (zhu?.zhuIndex === other?.zhuIndex) continue
       relations.push(...getZhuDoubleRelation(zhu!, other!)) // 天干地支、合害刑冲克
