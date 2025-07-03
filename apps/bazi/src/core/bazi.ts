@@ -75,6 +75,15 @@ export enum ZhuRelationType {
   zhiAnHe,
 }
 
+enum DeDiType {
+  deLing, // 得令
+  deSheng, // 得生
+  deZhu, // 得助
+  linGuan, // 临官
+  diWang, // 帝旺
+  mu, // 库
+}
+
 declare global {
   type De = {
     zhuIndex: ZhuIndex
@@ -87,6 +96,12 @@ declare global {
   type TongGen = {
     zhuIndex: ZhuIndex
     genType: 'qiangGen' | 'zhongGen' | 'ruoGen'
+    desc: string
+  }
+  type DeDi = {
+    zhuIndex: ZhuIndex
+    type: DeDiType
+    targetType: 'gan' | 'zhi'
     desc: string
   }
 
@@ -105,6 +120,8 @@ declare global {
     sourceDeZhu?: DeZhu[]
     tongGen?: TongGen[]
     sourceTongGen?: TongGen[]
+    deDi?: DeDi[]
+    sourceDeDi?: DeDi[]
   }
   export type Zhu = IndexField<{
     index: number // 六十甲子索引
@@ -215,9 +232,9 @@ declare global {
     curLiuShi?: LiuShi // 当前流时
     relations: ZhuRelation[] // 各柱干支关系
     sourceRelations: ZhuRelation[] // 原局干支关系
-    wuXingWangShuai: WxWangShuai[]
-    touGans?: TouGan[]
-    sourceTouGans?: TouGan[]
+    wuXingWangShuai: WxWangShuai[] // 五行旺衰
+    touGans?: TouGan[] // 行运透干
+    sourceTouGans?: TouGan[] // 原局透干
   }
 }
 
@@ -434,7 +451,7 @@ const getMingGong = (lunarDate: LunarDate, nianZhu: Zhu, shiZhi: Zhi): Zhu => {
   const monthOffset = 1 - lunarDate.month
   const maoOffset = (3 - shiZhi.index + 12) % 12
 
-  const zhiIndex = monthOffset + maoOffset
+  const zhiIndex = (monthOffset + maoOffset + 12) % 12
   const firstMonthGanIndex = nianZhu.gan.wuHudun.targetIndex
 
   const ganIndex = (firstMonthGanIndex + zhiIndex + 10) % 10
@@ -771,7 +788,8 @@ const getComparations = (bazi: Bazi) => {
     curLiuShi,
   } = bazi
 
-  const yunZhuList = [curDaYun, curLiuNian, curLiuYue, curLiuRi, curLiuShi]
+  // 大运可能还未起
+  const yunZhuList = [curDaYun, curLiuNian, curLiuYue, curLiuRi, curLiuShi].filter(Boolean)
   const zhuList = [nianZhu, yueZhu, riZhu, shiZhu]
   const mingZhuList = [taiYuan, mingGong, shenGong, taiXi, bianXing]
 
@@ -920,17 +938,72 @@ const getDeZhu = (zhu: Zhu, target: Zhu) => {
   return targetType ? ({ zhuIndex: target.zhuIndex, targetType, type, desc } as DeZhu) : null
 }
 
-// 初始化得令, 得生、得助...
+const getDeDi = (type: DeDiType, zhu: Zhu, target: Zhu, targetType: 'gan' | 'zhi'): DeDi => {
+  const zhuName = ZhuIndexMap[zhu.zhuIndex]
+  const ganName = zhu.gan.name
+  const wxName = zhu.gan.wuXing.name
+
+  const targetZhuName = ZhuIndexMap[target.zhuIndex]
+  const targetTypeName = NOUN[targetType]
+  const targetName = target[targetType]?.name
+
+  let desc = `${zhuName}天干${ganName}`
+
+  switch (type) {
+    case DeDiType.deLing:
+      desc += `得令`
+      break
+    case DeDiType.deSheng:
+      desc += `得${targetZhuName}${targetTypeName}${targetName}生助`
+      break
+    case DeDiType.deZhu:
+      desc += `得${targetZhuName}${targetTypeName}${targetName}同助`
+      break
+    case DeDiType.linGuan:
+      desc += `禄在${targetZhuName}${targetTypeName}${targetName}`
+      break
+    case DeDiType.diWang:
+      desc += `刃在${targetZhuName}${targetTypeName}${targetName}`
+      break
+    case DeDiType.mu:
+      desc += `逢月令${wxName}库`
+      break
+  }
+  desc += '得地'
+
+  return { zhuIndex: target.zhuIndex, type, targetType, desc } as DeDi
+}
+
+// 初始化得令, 得生、得助、得地...
 const initDe = (bazi: Bazi) => {
   const { yueZhu, ...extra } = bazi
 
-  const extraZhu = Object.values(extra).filter((item: any) => item.zhuIndex !== void 0)
+  const extraZhu = Object.values(extra)
+    .filter(Boolean)
+    .filter((item: any) => item.zhuIndex !== void 0)
   // 判断是否得令
-  yueZhu.gan.deLing = yueZhu.gan.wuXing.name === yueZhu.zhi.wuXing.name
+  const yueGanDeLing = yueZhu.gan.wuXing.name === yueZhu.zhi.wuXing.name
+  yueZhu.gan.deLing = yueGanDeLing
+  yueZhu.gan.sourceDeDi = []
+  // 月干得令得地
+  yueGanDeLing && yueZhu.gan.sourceDeDi.push(getDeDi(DeDiType.deLing, yueZhu, yueZhu, 'zhi'))
+  // 阳干逢月令为库得地
+  const isKu = isYang(yueZhu.gan.yinYang) && yueZhu.gan.mu === yueZhu.zhi.name
+  isKu && yueZhu.gan.sourceDeDi.push(getDeDi(DeDiType.mu, yueZhu, yueZhu, 'zhi'))
+
   extraZhu.forEach((zhu: Zhu) => {
     // 得令
-    zhu.zhi.deLing = zhu.zhi.wuXing.name === yueZhu.zhi.wuXing.name
-    zhu.gan.deLing = zhu.gan.wuXing.name === yueZhu.zhi.wuXing.name
+    const isZhiDeLing = zhu.zhi.wuXing.name === yueZhu.zhi.wuXing.name
+    const isGanDeLing = zhu.gan.wuXing.name === yueZhu.zhi.wuXing.name
+    zhu.zhi.deLing = isZhiDeLing
+    zhu.gan.deLing = isGanDeLing
+
+    // 得令得地
+    if (!zhu.gan.sourceDeDi) zhu.gan.sourceDeDi = []
+    isGanDeLing && zhu.gan.sourceDeDi.push(getDeDi(DeDiType.deLing, zhu, yueZhu, 'zhi'))
+    // 阳干逢月令为库得地
+    const isKu = isYang(zhu.gan.yinYang) && zhu.gan.mu === yueZhu.zhi.name
+    isKu && zhu.gan.sourceDeDi.push(getDeDi(DeDiType.mu, zhu, yueZhu, 'zhi'))
   })
 
   const { yunZhuList, zhuList } = getComparations(bazi)
@@ -942,21 +1015,48 @@ const initDe = (bazi: Bazi) => {
     // 判断是否得助
     const sourceDeZhu: DeZhu[] = []
     const deZhu: DeZhu[] = []
+    // 判断是否得地
+    const sourceDeDi: DeDi[] = []
+    const deDi: DeDi[] = []
 
     for (const target of zhuList) {
       const shengZhu = getDeSheng(zhu, target)
       shengZhu && sourceDeSheng.push(shengZhu)
+      // 得生得地
+      shengZhu &&
+        shengZhu.type === 'gan' &&
+        sourceDeDi.push(getDeDi(DeDiType.deSheng, zhu, target, shengZhu.targetType))
 
       const tongZhu = getDeZhu(zhu, target)
       tongZhu && sourceDeZhu.push(tongZhu)
+      // 得助得地
+      tongZhu && tongZhu.type === 'gan' && sourceDeDi.push(getDeDi(DeDiType.deZhu, zhu, target, tongZhu.targetType))
+
+      // 临官得地
+      const isLinGuan = zhu.gan.linGuan === target.zhi.name
+      isLinGuan && sourceDeDi.push(getDeDi(DeDiType.linGuan, zhu, target, 'zhi'))
+      // 帝旺得地
+      const isDiWang = zhu.gan.diWang === target.zhi.name
+      isDiWang && sourceDeDi.push(getDeDi(DeDiType.diWang, zhu, target, 'zhi'))
     }
 
     for (const target of yunZhuList) {
       const shengZhu = getDeSheng(zhu, target!)
       shengZhu && deSheng.push(shengZhu)
+      // 得生得地
+      shengZhu && shengZhu.type === 'gan' && deDi.push(getDeDi(DeDiType.deSheng, zhu, target!, shengZhu.targetType))
 
       const tongZhu = getDeZhu(zhu, target!)
       tongZhu && deZhu.push(tongZhu)
+      // 得助得地
+      tongZhu && tongZhu.type === 'gan' && deDi.push(getDeDi(DeDiType.deZhu, zhu, target!, tongZhu.targetType))
+
+      // 临官得地
+      const isLinGuan = zhu.gan.linGuan === target!.zhi.name
+      isLinGuan && deDi.push(getDeDi(DeDiType.linGuan, zhu, target!, 'zhi'))
+      // 帝旺得地
+      const isDiWang = zhu.gan.diWang === target!.zhi.name
+      isDiWang && deDi.push(getDeDi(DeDiType.diWang, zhu, target!, 'zhi'))
     }
 
     // 得生助
@@ -969,6 +1069,9 @@ const initDe = (bazi: Bazi) => {
     zhu.zhi.deZhu = deZhu.filter(item => item.type === 'zhi')
     zhu.gan.sourceDeZhu = sourceDeZhu.filter(item => item.type === 'gan')
     zhu.zhi.sourceDeZhu = sourceDeZhu.filter(item => item.type === 'zhi')
+    // 得地
+    zhu.gan.deDi = deDi
+    zhu.gan.sourceDeDi = [...(zhu.gan.sourceDeDi ?? []), ...sourceDeDi]
   }
 }
 

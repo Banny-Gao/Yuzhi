@@ -31,6 +31,12 @@ declare global {
     chong: ReturnType<typeof ganChong> // 天干相冲
     twelvePlace: ReturnType<typeof getGanPlace> // 十二宫
     shiShen: ReturnType<typeof getShiShen> // 十神
+    muYu: ZhiName // 沐浴
+    zhangSheng: ZhiName // 长生
+    guanDai: ZhiName // 冠带
+    linGuan: ZhiName // 临官
+    diWang: ZhiName // 帝旺
+    mu: ZhiName // 墓
   }>
 
   export type GanHe = TargetField<{
@@ -131,6 +137,12 @@ export const tianGans = GAN_NAME.map((name, index) => {
   gan.chong = ganChong.call(gan)
   gan.shiShen = getShiShen.call(gan)
   gan.twelvePlace = getGanPlace.call(gan)
+  gan.zhangSheng = gan.twelvePlace[0].dizhiName
+  gan.muYu = gan.twelvePlace[1].dizhiName
+  gan.guanDai = gan.twelvePlace[2].dizhiName
+  gan.linGuan = gan.twelvePlace[3].dizhiName
+  gan.diWang = gan.twelvePlace[4].dizhiName
+  gan.mu = gan.twelvePlace[5].dizhiName
 
   return gan
 })
